@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="Estilizacao/style.css">
-    <link rel="icon" type="image/png" href="imagens/logo_icon.png">
+    <link rel="stylesheet" href="home/Estilizacao/style.css">
+    <link rel="icon" type="home/image/png" href="imagens/logo_icon.png">
     <title>DomusFlow</title>
 </head>
 <body>
@@ -34,7 +34,7 @@
 
             <div class="col-md-8 d-flex align-items-center justify-content-center p-5"> 
                 <div class="text-center w-100"> 
-                    <img src="Imagens/DomusFlow.png" class="img-fluid logo-main-display" alt="Logo DomusFlow">
+                    <img src="home/Imagens/DomusFlow.png" class="img-fluid logo-main-display" alt="Logo DomusFlow">
                 </div>
             </div>
 
@@ -42,6 +42,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="Scripts/validacoes.js"></script>
+    <script src="home/Scripts/validacoes.js"></script>
 </body>
 </html>
