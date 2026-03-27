@@ -1,0 +1,52 @@
+*{
+    font-family: 'Arial', sans-serif;
+    padding: 0%;
+}
+
+body {
+    background-color: #FFFF; 
+    margin: 0;
+}
+
+.bg-sidebar {
+    background-color: #1e3d59; 
+}
+
+.custom-input {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid #ffff;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.logo-main-display {
+    width: 500px; 
+    max-width: 95%; 
+    height: auto;
+
+}
+
+.btn-black {
+    background-color: #000000;
+    color: white;
+    font-weight: bold;
+    padding: 12px;
+    border: none;
+    transition: 0.3s;
+}
+
+.btn-black:hover {
+    background-color: #333333;
+    color: white;
+}
+
+.logo-main-display {
+    width: 900px; /* Tamanho que você quer que o logo tenha no PC */
+    max-width: 95%; /* Garante responsividade em telas menores */
+    height: auto;
+}
+
+.card-text{
+    color: #fff;
+}
