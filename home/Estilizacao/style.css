@@ -46,3 +46,7 @@ body {
     max-width: 95%; /* Garante responsividade em telas menores */
     height: auto;
 }
+
+.card-text{
+    color: #fff;
+}
