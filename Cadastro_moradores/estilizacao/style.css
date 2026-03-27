@@ -1,3 +1,21 @@
-.form-floating{
- margin: 10px;
+.card {
+    border-radius: 25px;
+    overflow: hidden;
+    border: none;
+    margin-top: 20px;
+}
+
+.form-floating {
+    margin: 10px;
 }    
+
+.card-header {
+    background-color: #1e3d59 !important; 
+    color: #FFF !important;
+    padding: 20px;
+}
+
+.card-footer {
+    background-color: #1e3d59 !important;
+    min-height: 40px;
+}

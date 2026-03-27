@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="estilizacao/style.css">
-    <link rel="icon" type="image/png" href="imagens/logo_icon.png">
+    <link rel="icon" type="image/png" href="../home/imagens/logo_icon.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <title>Document</title>
 </head>
 <body>
-    <form action="processa_cadastro.php" method="POST">
+    <form action="../utils/proc_cadastro.php" method="POST">
         <div class="container">
             <div class="row">
-                <div class="col-12">                
+                <div class="col-12">               
                         <div class="card text-center">
                             <div class="p-4 bg-white rounded shadow-lg">
                                 <div class="card-header">Cadastro - DomusFlow</div>
@@ -27,13 +27,13 @@
                                         <div class="row g-2">
                                         <div class="col-md">
                                             <div class="form-floating">
-                                            <input type="text" class="form-control" id="user_name" name="user_name" placeholder="Nome Completo">
+                                            <input type="text" class="form-control" id="user_name" name="user_name" placeholder="Nome Completo" required>
                                             <label for="floatingInputGrid">Nome Completo:</label>
                                             </div>
                                         </div>
                                         <div class="col-md">
                                             <div class="form-floating">
-                                            <input type="text" class="form-control" id="user_cpf" name="user_cpf" placeholder="000.000.000-00" maxlength="14">
+                                            <input type="text" class="form-control" id="user_cpf" name="user_cpf" placeholder="000.000.000-00" maxlength="14" required>
                                             <label for="floatingInputGrid">CPF:</label>
                                             </div>
                                         </div>                                
@@ -41,13 +41,13 @@
                                         <div class="row g-2">
                                         <div class="col-md">
                                             <div class="form-floating">
-                                            <input type="text" class="form-control" id="user_apto" name="user_apto" placeholder="23A" maxlength="4">
+                                            <input type="text" class="form-control" id="user_apto" name="user_apto" placeholder="23A" maxlength="4" required>
                                             <label for="floatingInputGrid">Apartamento:</label>
                                             </div>
                                         </div>
                                         <div class="col-md">
                                             <div class="form-floating">
-                                            <input type="text" class="form-control" id="user_bloco" name="user_bloco" placeholder="A" maxlength="3">
+                                            <input type="text" class="form-control" id="user_bloco" name="user_bloco" placeholder="A" maxlength="3" required>
                                             <label for="floatingInputGrid">Bloco:</label>
                                             </div>
                                         </div>                                
@@ -55,7 +55,7 @@
                                         <div class="row g-2">
                                             <div class="col-md">
                                                 <div class="form-floating">
-                                                <input type="text" class="form-control" id="user_email" name="user_email" placeholder="Email">
+                                                <input type="text" class="form-control" id="user_email" name="user_email" placeholder="Email" required>
                                                 <label for="floatingInputGrid">Email:</label>
                                             </div>
                                         </div>                                
@@ -63,13 +63,13 @@
                                         <div class="row g-2">
                                         <div class="col-md">
                                             <div class="form-floating">
-                                            <input type="tel" class="form-control" id="user_cell" name="user_cell" placeholder="(00) 00000-0000" maxlength="14">
+                                            <input type="tel" class="form-control" id="user_cell" name="user_cell" placeholder="(00) 00000-0000" maxlength="15" required>
                                             <label for="floatingInputGrid">Telefone:</label>
                                             </div>
                                         </div>
                                         <div class="col-md">
                                             <div class="form-floating">
-                                            <input type="tel" class="form-control" id="user_recado" name="user_recado" placeholder="(00) 00000-0000" maxlength="14">
+                                            <input type="tel" class="form-control" id="user_recado" name="user_recado" placeholder="(00) 00000-0000" maxlength="15">
                                             <label for="floatingInputGrid">Telefone de Recado:</label>
                                             </div>
                                         </div>                               
@@ -77,13 +77,13 @@
                                         <div class="row g-2">
                                             <div class="col-md">
                                                 <div class="form-floating">
-                                                <input type="password" class="form-control" id="user_senha" name="user_senha" placeholder="Senha">
+                                                <input type="password" class="form-control" id="user_senha" name="user_senha" placeholder="Senha" required>
                                                 <label for="floatingInputGrid">Senha:</label>
                                             </div>
                                         </div>
                                         <div class="col-md">
                                             <div class="form-floating">
-                                                <input type="password" class="form-control" id="user_confirm_senha" name="user_confirm_senha" placeholder="Confirmar Senha">
+                                                <input type="password" class="form-control" id="user_confirm_senha" name="user_confirm_senha" placeholder="Confirmar Senha" required>
                                                 <label for="floatingInputGrid">Confirmar Senha:</label>
                                             </div>
                                         </div>                               
@@ -100,7 +100,8 @@
                 </div>
             </div>
         </form>
-    
+    <script src="script/script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+
 </body>
 </html>
