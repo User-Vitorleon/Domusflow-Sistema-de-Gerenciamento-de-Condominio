@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 24-Mar-2026 às 15:00
+-- Tempo de geração: 27/03/2026 às 05:13
 -- Versão do servidor: 10.4.32-MariaDB
--- versão do PHP: 8.0.30
+-- Versão do PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,7 +24,7 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Estrutura da tabela `locais_festivos`
+-- Estrutura para tabela `locais_festivos`
 --
 
 CREATE TABLE `locais_festivos` (
@@ -37,7 +37,7 @@ CREATE TABLE `locais_festivos` (
 -- --------------------------------------------------------
 
 --
--- Estrutura da tabela `morador`
+-- Estrutura para tabela `morador`
 --
 
 CREATE TABLE `morador` (
@@ -48,13 +48,23 @@ CREATE TABLE `morador` (
   `bloco` varchar(5) DEFAULT NULL,
   `CPF` varchar(14) DEFAULT NULL,
   `email` varchar(50) DEFAULT NULL,
-  `telefone` varchar(13) DEFAULT NULL
+  `telefone` varchar(15) DEFAULT NULL,
+  `tell_recado` varchar(15) DEFAULT NULL,
+  `senha` varchar(60) DEFAULT NULL,
+  `status` varchar(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `morador`
+--
+
+INSERT INTO `morador` (`id_user`, `identificador`, `nome`, `apto`, `bloco`, `CPF`, `email`, `telefone`, `tell_recado`, `senha`, `status`) VALUES
+(22, 1, 'Vitor Leon', '20B', '2A', '432.099.578-35', 'vitor.leon465@gmail.com', '(11) 98522-9968', '(11) 95907-3260', '$2y$10$j8cP8H89cSpc9zOv0MbQWunPYdSrlzXXzWp9yQVggnxaFVf8xdkrK', 'L');
 
 -- --------------------------------------------------------
 
 --
--- Estrutura da tabela `reservas`
+-- Estrutura para tabela `reservas`
 --
 
 CREATE TABLE `reservas` (
@@ -75,19 +85,21 @@ CREATE TABLE `reservas` (
 --
 
 --
--- Índices para tabela `locais_festivos`
+-- Índices de tabela `locais_festivos`
 --
 ALTER TABLE `locais_festivos`
   ADD PRIMARY KEY (`id_local`);
 
 --
--- Índices para tabela `morador`
+-- Índices de tabela `morador`
 --
 ALTER TABLE `morador`
-  ADD PRIMARY KEY (`id_user`);
+  ADD PRIMARY KEY (`id_user`),
+  ADD UNIQUE KEY `uc_cpf` (`CPF`),
+  ADD UNIQUE KEY `uc_email` (`email`);
 
 --
--- Índices para tabela `reservas`
+-- Índices de tabela `reservas`
 --
 ALTER TABLE `reservas`
   ADD PRIMARY KEY (`id_reserv`),
@@ -95,7 +107,7 @@ ALTER TABLE `reservas`
   ADD KEY `fk_reserva_local` (`id_local`);
 
 --
--- AUTO_INCREMENT de tabelas despejadas
+-- AUTO_INCREMENT para tabelas despejadas
 --
 
 --
@@ -108,7 +120,7 @@ ALTER TABLE `locais_festivos`
 -- AUTO_INCREMENT de tabela `morador`
 --
 ALTER TABLE `morador`
-  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT de tabela `reservas`
@@ -117,11 +129,11 @@ ALTER TABLE `reservas`
   MODIFY `id_reserv` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- Restrições para despejos de tabelas
+-- Restrições para tabelas despejadas
 --
 
 --
--- Limitadores para a tabela `reservas`
+-- Restrições para tabelas `reservas`
 --
 ALTER TABLE `reservas`
   ADD CONSTRAINT `fk_reserva_local` FOREIGN KEY (`id_local`) REFERENCES `locais_festivos` (`id_local`),
