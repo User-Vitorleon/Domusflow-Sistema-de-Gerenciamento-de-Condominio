@@ -42,8 +42,8 @@ body {
 }
 
 .logo-main-display {
-    width: 900px; /* Tamanho que você quer que o logo tenha no PC */
-    max-width: 95%; /* Garante responsividade em telas menores */
+    width: 900px; 
+    max-width: 95%; 
     height: auto;
 }
 
