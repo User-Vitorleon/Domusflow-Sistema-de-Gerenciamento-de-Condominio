@@ -7,6 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $apto = $_POST['user_apto']; 
     $bloco = $_POST['user_bloco']; 
     $email = $_POST['user_email'];
+    $sexo = $_POST['user_sexo'];
     $cell = $_POST['user_cell'];
     $senha = $_POST['user_senha'];
     $conf_senha = $_POST['user_confirm_senha']; 
@@ -29,10 +30,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $senha_crip = password_hash($senha, PASSWORD_DEFAULT);
 
+    //VALIDACAO SE HA CADASTRO COM O CPF INFORMADO
+    
+    $query_cpf = "SELECT COUNT(cpf) from morador where cpf = :cpf";
+    $stmt_cpf = $pdo->prepare($query_cpf);
+
+    $stmt_cpf->execute([
+        ':cpf'           =>   $cpf
+    ]);
+
+    if($stmt_cpf->fetchColumn() >= 1){
+        echo "<script>
+                alert('CPF informado já esta cadastrado, por favor valide os dados informado'); 
+                history.back();
+              </script>";
+        exit;
+    }
+
+    // FIM DA VALIDACAO
+
+    // INICIO DA QUERY PARA INSERT NO BANCO -- TUDO ESTA DE ACORDO COM O NECESSARIO
     try {
 
-        $sql = "INSERT INTO morador (identificador, nome, apto, bloco, CPF, email, telefone, tell_recado, senha, status) 
-                VALUES (:iden, :nome, :apto, :bloco, :cpf, :email, :cell, :recado, :senha_crip, :status)";
+        $sql = "INSERT INTO morador (identificador, nome, apto, bloco, CPF, email, sexo, telefone, tell_recado, senha, status) 
+                VALUES (:iden, :nome, :apto, :bloco, :cpf, :email, :sexo, :cell, :recado, :senha_crip, :status)";
         
         $stmt = $pdo->prepare($sql);
 
@@ -43,13 +64,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             ':bloco'      => $bloco,
             ':cpf'        => $cpf,
             ':email'      => $email,
+            ':sexo'       => $sexo,
             ':cell'       => $cell,
             ':recado'     => $recado,
             ':senha_crip' => $senha_crip,
             ':status'     => $status
-        ]);
+        ]); // FIM 
 
-        echo "
+        // MENSAGEM DE SUCESSO
+
+        echo " 
         <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css' rel='stylesheet' integrity='sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB' crossorigin='anonymous'>
 
         <div class='modal fade' id='modalSucesso' data-bs-backdrop='static' tabindex='-1' aria-hidden='true'>
@@ -76,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 document.getElementById('timer').innerText = tempo;
                 if (tempo <= 0) {
                     clearInterval(contador);
-                    window.location.href = '../../index.php'; 
+                    window.location.href = '../home/index.php'; 
                 }
             }, 1000);
         </script>";

@@ -1,5 +1,4 @@
 <?php
-
     require_once '../connection/conexao.php';
     session_start();
 
@@ -19,7 +18,7 @@
                     $_SESSION['usuario_id'] = $usuario['id_user'];
                     $_SESSION['usuario_nome']= $usuario['nome'];
 
-                    header("Location: ../dashboard/index.php");
+                    header("Location: ../dashboard_domusflow/index.php");
                     exit;
                 } else {
                     header("Location: ../dashboard/pendente.php");
