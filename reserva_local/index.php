@@ -1,53 +1,48 @@
 <?php
-require_once '../connection/conexao.php';
+require_once "../connection/conexao.php";
 session_start();
 
 if (!isset($_SESSION['usuario_id'])) {
-    header("Location: ../home/index.php");
+    header('Location: ../home/index.php');
     exit();
 }
 
 $id_logado = $_SESSION['usuario_id'];
 
 try {
-  
     $sql = "SELECT * FROM morador WHERE id_user = :id LIMIT 1";
     $stmt = $pdo->prepare($sql); 
     $stmt->execute(['id' => $id_logado]);
-
     $dados_usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-   
+
     if (!$dados_usuario) {                                     
         session_destroy();
-        header("Location: ../home/index.php");
+        header('Location: ../home/index.php');
         exit();
     }
-    
-    
+
     $nome_completo = $dados_usuario['nome']; 
     $prev          = $dados_usuario['previlegio'];
-    $primeiro_nome = explode(" ", $nome_completo)[0];
-    
+    $primeiro_nome = explode(' ', $nome_completo)[0];
     
 } catch (PDOException $e) {
     echo "Erro ao carregar dados: " . $e->getMessage();
 } 
-
 ?>
 
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang='pt-br'>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
     <title>Local Festivo</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <link rel="stylesheet" href="estilizacao/style.css">
+    <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css' rel='stylesheet'>
+    <link rel='stylesheet' href='estilizacao/style.css'>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <link rel="icon" type="image/png" href="../imagens/logo_icon.png">
+    <link rel='icon' type='image/png' href='../imagens/logo_icon.png'>
 </head>
 <body>
-    <nav class="sidebar">
+     <nav class="sidebar">
         <header>
             <div class="image-text">
                 <span class="image">
@@ -64,16 +59,26 @@ try {
                 <ul class="menu-links">
                     <li class="nav-link">
                         <a href="../dashboard_domusflow/index.php">
-                            <i class='bx bx-lock-alt icon'></i>
+                            <i class='bx bxs-dashboard icon' ></i>
                             <span class="text nav-text">Dashboard</span>
                         </a>
                     </li>
                     <li class="nav-link disabled">
                         <a href="#">
-                            <i class='bx bx-category icon'></i>
+                            <i class='bx bx-calendar-check icon'></i>
                             <span class="text nav-text">Reserva</span>
                         </a>
                     </li>
+                    <?php
+                        if($prev == 2){
+                           echo "<li class='nav-link'>
+                                    <a href='../new_moradores/index.php'>
+                                       <i class='bx bx-user-check icon'></i>
+                                        <span class='text nav-text'>Novos Usuarios</span>
+                                    </a>
+                                </li>";
+                        }
+                    ?>
                 </ul>
             </div>
             <a href="../utils/sair.php">
@@ -91,83 +96,132 @@ try {
                                 <?php echo htmlspecialchars($primeiro_nome); ?>
                             </span>
                             <span class="job">
-                                Ap: <?php echo htmlspecialchars($dados_usuario['apto']); ?> 
+                                Ap: <?php echo htmlspecialchars($dados_usuario['apto']); ?>
                               Bloco: <?php echo htmlspecialchars($dados_usuario['bloco']); ?>
                             </span>
                         </div>
                     </div>
                     <i class='bx bx-log-out icon'></i>
                 </li>
-            </a>   
+            </a>  
         </div>
     </nav>
-
-    
-     <?php
-
-        switch ($prev){
-            case 1: // morador
-                echo "Ola morador, $nome_completo";
+    <?php
+    switch ($prev) {
+        case 1: // MORADOR
+            ?>
+            <div class='container mt-4'>
+                <div class='card shadow-sm'>
+                    <div class='card-header bg-primary text-white'>
+                        <h5 class='mb-0'><i class='bx bx-calendar-plus'></i> Nova Reserva</h5>
+                    </div>
+                    <div class='card-body'>
+                        <form action='../utils/proc_reservar.php' method='POST' id='formReserva'>
+                            <div class='row g-3'>
+                                <div class='col-md-6'>
+                                    <label class='form-label'>Local Desejado</label>
+                                    <select class='form-select' name='id_local' id='id_local' required>
+                                        <option value=''>Selecione o local...</option>
+                                        <?php
+                                            $sql_locais = 'SELECT id_local, local, capacidade FROM locais_festivos WHERE disp_uso = \'S\'';
+                                            $stmt_locais = $pdo->query($sql_locais);
+                                            while($local = $stmt_locais->fetch(PDO::FETCH_ASSOC)) {
+                                                echo '<option value=\'' . $local['id_local'] . '\' data-cap=\'' . $local['capacidade'] . '\'>' . $local['local'] . '</option>';
+                                            }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class='col-md-6'>
+                                    <label class='form-label'>Capacidade Máxima</label>
+                                    <input type='text' class='form-control bg-light' id='capacidade' readonly>
+                                </div>
+                                <div class='col-md-4'>
+                                    <label class='form-label'>Dia do Evento</label>
+                                    <input type='date' class='form-control' name='data_reserva' id='data_reserva' required>
+                                </div>
+                                <div class='col-md-4'>
+                                    <label class='form-label'>Horário de Início</label>
+                                    <input type='time' class='form-control' name='hora_ini' required>
+                                </div>
+                                <div class='col-md-4'>
+                                    <label class='form-label'>Horário de Término</label>
+                                    <input type='time' class='form-control' name='hora_fim' required>
+                                </div>
+                                <div id='alertaFeriado' class='col-12 d-none'>
+                                    <div class='alert alert-warning d-flex align-items-center'>
+                                        <i class='bx bxs-info-circle me-2'></i>
+                                        <div>
+                                            <strong>Atenção:</strong> Este dia é feriado (<span id='nomeFeriado'></span>).
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class='col-12 mt-4'>
+                                    <button type='submit' class='btn btn-success w-100'>
+                                        <i class='bx bx-check-double'></i> Solicitar Reserva
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <?php
             break;
 
-            case 2: // sindico
-                echo "<section class='home'>
-                    <div class='text'>Gestão de Espaços</div>
-
-                    <div class='container-fluid px-4'> 
-                        <div class='row justify-content-center'>
-                            <div class='col-12 col-xl-8'>
-                                
-                                <div class='card shadow-sm border-0 mt-3'>
-                                    <div class='card-header d-flex align-items-center'>
-                                        <i class='bx bx-building-house fs-4 me-2'></i>
-                                        <h5 class='mb-0'>Cadastrar Local Festivo</h5>
-                                    </div>
-                                    
-                                    <div class='card-body p-4'>
-                                        <form action='../utils/cadastro_locais.php' method='POST'>
-                                            <div class='row'>
-                                                <div class='col-12 mb-3'>
-                                                    <label class='form-label fw-bold'>Nome do Local</label>
-                                                    <input type='text' name='nome_local' class='form-control form-control-lg' placeholder='Ex: Salão de Festas' required>
-                                                </div>
-
-                                                <div class='col-md-6 mb-3'>
-                                                    <label class='form-label fw-bold'>Capacidade (Pessoas)</label>
-                                                    <div class='input-group'>
-                                                        <span class='input-group-text'><i class='bx bx-group'></i></span>
-                                                        <input type='number' name='capacidade' class='form-control' placeholder='0' required>
-                                                    </div>
-                                                </div>
-
-                                                <div class='col-md-6 mb-3'>
-                                                    <label class='form-label fw-bold'>Status de Uso</label>
-                                                    <select name='disponivel' class='form-select' required>
-                                                        <option value='S' selected>Disponível</option>
-                                                        <option value='N'>Indisponível / Manutenção</option>
-                                                    </select>
+        case 2: // SINDICO
+            ?>
+            <section class='home'>
+                <div class='text'>Gestão de Espaços</div>
+                <div class='container-fluid px-4'> 
+                    <div class='row justify-content-center'>
+                        <div class='col-12 col-xl-8'>
+                            <div class='card shadow-sm border-0 mt-3'>
+                                <div class='card-header d-flex align-items-center'>
+                                    <i class='bx bx-building-house fs-4 me-2'></i>
+                                    <h5 class='mb-0'>Cadastrar Local Festivo</h5>
+                                </div>
+                                <div class='card-body p-4'>
+                                    <form action='../utils/cadastro_locais.php' method='POST'>
+                                        <div class='row'>
+                                            <div class='col-12 mb-3'>
+                                                <label class='form-label fw-bold'>Nome do Local</label>
+                                                <input type='text' name='nome_local' class='form-control form-control-lg' placeholder='Ex: Salão de Festas' required>
+                                            </div>
+                                            <div class='col-md-6 mb-3'>
+                                                <label class='form-label fw-bold'>Capacidade (Pessoas)</label>
+                                                <div class='input-group'>
+                                                    <span class='input-group-text'><i class='bx bx-group'></i></span>
+                                                    <input type='number' name='capacidade' class='form-control' placeholder='0' required>
                                                 </div>
                                             </div>
-
-                                            <div class='border-top pt-3 mt-3 d-flex justify-content-end gap-2'>
-                                                <button type='reset' class='btn btn-light border'>Limpar</button>
-                                                <button type='submit' class='btn px-5'>Salvar Espaço</button>
+                                            <div class='col-md-6 mb-3'>
+                                                <label class='form-label fw-bold'>Status de Uso</label>
+                                                <select name='disponivel' class='form-select' required>
+                                                    <option value='S' selected>Disponível</option>
+                                                    <option value='N'>Indisponível / Manutenção</option>
+                                                </select>
                                             </div>
-                                        </form>
-                                    </div>
+                                        </div>
+                                        <div class='border-top pt-3 mt-3 d-flex justify-content-end gap-2'>
+                                            <button type='reset' class='btn btn-light border'>Limpar</button>
+                                            <button type='submit' class='btn btn-primary px-5'>Salvar Espaço</button>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    </section>";
-                break;
+                </div>
+            </section>
+            <?php
+            break;
 
-            default: // adm
-                echo "Previlegio nao encontrado";
-        }
-     ?>  
+        default:
+            echo 'Privilégio não encontrado';
+    }
+    ?>  
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-    <script src="script/script.js"></script>
+    <script src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js'></script>
+    <script src='script/script.js'></script>
 </body>
 </html>
