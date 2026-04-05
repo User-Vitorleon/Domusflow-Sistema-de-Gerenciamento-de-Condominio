@@ -51,4 +51,19 @@ class ReservaController {
             exit();
         }
     }
+
+    public function decidir(): void
+    {
+        $idReserva = $_POST['id_reserva'] ?? null;
+        $acao      = $_POST['acao'] ?? null;
+
+        if ($idReserva && $acao) {
+            $reservaRepo = new ReservaRepository();
+            $novoStatus = ($acao === 'aceitar') ? 'L' : 'R';
+            $reservaRepo->atualizarStatus((int)$idReserva, $novoStatus);
+        }
+
+        header('Location: ' . BASE_URL . '/dashboard');
+        exit();
+    }
 }

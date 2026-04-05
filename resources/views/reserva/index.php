@@ -15,6 +15,7 @@ $prev = $usuario['previlegio'] ?? 1;
     <?php if (isset($_GET['sucesso'])): ?>
         <div class="df-alert df-alert-success">Operação realizada com sucesso!</div>
     <?php endif; ?>
+
     <?php if (isset($_SESSION['erro_reserva'])): ?>
         <div class="df-alert df-alert-error"><?= htmlspecialchars($_SESSION['erro_reserva']) ?></div>
         <?php unset($_SESSION['erro_reserva']); ?>
@@ -29,15 +30,15 @@ $prev = $usuario['previlegio'] ?? 1;
                         <select name="id_local" id="id_local" required>
                             <option value="">Selecione...</option>
                             <?php foreach ($locais as $local): ?>
-                                <option value="<?= $local['id_local'] ?>" data-cap="<?= $local['capacidade'] ?>">
-                                    <?= htmlspecialchars($local['local']) ?>
+                                <option value="<?= $local['id_local'] ?>" data-capacidade="<?= $local['capacidade'] ?>">
+                                    <?= htmlspecialchars($local['local'] ?? $local['nome_local']) ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="df-field">
                         <label>Capacidade Máxima</label>
-                        <input type="text" id="capacidade" readonly placeholder="Selecione um local">
+                        <input type="text" id="capacidade_display" readonly placeholder="Selecione um local">
                     </div>
                 </div>
 
@@ -56,7 +57,12 @@ $prev = $usuario['previlegio'] ?? 1;
                     </div>
                 </div>
 
-                <div id="alertaFeriado" class="df-alert df-alert-warning d-none">
+                <div class="df-field" style="margin-top: 15px; max-width: 200px;">
+                    <label>Qtd. de Convidados</label>
+                    <input type="number" name="qtd_convidados" min="1" placeholder="Ex: 10">
+                </div>
+
+                <div id="alertaFeriado" class="df-alert df-alert-warning d-none" style="margin-top: 20px;">
                     <i class='bx bxs-info-circle'></i>
                     Atenção: esta data é feriado — <strong id="nomeFeriado"></strong>
                 </div>
@@ -67,7 +73,6 @@ $prev = $usuario['previlegio'] ?? 1;
             </form>
 
         <?php else: ?>
-
             <form action="<?= BASE_URL ?>/reserva/salvar" method="POST">
                 <div class="df-grid-2">
                     <div class="df-field">

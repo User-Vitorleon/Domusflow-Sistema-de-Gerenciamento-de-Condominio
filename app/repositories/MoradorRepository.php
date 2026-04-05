@@ -1,4 +1,5 @@
 <?php
+
 class MoradorRepository
 {
     private PDO $pdo;
@@ -29,13 +30,20 @@ class MoradorRepository
         return (int)$stmt->fetchColumn() > 0;
     }
 
+    public function existeEmail(string $email): bool
+    {
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM morador WHERE email = :email");
+        $stmt->execute([':email' => $email]);
+        return (int)$stmt->fetchColumn() > 0;
+    }
+
     public function findPendentes(): array
     {
-        $stmt = $this->pdo->query("SELECT * FROM morador WHERE status = 'P'");
+        $stmt = $this->pdo->query("SELECT * FROM morador WHERE status = 'P' ORDER BY nome ASC");
         return $stmt->fetchAll();
     }
 
-    public function save(array $data): bool
+    public function save(array $data): int|bool
     {
         $stmt = $this->pdo->prepare(
             "INSERT INTO morador
@@ -43,8 +51,9 @@ class MoradorRepository
              VALUES
                 (:iden, :nome, :apto, :bloco, :cpf, :email, :sexo, :cell, :recado, :senha, :status)"
         );
-        return $stmt->execute([
-            ':iden'   => 1,
+
+        $sucesso = $stmt->execute([
+            ':iden'   => 1, // 1 para Morador comum
             ':nome'   => $data['nome'],
             ':apto'   => $data['apto'],
             ':bloco'  => $data['bloco'],
@@ -54,8 +63,14 @@ class MoradorRepository
             ':cell'   => $data['telefone'],
             ':recado' => $data['telefone_recado'] ?? null,
             ':senha'  => $data['senha'],
-            ':status' => 'P',
+            ':status' => 'P', // Sempre nasce como Pendente
         ]);
+
+        if ($sucesso) {
+            return (int)$this->pdo->lastInsertId();
+        }
+
+        return false;
     }
 
     public function atualizarStatus(int $id, string $status): bool

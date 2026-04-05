@@ -23,14 +23,13 @@ class ReservaRepository
         ]);
     }
 
-    // ── Verifica conflito de horário (apenas reservas aprovadas) ──
     public function existeConflito(int $id_local, string $data, string $hora_ini, string $hora_fim): bool
     {
         $stmt = $this->pdo->prepare("
             SELECT COUNT(*) FROM reservas
             WHERE id_local     = :id_local
               AND data_reserva = :data
-              AND status       = 'A'
+              AND status       = 'L'
               AND hora_ini     < :hora_fim
               AND hora_fim     > :hora_ini
         ");
@@ -43,7 +42,6 @@ class ReservaRepository
         return (int)$stmt->fetchColumn() > 0;
     }
 
-    // ── Verifica se morador já tem reserva pendente no dia ────────
     public function existePendenteNoDia(int $id_user, string $data): bool
     {
         $stmt = $this->pdo->prepare("
@@ -56,18 +54,36 @@ class ReservaRepository
         return (int)$stmt->fetchColumn() > 0;
     }
 
-    // ── Lista reservas de um usuário com nome do local ────────────
-    public function findByUsuario(int $id_user): array
+    public function buscarReservasPorUsuario($id_user): array
     {
-        $stmt = $this->pdo->prepare("
-            SELECT r.*, l.local AS nome_local
-            FROM reservas r
-            JOIN locais_festivos l ON l.id_local = r.id_local
-            WHERE r.id_user = :id_user
-            ORDER BY r.data_reserva DESC
-        ");
-        $stmt->execute([':id_user' => $id_user]);
-        return $stmt->fetchAll();
+        $sql = "SELECT r.*, l.local, l.capacidade 
+                FROM reservas r
+                INNER JOIN locais_festivos l ON r.id_local = l.id_local
+                WHERE r.id_user = :id 
+                ORDER BY r.data_reserva ASC";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['id' => $id_user]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function buscarReservasPendentesGeral(): array
+    {
+        $sql = "SELECT r.*, l.local, l.capacidade, m.nome as nome_morador, m.apto, m.bloco, m.sexo 
+                FROM reservas r
+                INNER JOIN locais_festivos l ON r.id_local = l.id_local
+                INNER JOIN morador m ON r.id_user = m.id_user 
+                WHERE r.status = 'P' 
+                ORDER BY r.data_reserva ASC";
+        $stmt = $this->pdo->prepare($sql); 
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function atualizarStatus(int $id, string $status): bool
+    {
+        $sql = "UPDATE reservas SET status = :status WHERE id_reserva = :id";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute(['status' => $status, 'id' => $id]);
     }
 
     public function countByStatus(string $status): int

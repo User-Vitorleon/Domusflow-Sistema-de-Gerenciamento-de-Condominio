@@ -11,31 +11,31 @@ class AuthService
     }
 
     public function login(string $cpf, string $senha): array
-    {
-        $cpf     = preg_replace('/[^0-9]/', '', $cpf); // remove pontos e traço
-        $usuario = $this->repo->findByCpf($cpf);
+{
+    $cpf = preg_replace('/[^0-9]/', '', $cpf);
+    $usuario = $this->repo->findByCpf($cpf);
 
-        if (!$usuario || !password_verify($senha, $usuario['senha'])) {
-            return ['sucesso' => false, 'mensagem' => 'CPF ou senha incorretos.'];
-        }
-
-        if ($usuario['status'] === 'P') {
-            $_SESSION['usuario_id']   = $usuario['id_user'];
-            $_SESSION['usuario_nome'] = $usuario['nome'];
-            header('Location: ' . BASE_URL . '/pendente');
-            exit();
-        }
-
-        if ($usuario['status'] === 'B') {
-            return ['sucesso' => false, 'mensagem' => 'Acesso bloqueado. Entre em contato com o síndico.'];
-        }
-
-        $_SESSION['usuario_id']         = $usuario['id_user'];
-        $_SESSION['usuario_nome']        = $usuario['nome'];
-        $_SESSION['usuario_previlegio']  = $usuario['previlegio'];
-
-        return ['sucesso' => true, 'redirecionar' => BASE_URL . '/dashboard'];
+    if (!$usuario || !password_verify($senha, $usuario['senha'])) {
+        return ['sucesso' => false, 'mensagem' => 'CPF ou senha incorretos.'];
     }
+
+    // Definimos os dados básicos da sessão para todos que passarem na senha
+    $_SESSION['usuario_id']   = $usuario['id_user'];
+    $_SESSION['usuario_nome'] = $usuario['nome'];
+
+    // Se estiver pendente, avisamos o Controller para mandar para /pendente
+    if ($usuario['status'] === 'P') {
+        return ['sucesso' => true, 'redirecionar' => BASE_URL . '/pendente'];
+    }
+
+    if ($usuario['status'] === 'B') {
+        return ['sucesso' => false, 'mensagem' => 'Acesso bloqueado. Entre em contato com o síndico.'];
+    }
+
+    // Se chegou aqui, está Liberado (L)
+    $_SESSION['usuario_previlegio'] = $usuario['previlegio'];
+    return ['sucesso' => true, 'redirecionar' => BASE_URL . '/dashboard'];
+}
 
     public function logout(): void
     {

@@ -9,6 +9,7 @@ $routes = [
     'logout'              => ['AuthController',      'logout'],
     'cadastro'            => ['MoradorController',   'formCadastro'],
     'cadastro/salvar'     => ['MoradorController',   'salvar'],
+    'reservas/decidir'    => ['ReservaController',   'decidir'],
     'dashboard'           => ['DashboardController', 'index'],
     'pendente'            => ['AuthController',      'pendente'],
     'pendente/checar'     => ['AuthController',      'checar'],
@@ -17,6 +18,7 @@ $routes = [
     'moradores/pendentes' => ['MoradorController',   'pendentes'],
     'moradores/liberar'   => ['MoradorController',   'liberar'],
     'api/feriados'        => ['FeriadoController',   'index'],
+    
 ];
 
 if (isset($routes[$uri])) {

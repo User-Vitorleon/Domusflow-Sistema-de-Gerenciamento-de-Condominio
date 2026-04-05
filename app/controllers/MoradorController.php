@@ -12,6 +12,12 @@ class MoradorController
 
     public function formCadastro(): void
     {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+    
+        session_unset(); 
+        
         require_once __DIR__ . '/../../resources/views/cadastro/index.php';
     }
 
@@ -23,16 +29,16 @@ class MoradorController
         }
 
         $resultado = $this->service->cadastrar([
-            'nome'            => $_POST['user_name']          ?? '',
-            'cpf'             => $_POST['user_cpf']           ?? '',
-            'apto'            => $_POST['user_apto']          ?? '',
-            'bloco'           => $_POST['user_bloco']         ?? '',
-            'email'           => $_POST['user_email']         ?? '',
-            'sexo'            => $_POST['user_sexo']          ?? 'M',
-            'telefone'        => $_POST['user_cell']          ?? '',
-            'telefone_recado' => $_POST['user_recado']        ?? null,
-            'senha'           => $_POST['user_senha']         ?? '',
-            'conf_senha'      => $_POST['user_confirm_senha'] ?? '',
+            'nome'            => $_POST['user_name']           ?? '',
+            'cpf'             => $_POST['user_cpf']            ?? '',
+            'apto'            => $_POST['user_apto']           ?? '',
+            'bloco'           => $_POST['user_bloco']          ?? '',
+            'email'           => $_POST['user_email']          ?? '',
+            'sexo'            => $_POST['user_sexo']           ?? 'M',
+            'telefone'        => $_POST['user_cell']           ?? '',
+            'telefone_recado' => $_POST['user_recado']         ?? null,
+            'senha'           => $_POST['user_senha']          ?? '',
+            'conf_senha'      => $_POST['user_confirm_senha']  ?? '',
         ]);
 
         if ($resultado['sucesso']) {
@@ -48,8 +54,8 @@ class MoradorController
     {
         $this->requireSindico();
 
-        $repo     = new MoradorRepository();
-        $usuario  = $repo->findById((int)$_SESSION['usuario_id']); // ← linha faltava
+        $repo      = new MoradorRepository();
+        $usuario   = $repo->findById((int)$_SESSION['usuario_id']);
         $moradores = $this->service->listarPendentes();
 
         require_once __DIR__ . '/../../resources/views/moradores/pendentes.php';

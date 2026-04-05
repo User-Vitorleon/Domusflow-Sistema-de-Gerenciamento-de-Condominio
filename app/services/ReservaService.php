@@ -56,8 +56,12 @@ class ReservaService
             $dados['data_reserva']
         );
         if ($jaPendente) {
-            return ['sucesso' => false, 'mensagem' => 'Você já possui uma reserva pendente nesta data.'];
-        }
+        echo "<script>
+                alert('Você já possui uma reserva pendente nesta data.');
+                window.history.back();
+            </script>";
+    exit;
+}
 
         // ── Salva ─────────────────────────────────────
         $this->reservaRepo->save([
