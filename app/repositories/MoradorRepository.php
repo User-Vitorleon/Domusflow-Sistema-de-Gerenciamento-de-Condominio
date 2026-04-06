@@ -99,4 +99,10 @@ class MoradorRepository
         $stmt->execute([':status' => $status]);
         return (int)$stmt->fetchColumn();
     }
+
+    public function findAll(): array
+    {
+        $stmt = $this->pdo->query("SELECT * FROM morador ORDER BY nome ASC");
+        return $stmt->fetchAll();
+    }
 }

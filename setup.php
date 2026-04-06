@@ -1,36 +1,43 @@
 <?php
 
 /**
- * DomusFlow — Setup inicial
- * Execute UMA VEZ após clonar o repositório:
- * http://localhost/Domusflow-novo/setup.php
- * 
- * APAGUE este arquivo após executar!
- * só criamos isso para RAFAZER O HASH QUANDO CLONAR DOS 3 TIPOS DE USER !!!
+ * domusflow — setup inicial
+ * execute uma vez após clonar o repositório:
+ * http://localhost/Domusflow_novo/setup.php
+ *
+ * apague este arquivo após executar!
  */
 
 require_once __DIR__ . '/config/database.php';
 
-$senhapadrao = '123456';
-$hash = password_hash($senhapadrao, PASSWORD_BCRYPT);
+$senha_padrao = '123456';
+$hash         = password_hash($senha_padrao, PASSWORD_BCRYPT);
 
 try {
-    $pdo = getConnection(); // aqui chama a função do database.php
+    $pdo = getConnection();
 
+    // todos os usuários padrão do sistema
     $emails = [
-        'sindico@domusflow.com',
-        'zefinha@domusflow.com',
         'admin@domusflow.com',
+        'sindico@domusflow.com',
+        'porteiro@domusflow.com',
+        'zefinha@domusflow.com',
     ];
 
     foreach ($emails as $email) {
         $stmt = $pdo->prepare("UPDATE morador SET senha = ? WHERE email = ?");
         $stmt->execute([$hash, $email]);
-        echo "Hash atualizado: <strong>$email</strong><br>";
+        $linhas = $stmt->rowCount();
+
+        if ($linhas > 0) {
+            echo "Hash atualizado: <strong>$email</strong><br>";
+        } else {
+            echo "Não encontrado: <strong>$email</strong><br>";
+        }
     }
 
-    echo "<br><p>Senha padrão: <strong>$senhapadrao</strong></p>";
-    echo "<p>⚠️ <strong>APAGUE este arquivo agora!</strong></p>";
+    echo "<br><p>Senha padrão: <strong>$senha_padrao</strong></p>";
+    echo "<p style='color:red'><strong>Apague este arquivo agora!</strong></p>";
 } catch (Exception $e) {
     echo "Erro: " . $e->getMessage();
 }

@@ -4,21 +4,36 @@ $uri = preg_replace('#^Domusflow_novo/?#i', '', $uri);
 $uri = trim($uri, '/');
 
 $routes = [
+    // Autenticação
     ''                    => ['HomeController',      'index'],
     'login'               => ['AuthController',      'login'],
     'logout'              => ['AuthController',      'logout'],
-    'cadastro'            => ['MoradorController',   'formCadastro'],
-    'cadastro/salvar'     => ['MoradorController',   'salvar'],
-    'reservas/decidir'    => ['ReservaController',   'decidir'],
-    'dashboard'           => ['DashboardController', 'index'],
     'pendente'            => ['AuthController',      'pendente'],
     'pendente/checar'     => ['AuthController',      'checar'],
-    'reserva'             => ['ReservaController',   'index'],
-    'reserva/salvar'      => ['ReservaController',   'salvar'],
+
+    // Cadastro de morador
+    'cadastro'            => ['MoradorController',   'formCadastro'],
+    'cadastro/salvar'     => ['MoradorController',   'salvar'],
     'moradores/pendentes' => ['MoradorController',   'pendentes'],
     'moradores/liberar'   => ['MoradorController',   'liberar'],
+
+    // Dashboard
+    'dashboard'           => ['DashboardController', 'index'],
+
+    // Reservas
+    'reserva'             => ['ReservaController',   'index'],
+    'reserva/salvar'      => ['ReservaController',   'salvar'],
+    'reservas/decidir'    => ['ReservaController',   'decidir'],
+
+    // Veículos
+    'veiculo'             => ['VeiculoController',   'index'],
+    'veiculo/salvar'      => ['VeiculoController',   'salvar'],
+    'veiculo/editar'      => ['VeiculoController',   'editar'],
+    'veiculo/excluir'     => ['VeiculoController',   'excluir'],
+    'veiculo/consultar'   => ['VeiculoController',   'consultar'],
+
+    // API
     'api/feriados'        => ['FeriadoController',   'index'],
-    
 ];
 
 if (isset($routes[$uri])) {

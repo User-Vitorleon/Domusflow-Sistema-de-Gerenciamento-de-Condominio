@@ -1,0 +1,61 @@
+/* título das seções dentro do card */
+.section-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--text);
+}
+
+/* scroll horizontal na tabela em telas pequenas */
+.table-wrap {
+    overflow-x: auto;
+}
+
+/* tabela padrão do módulo */
+.df-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.df-table thead th {
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+}
+
+.df-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background var(--transition);
+}
+
+.df-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.df-table tbody tr:hover {
+    background: var(--bg);
+}
+
+.df-table td {
+    padding: 12px 14px;
+    color: var(--text);
+}
+
+/* card que exibe o resultado da consulta por placa */
+.resultado-card {
+    margin-top: 24px;
+}
+
+/* valor em destaque no resultado */
+.resultado-valor {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    margin: 0;
+}

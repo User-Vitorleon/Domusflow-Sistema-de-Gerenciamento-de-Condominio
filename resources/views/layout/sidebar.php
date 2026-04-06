@@ -11,8 +11,8 @@ $avatar        = ($usuario['sexo'] === 'M')
         <div class="brand">
             <div class="brand-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/>
-                    <path d="M9 21V12h6v9"/>
+                    <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z" />
+                    <path d="M9 21V12h6v9" />
                 </svg>
             </div>
             <span class="brand-name">DomusFlow</span>
@@ -22,28 +22,56 @@ $avatar        = ($usuario['sexo'] === 'M')
 
     <div class="menu-bar">
         <ul class="menu-links">
+
+            <!-- dashboard — todos os perfis -->
             <li class="nav-link <?= $paginaAtiva === 'dashboard' ? 'active' : '' ?>">
                 <a href="<?= BASE_URL ?>/dashboard">
                     <i class='bx bxs-dashboard'></i>
                     <span class="nav-text">Dashboard</span>
                 </a>
             </li>
-            <li class="nav-link <?= $paginaAtiva === 'reserva' ? 'active' : '' ?>">
-                <a href="<?= BASE_URL ?>/reserva">
-                    <i class='bx bx-calendar-check'></i>
-                    <span class="nav-text">Reservas</span>
-                </a>
-            </li>
-            <?php if ($prev == 2): ?>
-            <li class="nav-link <?= $paginaAtiva === 'moradores' ? 'active' : '' ?>">
-                <a href="<?= BASE_URL ?>/moradores/pendentes">
-                    <i class='bx bx-user-check'></i>
-                    <span class="nav-text">Novos Usuários</span>
-                </a>
-            </li>
+
+            <!-- reservas — morador e síndico -->
+            <?php if (in_array($prev, [1, 2, 4])): ?>
+                <li class="nav-link <?= $paginaAtiva === 'reserva' ? 'active' : '' ?>">
+                    <a href="<?= BASE_URL ?>/reserva">
+                        <i class='bx bx-calendar-check'></i>
+                        <span class="nav-text">Reservas</span>
+                    </a>
+                </li>
             <?php endif; ?>
+
+            <!-- novos usuários — síndico e admin -->
+            <?php if (in_array($prev, [2, 4])): ?>
+                <li class="nav-link <?= $paginaAtiva === 'moradores' ? 'active' : '' ?>">
+                    <a href="<?= BASE_URL ?>/moradores/pendentes">
+                        <i class='bx bx-user-check'></i>
+                        <span class="nav-text">Novos Usuários</span>
+                    </a>
+                </li>
+            <?php endif; ?>
+
+            <!-- veículos — todos os perfis (cada um vê o que pode) -->
+            <li class="nav-link <?= $paginaAtiva === 'veiculo' ? 'active' : '' ?>">
+                <a href="<?= BASE_URL ?>/veiculo">
+                    <i class='bx bx-car'></i>
+                    <span class="nav-text">Veículos</span>
+                </a>
+            </li>
+
+            <!-- consulta rápida por placa — porteiro e admin -->
+            <?php if (in_array($prev, [3, 4])): ?>
+                <li class="nav-link <?= $paginaAtiva === 'consulta-veiculo' ? 'active' : '' ?>">
+                    <a href="<?= BASE_URL ?>/veiculo/consultar">
+                        <i class='bx bx-search-alt'></i>
+                        <span class="nav-text">Consultar Placa</span>
+                    </a>
+                </li>
+            <?php endif; ?>
+
         </ul>
 
+        <!-- perfil + logout no rodapé da sidebar -->
         <a href="<?= BASE_URL ?>/logout" class="sidebar-profile">
             <img src="<?= $avatar ?>" alt="avatar">
             <div class="profile-info">

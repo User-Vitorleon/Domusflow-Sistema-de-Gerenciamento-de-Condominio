@@ -138,4 +138,29 @@ INSERT INTO `reservas`
 VALUES
   (1, 1, 2, '2026-04-10', '10:00:00', '13:00:00', 'P');
 
-COMMIT;
+-- ── Tabela Veiculos ──────────────────────────────────────
+CREATE TABLE IF NOT EXISTS `veiculos` (
+  `id_veiculo`   INT(11)      NOT NULL AUTO_INCREMENT,
+  `placa`        VARCHAR(10)  NOT NULL,
+  `marca`        VARCHAR(60)  NOT NULL,
+  `modelo`       VARCHAR(60)  NOT NULL,
+  `cor`          VARCHAR(30)  NOT NULL,
+  `id_user`      INT(11)      NOT NULL,
+  `id_user_cad`  INT(11)      NOT NULL,
+  `created_at`   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_veiculo`),
+  UNIQUE KEY `uk_placa` (`placa`),
+  CONSTRAINT `fk_veiculo_morador`   FOREIGN KEY (`id_user`)     REFERENCES `morador` (`id_user`),
+  CONSTRAINT `fk_veiculo_cadastrou` FOREIGN KEY (`id_user_cad`) REFERENCES `morador` (`id_user`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Exemplo Veiculos ──────────────────────────────────────
+-- Vitor Leon (id_user: 2) — Síndico
+INSERT INTO `veiculos` (`placa`, `marca`, `modelo`, `cor`, `id_user`, `id_user_cad`) VALUES
+('ABC1234', 'Honda',   'Civic',    'Prata',  2, 2),
+('DEF5678', 'Toyota',  'Corolla',  'Preto',  2, 2);
+
+-- Dona Zefinha (id_user: 4) — Morador
+INSERT INTO `veiculos` (`placa`, `marca`, `modelo`, `cor`, `id_user`, `id_user_cad`) VALUES
+('GHI9012', 'Fiat',    'Uno',      'Branco', 4, 2),
+('JKL3456', 'Chevrolet', 'Onix',   'Vermelho', 4, 2);
