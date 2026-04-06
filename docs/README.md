@@ -1,7 +1,7 @@
 # DomusFlow
 
 Sistema de gerenciamento de condomínio desenvolvido com **PHP puro**, **PDO** e **MySQL**.  
-O projeto segue uma estrutura simples em **MVC** e roda localmente com **XAMPP** [file:41].
+O projeto segue uma estrutura simples em **MVC** e roda localmente com **XAMPP**
 
 ---
 
@@ -14,7 +14,7 @@ O projeto segue uma estrutura simples em **MVC** e roda localmente com **XAMPP**
 - javascript
 - chart.js
 - vue 3
-- boxicons [file:41]
+- boxicons
 
 ---
 
@@ -45,14 +45,14 @@ O projeto segue uma estrutura simples em **MVC** e roda localmente com **XAMPP**
 
 ## módulos principais
 
-- autenticação com controle por perfil [file:41]
-- cadastro e aprovação de moradores [file:41]
-- reservas de locais [file:41]
-- dashboard com indicadores [file:41]
+- autenticação com controle por perfil 
+- cadastro e aprovação de moradores
+- reservas de locais
+- dashboard com indicadores
 - controle de veículos:
   - cadastro de veículos
   - consulta por placa
-  - visualização por perfil [file:41]
+  - visualização por perfil
 
 ---
 
@@ -123,7 +123,3 @@ O campo `previlegio` usa:
 - js global em `public/js/app.js`
 - css e js específicos por página em arquivos separados
 - sql apenas nos `repositories`
-
-## observação
-
-Este projeto foi desenvolvido com foco acadêmico, usando código simples, organizado e fácil de manter [file:41].
