@@ -82,24 +82,46 @@ CREATE TABLE IF NOT EXISTS `reservas` (
 --  Dados iniciais (seed)
 -- ═══════════════════════════════════════════════════════════
 
--- ── Síndico padrão ──────────────────────────────────────────
--- CPF: 432.099.578-35  |  Senha: 123456  (hash bcrypt)
+-- ── Admin Root ──────────────────────────────────────────────
+-- CPF: 000.000.000-00 | Senha: 123456 | Privilégio: 4
 INSERT INTO `morador`
   (`id_user`, `identificador`, `nome`, `apto`, `bloco`, `cpf`, `email`,
    `telefone`, `tell_recado`, `sexo`, `senha`, `status`, `previlegio`)
 VALUES
-  (1, 1, 'Vitor Leon', '20', '2', '432.099.578-35', 'sindico@domusflow.com',
+  (1, 1, 'Admin Root', '00', '0', '00000000000', 'admin@domusflow.com',
+   '(11) 00000-0000', NULL, 'M',
+   '$2y$10$ippmJA./AtFuQ/TGG.8Qxu8xHCFgqmCo0QLYUpeX/lWRwIggfFQgm',
+   'L', 4);
+
+-- ── Síndico ─────────────────────────────────────────────────
+-- CPF: 432.099.578-35 | Senha: 123456 | Privilégio: 2
+INSERT INTO `morador`
+  (`id_user`, `identificador`, `nome`, `apto`, `bloco`, `cpf`, `email`,
+   `telefone`, `tell_recado`, `sexo`, `senha`, `status`, `previlegio`)
+VALUES
+  (2, 1, 'Vitor Leon', '20', '2', '43209957835', 'sindico@domusflow.com',
    '(11) 98522-9900', '(11) 98544-5780', 'M',
    '$2y$10$ippmJA./AtFuQ/TGG.8Qxu8xHCFgqmCo0QLYUpeX/lWRwIggfFQgm',
    'L', 2);
 
--- ── Morador de teste ────────────────────────────────────────
--- CPF: 117.604.018-97  |  Senha: 123456  (hash bcrypt)
+-- ── Porteiro ────────────────────────────────────────────────
+-- CPF: 111.111.111-11 | Senha: 123456 | Privilégio: 3
 INSERT INTO `morador`
   (`id_user`, `identificador`, `nome`, `apto`, `bloco`, `cpf`, `email`,
    `telefone`, `tell_recado`, `sexo`, `senha`, `status`, `previlegio`)
 VALUES
-  (2, 1, 'Dona Zefinha', '20', '1A', '117.604.018-97', 'zefinha@domusflow.com',
+  (3, 1, 'Porteiro Padrão', '00', '0', '11111111111', 'porteiro@domusflow.com',
+   '(11) 00000-0001', NULL, 'M',
+   '$2y$10$ippmJA./AtFuQ/TGG.8Qxu8xHCFgqmCo0QLYUpeX/lWRwIggfFQgm',
+   'L', 3);
+
+-- ── Morador de teste ────────────────────────────────────────
+-- CPF: 117.604.018-97 | Senha: 123456 | Privilégio: 1
+INSERT INTO `morador`
+  (`id_user`, `identificador`, `nome`, `apto`, `bloco`, `cpf`, `email`,
+   `telefone`, `tell_recado`, `sexo`, `senha`, `status`, `previlegio`)
+VALUES
+  (4, 1, 'Dona Zefinha', '20', '1A', '11760401897', 'zefinha@domusflow.com',
    '(11) 98475-5600', '(11) 54878-7870', 'F',
    '$2y$10$/h375Lp3ZVoPCJ678rGKAef//ZsoZzaQHZEIp0zZQI0b270Dg2tkW',
    'L', 1);
