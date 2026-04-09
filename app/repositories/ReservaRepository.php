@@ -74,6 +74,7 @@ class ReservaRepository
                 INNER JOIN morador m ON r.id_user = m.id_user 
                 WHERE r.status = 'P' 
                 ORDER BY r.data_reserva ASC";
+                
         $stmt = $this->pdo->prepare($sql); 
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

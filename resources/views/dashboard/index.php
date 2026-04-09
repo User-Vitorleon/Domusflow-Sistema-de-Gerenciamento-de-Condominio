@@ -14,31 +14,36 @@ require_once __DIR__ . '/../layout/sidebar.php';
     </div>
 
     <h3 class="section-title">Minhas Reservas</h3>
-    <?php if (empty($minhasReservas)): ?>
-        <p class="text-muted">Você ainda não possui reservas efetuadas.</p>
-    <?php else: ?>
-        <?php foreach ($minhasReservas as $reserva): 
-            $corFundo = ($reserva['status'] == 'L') ? '#DCFCE7' : '#FEF2F2'; 
-            $corTexto = ($reserva['status'] == 'L') ? '#16A34A' : '#EF4444'; 
-            $textoStatus = ($reserva['status'] == 'L') ? 'Liberado' : 'Pendente';
-        ?>
-        <div class="kpi-card kpi-card-feriado" style="margin-bottom: 15px;">
-            <div class="kpi-icon" style="background: <?= $corFundo ?>; color: <?= $corTexto ?>;">
-                <i class='bx bx-calendar-check'></i>
-            </div>
-            <div>
-                <p class="kpi-label">Local Reservado</p>
-                <h3 class="kpi-value kpi-value-sm">
-                    <?= htmlspecialchars($reserva['local']) ?>
-                </h3>
-                <span class="kpi-sub">
-                    Data: <?= date('d/m/Y', strtotime($reserva['data_reserva'])) ?> | 
-                    <strong>Status: <?= $textoStatus ?></strong>
-                </span>
-            </div>
-        </div>
-        <?php endforeach; ?>
-    <?php endif; ?>
+
+        <?php if (empty($minhasReservas)): ?>
+            <p class="text-muted">Você ainda não possui reservas efetuadas.</p>
+        <?php else: ?>
+            <?php foreach ($minhasReservas as $reserva): 
+                $corFundo = ($reserva['status'] == 'L') ? '#DCFCE7' : (($reserva['status'] == 'R') ? '#FEE2E2' : '#FEF2F2'); 
+                $corTexto = ($reserva['status'] == 'L') ? '#16A34A' : (($reserva['status'] == 'R') ? '#991B1B' : '#EF4444'); 
+                $textoStatus = ($reserva['status'] == 'L') ? 'Liberado' : (($reserva['status'] == 'R') ? 'Recusado' : 'Pendente');
+            ?>
+
+                <div class="kpi-card kpi-card-feriado" style="margin-bottom: 15px;">
+                    <div class="kpi-icon" style="background: <?= $corFundo ?>; color: <?= $corTexto ?>;">
+                        <i class='bx bx-calendar-check'></i>
+                    </div>
+                    <div>
+                        <p class="kpi-label">Local Reservado</p>
+                        <h3 class="kpi-value kpi-value-sm">
+                            <?= htmlspecialchars($reserva['local']) ?>
+                        </h3>
+                        <span class="kpi-sub">
+                            Data: <?= date('d/m/Y', strtotime($reserva['data_reserva'])) ?> | 
+                            <strong>Status: 
+                                <span style="color: <?= $corTexto ?>;"><?= $textoStatus ?></span>
+                            </strong>
+                        </span>
+                    </div>
+                </div>
+
+            <?php endforeach; ?>
+        <?php endif; ?>
 
     <br>
 

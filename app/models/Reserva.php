@@ -6,7 +6,7 @@ class Reserva {
     public string $data_reserva;
     public string $hora_ini;
     public string $hora_fim;
-    public string $status; // P=Pendente, A=Aprovada, N=Negada
+    public string $status; // P=Pendente, A=Aprovada, R=Recusado
 
     public static function fromArray(array $data): self {
         $r = new self();
