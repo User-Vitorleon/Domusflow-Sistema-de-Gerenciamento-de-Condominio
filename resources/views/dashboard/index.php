@@ -73,6 +73,7 @@ require_once __DIR__ . '/../layout/sidebar.php';
                     <p class="kpi-label">Moradores Ativos</p>
                     <h3 class="kpi-value"><?= $moradoresAtivos ?></h3>
                 </div>
+
             </div>
         </div>
 

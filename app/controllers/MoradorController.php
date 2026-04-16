@@ -85,4 +85,50 @@ class MoradorController
             exit();
         }
     }
+
+    public function formUpdate(): void 
+    {
+        if(!isset($_SESSION['usuario_id'])){
+            header('Location: ' . BASE_URL . '/');
+            exit();
+        }
+
+        $repo    = new MoradorRepository();    
+        $usuario = $repo->findById((int)$_SESSION['usuario_id']);
+
+        require_once __DIR__ . '/../../resources/views/moradores/update/index.php';
+    }
+
+    public function updateSalvar(): void 
+    {
+        if($_SERVER['REQUEST_METHOD'] !== 'POST'){
+            header('Location: ' . BASE_URL . '/cadastro/update');
+            exit();
+        }
+
+        $resultado = $this->service->atualizar ([
+            'id' => $_SESSION['usuario_id'],
+            'nome'         => $_POST['user_nome'] ?? '',
+            'email'        => $_POST['user_email'] ?? '',
+            'apto'         => $_POST['user_apto'] ?? '',
+            'bloco'        => $_POST['user_bloco'] ?? '',
+            'telefone'     => $_POST['user_telefone'] ?? '',
+            'tell_recado'  => $_POST['user_tell_recado'] ?? '',
+            'conf_senha' => $_POST['user_conf_senha'] ?? '',
+            'senha'        => $_POST['user_senha'] ?? ''
+        ]);
+
+        if ($resultado['sucesso']) {
+            header('Location: ' . BASE_URL . '/dashboard');
+        } else {
+            $_SESSION['erro_update'] = $resultado['mensagem'];
+            header('Location: ' . BASE_URL . '/cadastro/update');
+        }
+        exit();
+
+    }
+
+
+
+
 }

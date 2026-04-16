@@ -71,4 +71,36 @@ class MoradorService
             'status'  => ($acao === 'aceitar') ? 'liberado' : 'negado'
         ];
     }
+
+    public function atualizar(array $dadosUpdate): array{
+
+        if (empty($dadosUpdate['nome'])){
+            return ['sucesso' => false, 'mensagem' => 'Por favor, preencha o campo nome !'];
+        }
+
+        if (empty($dadosUpdate['email'])){
+            return ['sucesso' => false, 'mensagem' => 'Por favor, preencha o campo Email !'];
+        }
+
+        if (empty($dadosUpdate['bloco'])){
+            return ['sucesso' => false, 'mensagem' => 'Por favor, preencha o campo com o Bloco que reside !'];
+        }
+
+        if (empty($dadosUpdate['apto'])){
+            return ['sucesso' => false, 'mensagem' => 'Por favor, preencha o campo com o numero do Apto que reside !'];
+        }
+
+        if (empty($dadosUpdate['telefone'])){
+            return ['sucesso' => false, 'mensagem' => 'Por favor, preencha o campo com seu numero para contato !'];
+        }
+
+        if (!empty($dadosUpdate['senha'])) {
+            $dadosUpdate['senha'] = password_hash($dadosUpdate['senha'], PASSWORD_DEFAULT);
+        }
+        $atualizado = $this->repo->atualizar($dadosUpdate);
+        return $atualizado
+            ? ['sucesso' => true]
+            : ['sucesso' => false, 'mensagem' => 'Erro ao atualizar. Tente novamente.'];
+
+    }
 }

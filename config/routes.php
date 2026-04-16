@@ -11,11 +11,13 @@ $routes = [
     'pendente'            => ['AuthController',      'pendente'],
     'pendente/checar'     => ['AuthController',      'checar'],
 
-    // Cadastro de morador
-    'cadastro'            => ['MoradorController',   'formCadastro'],
-    'cadastro/salvar'     => ['MoradorController',   'salvar'],
-    'moradores/pendentes' => ['MoradorController',   'pendentes'],
-    'moradores/liberar'   => ['MoradorController',   'liberar'],
+    // moradores
+    'cadastro'               => ['MoradorController',   'formCadastro'],
+    'cadastro/salvar'        => ['MoradorController',   'salvar'],
+    'cadastro/update'        => ['MoradorController',   'formUpdate'  ],
+    'cadastro/update/salvar' => ['Moradorcontroller',   'updateSalvar'],
+    'moradores/pendentes'    => ['MoradorController',   'pendentes'],
+    'moradores/liberar'      => ['MoradorController',   'liberar'],
 
     // Dashboard
     'dashboard'           => ['DashboardController', 'index'],
