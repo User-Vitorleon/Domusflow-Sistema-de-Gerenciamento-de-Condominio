@@ -107,14 +107,14 @@ class MoradorController
         }
 
         $resultado = $this->service->atualizar ([
-            'id' => $_SESSION['usuario_id'],
+            'id'           => $_SESSION['usuario_id'],
             'nome'         => $_POST['user_nome'] ?? '',
             'email'        => $_POST['user_email'] ?? '',
             'apto'         => $_POST['user_apto'] ?? '',
             'bloco'        => $_POST['user_bloco'] ?? '',
             'telefone'     => $_POST['user_telefone'] ?? '',
             'tell_recado'  => $_POST['user_tell_recado'] ?? '',
-            'conf_senha' => $_POST['user_conf_senha'] ?? '',
+            'conf_senha'   => $_POST['user_conf_senha'] ?? '',
             'senha'        => $_POST['user_senha'] ?? ''
         ]);
 

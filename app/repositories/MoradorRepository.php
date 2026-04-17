@@ -105,4 +105,35 @@ class MoradorRepository
         $stmt = $this->pdo->query("SELECT * FROM morador ORDER BY nome ASC");
         return $stmt->fetchAll();
     }
+
+    public function atualizarDados(array $update){
+        if (empty($update['senha'])){
+            $stmt = $this->pdo->prepare(
+                "UPDATE morador SET nome = :nome, email = :email, apto = :apto, bloco = :bloco, telefone = :telefone, tell_recado = :tell_recado WHERE id_user = :id"
+                );
+                return $stmt->execute([
+                            'nome' => $update['nome'],
+                            'email' => $update['email'],
+                            'apto' => $update['apto'],
+                            'bloco' => $update['bloco'], 
+                            'telefone' => $update['telefone'],
+                            'tell_recado' => $update['tell_recado'],
+                            'id' => $update['id']
+                    ]);
+        }else{
+            $stmt = $this->pdo->prepare(
+                "UPDATE morador SET nome = :nome, email = :email, apto = :apto, bloco = :bloco, telefone = :telefone, tell_recado = :tell_recado, senha = :senha WHERE id_user = :id"
+                );
+                return $stmt->execute([
+                            'nome' => $update['nome'],
+                            'email' => $update['email'],
+                            'apto' => $update['apto'],
+                            'bloco' => $update['bloco'], 
+                            'telefone' => $update['telefone'],
+                            'tell_recado' => $update['tell_recado'],
+                            'senha' => $update['senha'],
+                            'id' => $update['id']
+                    ]);
+        }
+    }
 }

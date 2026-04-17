@@ -59,6 +59,13 @@ $avatar        = ($usuario['sexo'] === 'M')
                 </a>
             </li>
 
+            <li class="nav-link <?= $paginaAtiva === 'dashboard' ? 'active' : '' ?>">
+                <a href="<?= BASE_URL ?>/cadastro/update">
+                    <i class='bx bxs-dashboard'></i>
+                    <span class="nav-text">Atualizar Dados</span>
+                </a>
+            </li>
+
             <!-- consulta rápida por placa — porteiro e admin -->
             <?php if (in_array($prev, [3, 4])): ?>
                 <li class="nav-link <?= $paginaAtiva === 'consulta-veiculo' ? 'active' : '' ?>">

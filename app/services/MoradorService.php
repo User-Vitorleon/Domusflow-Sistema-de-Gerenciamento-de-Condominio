@@ -97,7 +97,7 @@ class MoradorService
         if (!empty($dadosUpdate['senha'])) {
             $dadosUpdate['senha'] = password_hash($dadosUpdate['senha'], PASSWORD_DEFAULT);
         }
-        $atualizado = $this->repo->atualizar($dadosUpdate);
+        $atualizado = $this->repo->atualizarDados($dadosUpdate);
         return $atualizado
             ? ['sucesso' => true]
             : ['sucesso' => false, 'mensagem' => 'Erro ao atualizar. Tente novamente.'];
