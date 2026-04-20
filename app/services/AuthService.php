@@ -15,21 +15,28 @@ class AuthService
     $cpf = preg_replace('/[^0-9]/', '', $cpf);
     $usuario = $this->repo->findByCpf($cpf);
 
-    if (!$usuario || !password_verify($senha, $usuario['senha'])) {
+
+    if (!$usuario) {
         return ['sucesso' => false, 'mensagem' => 'CPF ou senha incorretos.'];
     }
 
-    // Definimos os dados básicos da sessão para todos que passarem na senha
+    // 2. conta bloqueada ou deletada?
+    if ($usuario['status'] === 'B' || $usuario['status'] === 'E') {
+        return ['sucesso' => false, 'mensagem' => 'Esta conta não pode ser acessada. Entre em contato com o síndico.'];
+    }
+
+    // 3. valida a senha
+    if (!password_verify($senha, $usuario['senha'])) {
+        return ['sucesso' => false, 'mensagem' => 'CPF ou senha incorretos.'];
+    }
+
+    // só agora salva na sessão
     $_SESSION['usuario_id']   = $usuario['id_user'];
     $_SESSION['usuario_nome'] = $usuario['nome'];
 
     // Se estiver pendente, avisamos o Controller para mandar para /pendente
     if ($usuario['status'] === 'P') {
         return ['sucesso' => true, 'redirecionar' => BASE_URL . '/pendente'];
-    }
-
-    if ($usuario['status'] === 'B') {
-        return ['sucesso' => false, 'mensagem' => 'Acesso bloqueado. Entre em contato com o síndico.'];
     }
 
     // Se chegou aqui, está Liberado (L)

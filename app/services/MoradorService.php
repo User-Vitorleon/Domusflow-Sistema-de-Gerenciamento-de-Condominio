@@ -103,4 +103,9 @@ class MoradorService
             : ['sucesso' => false, 'mensagem' => 'Erro ao atualizar. Tente novamente.'];
 
     }
+
+    public function deletar(array $dados): array{
+        $this->repo->deletarDados($dados['id']);
+        return ['sucesso' => true];
+    }
 }

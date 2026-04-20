@@ -128,6 +128,49 @@ class MoradorController
 
     }
 
+    public function inativar(): void {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        if (!isset($_SESSION['usuario_id'])) {
+            header('Location: ' . BASE_URL . '/');
+            exit(); 
+        }
+        
+        $repo = new MoradorRepository();
+        $id = $_SESSION['usuario_id'];
+        $repo->atualizarStatus($id, 'B');
+
+        session_unset();
+        session_destroy();
+        var_dump($_SESSION); // verifica se a sessão foi destruída
+        var_dump($usuario['status']); // verifica o status no banco
+        exit();
+    }
+
+    public function deletar(): void {
+        if (!isset($_SESSION['usuario_id'])) {
+            header('Location: ' . BASE_URL . '/');
+            exit(); 
+        }
+            $this->service->deletar([
+                'id'         => $_SESSION['usuario_id'],
+                'nome'       => '***',
+                'email'      => '***',
+                'apto'       => '***',
+                'bloco'      => '***',
+                'telefone'   => '***',
+                'tell_recado'=> '***',
+                'senha'      => '***',
+                'cpf'        => '***'
+            ]);
+
+            session_unset();
+            session_destroy();
+            header('Location: ' . BASE_URL . '/');
+            exit();
+    }
 
 
 

@@ -43,6 +43,19 @@ class DashboardController
             exit();
         }
 
+        if ($usuario['status'] === 'B') {
+            $_SESSION['erro_login'] = 'Esta conta está inativa. Entre em contato com o síndico.';
+            session_unset();
+            session_destroy();
+            header('Location: ' . BASE_URL . '/');
+            exit();
+        }
+
+        if ($usuario['status'] === 'B') {
+            var_dump($usuario['status']);
+            exit();
+        }
+
         // --- A partir daqui, só entra quem é status 'L' (Liberado) ---
 
         $idLogado = $_SESSION['usuario_id'];
@@ -70,4 +83,6 @@ class DashboardController
         // Chama a View
         require_once __DIR__ . '/../../resources/views/dashboard/index.php';
     }
+
+    
 }

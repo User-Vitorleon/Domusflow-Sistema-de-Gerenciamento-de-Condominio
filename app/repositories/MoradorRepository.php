@@ -136,4 +136,26 @@ class MoradorRepository
                     ]);
         }
     }
+    
+    public function deletarDados(int $id): bool {
+        $stmt = $this->pdo->prepare(
+            "UPDATE morador SET 
+                nome        = :nome,
+                email       = :email,
+                apto        = '***',
+                bloco       = '***',
+                telefone    = '***',
+                tell_recado = '***',
+                senha       = '***',
+                status      = 'E'
+            WHERE id_user = :id"
+        );
+        return $stmt->execute([
+            ':nome'  => '***' . $id,
+            ':email' => '***' . $id . '@deletado.com',
+            ':id'    => $id
+        ]);
+    }
 }
+
+

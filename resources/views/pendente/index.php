@@ -70,12 +70,6 @@ $nome = htmlspecialchars($_SESSION['usuario_nome'] ?? 'Morador');
 
         <hr class="df-divider">
 
-        <!-- Contador -->
-        <p class="pendente-refresh">
-            <i class='bx bx-refresh'></i>
-            Verificando automaticamente em <strong id="contador">10</strong>s
-        </p>
-
         <a href="<?= BASE_URL ?>/logout" class="btn-ghost w-100 text-center mt-3">
             ← Voltar ao login
         </a>
