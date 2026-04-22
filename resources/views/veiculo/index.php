@@ -111,8 +111,43 @@ $prev = $usuario['previlegio'] ?? 1;
                     </tbody>
                 </table>
             </div>
-        <?php endif; ?>
-    </div>
+    <?php endif; ?>
+
+    <?php if (($totalPaginas ?? 1) > 1): ?>
+    <nav class="mt-3 d-flex justify-content-center">
+        <ul class="pagination">
+
+            <li class="page-item <?= $pagina <= 1 ? 'disabled' : '' ?>">
+                <a class="page-link" href="?pagina=<?= $pagina - 1 ?>">Anterior</a>
+            </li>
+
+<?php
+            $range = 2;
+            for ($i = 1; $i <= $totalPaginas; $i++):
+                $mostrar = (
+                    $i == 1 ||
+                    $i == $totalPaginas ||
+                    ($i >= $pagina - $range && $i <= $pagina + $range)
+                );
+                if (!$mostrar):
+                    if ($i == 2 || $i == $totalPaginas - 1): ?>
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    <?php endif; ?>
+                    <?php continue; ?>
+                <?php endif; ?>
+                <li class="page-item <?= $i === $pagina ? 'active' : '' ?>">
+                    <a class="page-link" href="?pagina=<?= $i ?>"><?= $i ?></a>
+                </li>
+            <?php endfor; ?>
+
+            <li class="page-item <?= $pagina >= $totalPaginas ? 'disabled' : '' ?>">
+                <a class="page-link" href="?pagina=<?= $pagina + 1 ?>">Próximo</a>
+            </li>
+
+        </ul>
+    </nav>
+    <?php endif; ?>
+
 </main>
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>

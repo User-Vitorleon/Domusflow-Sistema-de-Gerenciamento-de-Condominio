@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../services/MoradorService.php';
+require_once __DIR__ . '/../repositories/MoradorRepository.php';
 
 class MoradorController
 {
@@ -56,7 +57,14 @@ class MoradorController
 
         $repo      = new MoradorRepository();
         $usuario   = $repo->findById((int)$_SESSION['usuario_id']);
-        $moradores = $this->service->listarPendentes();
+
+        $pagina      = (int)($_GET['pagina'] ?? 1);
+        $porPagina   = 10;
+        $todos        = $this->service->listarPendentes();
+        $total        = count($todos);
+        $totalPaginas = (int)ceil($total / $porPagina);
+        $offset       = ($pagina - 1) * $porPagina;
+        $moradores    = array_slice($todos, $offset, $porPagina);
 
         require_once __DIR__ . '/../../resources/views/moradores/pendentes.php';
     }
@@ -144,9 +152,10 @@ class MoradorController
 
         session_unset();
         session_destroy();
-        var_dump($_SESSION); // verifica se a sessão foi destruída
-        var_dump($usuario['status']); // verifica o status no banco
-        exit();
+        session_start();
+        $_SESSION['erro_login'] = 'Esta conta está inativa. Entre em contato com o síndico.';
+        header('Location: ' . BASE_URL . '/');
+        exit(); 
     }
 
     public function deletar(): void {

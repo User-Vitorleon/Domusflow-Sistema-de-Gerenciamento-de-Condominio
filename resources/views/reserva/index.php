@@ -98,6 +98,84 @@ $prev = $usuario['previlegio'] ?? 1;
             </form>
         <?php endif; ?>
     </div>
+    <br>
+    <hr>
+
+    <?php if (($usuario['previlegio'] ?? 0) == 2): ?>
+        <h3 class="section-title">Solicitações de Reserva Pendentes</h3>
+        
+        <?php if (empty($reservasParaAprovar)): ?>
+            <div class="empty-state">
+                <div class="empty-state-icon"><i class='bx bx-check-shield'></i></div>
+                <h5>Tudo em dia!</h5>
+                <p>Nenhuma reserva aguardando sua aprovação.</p>
+            </div>
+        <?php else: ?>
+            <?php foreach ($reservasParaAprovar as $res): 
+                // Corrigido para usar $res que vem do foreach
+                $sexoMorador = $res['sexo'] ?? 'M';
+                $avatar = ($sexoMorador === 'M')
+                    ? 'https://png.pngtree.com/png-vector/20231019/ourmid/pngtree-user-profile-avatar-png-image_10211467.png'
+                    : 'https://images.icon-icons.com/3708/PNG/512/girl_female_woman_person_people_avatar_icon_230018.png';
+            ?>
+                <div class="morador-card">
+                    <img src="<?= $avatar ?>" alt="avatar" class="morador-avatar">
+                    <div class="morador-info">
+                        <strong><?= htmlspecialchars($res['nome_morador']) ?></strong>
+                        <span>
+                            Local: <strong><?= htmlspecialchars($res['local']) ?></strong> 
+                            <br>
+                            
+                            Dia: <?= date('d/m/Y', strtotime($res['data_reserva'])) ?> | 
+                            Apartamento: <?= htmlspecialchars($res['apto'] ?? 'N/A') ?> Bloco: <?= htmlspecialchars($res['bloco'] ?? 'N/A') ?>
+                        </span>
+                    </div>
+
+                    <form action="<?= BASE_URL ?>/reservas/decidir" method="POST" class="morador-actions">
+                        <input type="hidden" name="id_reserva" value="<?= $res['id_reserva'] ?>">
+                        <button type="submit" name="acao" value="aceitar" class="btn-success-sm">Aprovar</button>
+                        <button type="submit" name="acao" value="negar" class="btn-danger-sm">Negar</button>
+                    </form>
+                </div>
+                <br>
+            <?php endforeach; ?>
+            <?php if ($totalPaginas > 1): ?>
+                <nav class="mt-3 d-flex justify-content-center">
+                    <ul class="pagination">
+
+                        <li class="page-item <?= $pagina <= 1 ? 'disabled' : '' ?>">
+                            <a class="page-link" href="?pagina=<?= $pagina - 1 ?>">Anterior</a>
+                        </li>
+                        <?php
+                        $range = 2; // quantas páginas ao redor da atual
+                        for ($i = 1; $i <= $totalPaginas; $i++):
+                            $mostrar = (
+                                $i == 1 ||
+                                $i == $totalPaginas ||
+                                ($i >= $pagina - $range && $i <= $pagina + $range)
+                            );
+                            if (!$mostrar):
+                                if ($i == 2 || $i == $totalPaginas - 1):
+                            ?>
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        <?php
+                            endif;
+                            continue;
+                            endif;
+                        ?>
+                            <li class="page-item <?= $i === $pagina ? 'active' : '' ?>">
+                                <a class="page-link" href="?pagina=<?= $i ?>"><?= $i ?></a>
+                            </li>
+                        <?php endfor; ?>
+                        <li class="page-item <?= $pagina >= $totalPaginas ? 'disabled' : '' ?>">
+                            <a class="page-link" href="?pagina=<?= $pagina + 1 ?>">Próximo</a>
+                        </li>
+
+                    </ul>
+                </nav>
+            <?php endif; ?>
+        <?php endif; ?>
+    <?php endif; ?>
 </main>
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>

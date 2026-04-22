@@ -12,7 +12,7 @@ class VeiculoController
     }
 
     // lista geral — síndico/porteiro veem todos, morador vê só os seus
-    public function index(): void
+   public function index(): void
     {
         $this->requireAuth();
 
@@ -21,14 +21,20 @@ class VeiculoController
         $prev     = (int)($_SESSION['usuario_previlegio'] ?? 1);
         $moradores = [];
 
+        $pagina    = (int)($_GET['pagina'] ?? 1);
+        $porPagina = 10;
+
         if (in_array($prev, [2, 3, 4])) {
-            // síndico, porteiro e admin veem todos os veículos
-            $veiculos  = $this->veiculoService->listarTodos();
-            $moradores = $repo->findAll(); // para o select do formulário
+            $todos     = $this->veiculoService->listarTodos();
+            $moradores = $repo->findAll();
         } else {
-            // morador vê apenas os seus próprios veículos
-            $veiculos = $this->veiculoService->listarPorUsuario((int)$_SESSION['usuario_id']);
+            $todos = $this->veiculoService->listarPorUsuario((int)$_SESSION['usuario_id']);
         }
+
+        $total        = count($todos);
+        $totalPaginas = (int)ceil($total / $porPagina);
+        $offset       = ($pagina - 1) * $porPagina;
+        $veiculos     = array_slice($todos, $offset, $porPagina);
 
         require_once __DIR__ . '/../../resources/views/veiculo/index.php';
     }

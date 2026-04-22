@@ -19,6 +19,24 @@ class ReservaController {
         $usuario = $repo->findById((int)$_SESSION['usuario_id']);
         $locais  = $this->reservaService->listarLocaisDisponiveis();
 
+        $reservasParaAprovar = [];
+        if (($usuario['previlegio'] ?? 0) == 2) {
+            $reservasParaAprovar = $this->reservaService->listarPendentesGeral();
+        }
+
+        $reservasParaAprovar = [];
+            if (($usuario['previlegio'] ?? 0) == 2) {
+                $pagina = (int)($_GET['pagina'] ?? 1);
+                $reservasParaAprovar = $this->reservaService->listarPendentesGeral();
+                $totalPendentes = count($reservasParaAprovar);
+                $porPagina = 10;
+                $totalPaginas = (int)ceil($totalPendentes / $porPagina);
+                $offset = ($pagina - 1) * $porPagina;
+                $reservasParaAprovar = array_slice($reservasParaAprovar, $offset, $porPagina);
+            }
+
+        require_once __DIR__ . '/../../resources/views/reserva/index.php';
+
         require_once __DIR__ . '/../../resources/views/reserva/index.php';
     }
 
@@ -63,7 +81,9 @@ class ReservaController {
             $reservaRepo->atualizarStatus((int)$idReserva, $novoStatus);
         }
 
-        header('Location: ' . BASE_URL . '/dashboard');
+        header('Location: ' . BASE_URL . '/reserva');
         exit();
     }
+
+        
 }

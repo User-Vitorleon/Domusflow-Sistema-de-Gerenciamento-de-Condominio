@@ -84,4 +84,9 @@ class ReservaService
     {
         return $this->reservaRepo->findByUsuario($id_user);
     }
+
+    public function listarPendentesGeral(): array
+{
+    return $this->reservaRepo->buscarReservasPendentesGeral();
+}
 }

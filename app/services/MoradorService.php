@@ -34,7 +34,7 @@ class MoradorService
             'sexo'            => $dados['sexo'],
             'telefone'        => $dados['telefone'],
             'telefone_recado' => $dados['telefone_recado'] ?? null,
-            'senha'           => password_hash($dados['senha'], PASSWORD_DEFAULT),
+            'senha'           => hashSenha($dados['senha']),
             'status'          => 'P' 
         ]);
 
@@ -95,7 +95,7 @@ class MoradorService
         }
 
         if (!empty($dadosUpdate['senha'])) {
-            $dadosUpdate['senha'] = password_hash($dadosUpdate['senha'], PASSWORD_DEFAULT);
+            $dadosUpdate['senha'] = hashSenha($dadosUpdate['senha']);
         }
         $atualizado = $this->repo->atualizarDados($dadosUpdate);
         return $atualizado

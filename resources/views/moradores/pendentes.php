@@ -10,7 +10,7 @@ require_once __DIR__ . '/../layout/sidebar.php';
         <h2>Solicitações de Acesso</h2>
         <p class="text-muted">Aprove ou negue os cadastros pendentes</p>
     </div>
-
+    
     <?php if (isset($_GET['status'])): ?>
         <div class="df-alert df-alert-<?= $_GET['status'] === 'liberado' ? 'success' : 'warning' ?>">
             Morador <?= $_GET['status'] === 'liberado' ? 'liberado' : 'negado' ?> com sucesso.
@@ -44,6 +44,39 @@ require_once __DIR__ . '/../layout/sidebar.php';
                 </div>
             <?php endforeach; ?>
         </div>
+        <?php if ($totalPaginas > 1): ?>
+        <nav class="mt-3 d-flex justify-content-center">
+            <ul class="pagination">
+
+                <li class="page-item <?= $pagina <= 1 ? 'disabled' : '' ?>">
+                    <a class="page-link" href="?pagina=<?= $pagina - 1 ?>">Anterior</a>
+                </li>
+
+                <?php
+                $range = 2;
+                for ($i = 1; $i <= $totalPaginas; $i++):
+                    $mostrar = (
+                        $i == 1 ||
+                        $i == $totalPaginas ||
+                        ($i >= $pagina - $range && $i <= $pagina + $range)
+                    );
+                    if (!$mostrar):
+                        if ($i == 2 || $i == $totalPaginas - 1):
+                ?>
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                <?php   endif; continue; endif; ?>
+                    <li class="page-item <?= $i === $pagina ? 'active' : '' ?>">
+                        <a class="page-link" href="?pagina=<?= $i ?>"><?= $i ?></a>
+                    </li>
+                <?php endfor; ?>
+
+                <li class="page-item <?= $pagina >= $totalPaginas ? 'disabled' : '' ?>">
+                    <a class="page-link" href="?pagina=<?= $pagina + 1 ?>">Próximo</a>
+                </li>
+
+            </ul>
+        </nav>
+        <?php endif; ?>
     <?php endif; ?>
 </main>
 

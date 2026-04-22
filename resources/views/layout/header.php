@@ -1,6 +1,7 @@
 <?php
 $paginaTitulo = $paginaTitulo ?? 'DomusFlow';
 $cssExtra     = $cssExtra     ?? null;
+$cssTela      = $cssTela      ?? null;
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -14,7 +15,10 @@ $cssExtra     = $cssExtra     ?? null;
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/app.css">
     <?php if ($cssExtra): ?>
-        <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/<?= $cssExtra ?>">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/<?= $cssExtra ?>">
+    <?php endif; ?>
+    <?php if ($cssTela): ?>
+        <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/<?= $cssTela ?>">
     <?php endif; ?>
 </head>
 

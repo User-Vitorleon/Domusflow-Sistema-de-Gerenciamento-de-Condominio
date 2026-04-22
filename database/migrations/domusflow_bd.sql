@@ -78,66 +78,6 @@ CREATE TABLE IF NOT EXISTS `reservas` (
     REFERENCES `locais_festivos` (`id_local`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ═══════════════════════════════════════════════════════════
---  Dados iniciais (seed)
--- ═══════════════════════════════════════════════════════════
-
--- ── Admin Root ──────────────────────────────────────────────
--- CPF: 000.000.000-00 | Senha: 123456 | Privilégio: 4
-INSERT INTO `morador`
-  (`id_user`, `identificador`, `nome`, `apto`, `bloco`, `cpf`, `email`,
-   `telefone`, `tell_recado`, `sexo`, `senha`, `status`, `previlegio`)
-VALUES
-  (1, 1, 'Admin Root', '00', '0', '00000000000', 'admin@domusflow.com',
-   '(11) 00000-0000', NULL, 'M',
-   '$2y$10$ippmJA./AtFuQ/TGG.8Qxu8xHCFgqmCo0QLYUpeX/lWRwIggfFQgm',
-   'L', 4);
-
--- ── Síndico ─────────────────────────────────────────────────
--- CPF: 432.099.578-35 | Senha: 123456 | Privilégio: 2
-INSERT INTO `morador`
-  (`id_user`, `identificador`, `nome`, `apto`, `bloco`, `cpf`, `email`,
-   `telefone`, `tell_recado`, `sexo`, `senha`, `status`, `previlegio`)
-VALUES
-  (2, 1, 'Vitor Leon', '20', '2', '43209957835', 'sindico@domusflow.com',
-   '(11) 98522-9900', '(11) 98544-5780', 'M',
-   '$2y$10$ippmJA./AtFuQ/TGG.8Qxu8xHCFgqmCo0QLYUpeX/lWRwIggfFQgm',
-   'L', 2);
-
--- ── Porteiro ────────────────────────────────────────────────
--- CPF: 111.111.111-11 | Senha: 123456 | Privilégio: 3
-INSERT INTO `morador`
-  (`id_user`, `identificador`, `nome`, `apto`, `bloco`, `cpf`, `email`,
-   `telefone`, `tell_recado`, `sexo`, `senha`, `status`, `previlegio`)
-VALUES
-  (3, 1, 'Porteiro Padrão', '00', '0', '11111111111', 'porteiro@domusflow.com',
-   '(11) 00000-0001', NULL, 'M',
-   '$2y$10$ippmJA./AtFuQ/TGG.8Qxu8xHCFgqmCo0QLYUpeX/lWRwIggfFQgm',
-   'L', 3);
-
--- ── Morador de teste ────────────────────────────────────────
--- CPF: 117.604.018-97 | Senha: 123456 | Privilégio: 1
-INSERT INTO `morador`
-  (`id_user`, `identificador`, `nome`, `apto`, `bloco`, `cpf`, `email`,
-   `telefone`, `tell_recado`, `sexo`, `senha`, `status`, `previlegio`)
-VALUES
-  (4, 1, 'Dona Zefinha', '20', '1A', '11760401897', 'zefinha@domusflow.com',
-   '(11) 98475-5600', '(11) 54878-7870', 'F',
-   '$2y$10$/h375Lp3ZVoPCJ678rGKAef//ZsoZzaQHZEIp0zZQI0b270Dg2tkW',
-   'L', 1);
-
--- ── Locais festivos ─────────────────────────────────────────
-INSERT INTO `locais_festivos` (`id_local`, `local`, `capacidade`, `disp_uso`, `id_user_cad`) VALUES
-  (1, 'Churrasqueira',          100, 'S', 1),
-  (2, 'Parquinho de Diversão',   10, 'N', 1),
-  (3, 'Salão de Festa Pequeno',  50, 'S', 1);
-
--- ── Reserva de exemplo ──────────────────────────────────────
-INSERT INTO `reservas`
-  (`id_reserva`, `id_local`, `id_user`, `data_reserva`, `hora_ini`, `hora_fim`, `status`)
-VALUES
-  (1, 1, 2, '2026-04-10', '10:00:00', '13:00:00', 'P');
-
 -- ── Tabela Veiculos ──────────────────────────────────────
 CREATE TABLE IF NOT EXISTS `veiculos` (
   `id_veiculo`   INT(11)      NOT NULL AUTO_INCREMENT,
@@ -153,14 +93,3 @@ CREATE TABLE IF NOT EXISTS `veiculos` (
   CONSTRAINT `fk_veiculo_morador`   FOREIGN KEY (`id_user`)     REFERENCES `morador` (`id_user`),
   CONSTRAINT `fk_veiculo_cadastrou` FOREIGN KEY (`id_user_cad`) REFERENCES `morador` (`id_user`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ── Exemplo Veiculos ──────────────────────────────────────
--- Vitor Leon (id_user: 2) — Síndico
-INSERT INTO `veiculos` (`placa`, `marca`, `modelo`, `cor`, `id_user`, `id_user_cad`) VALUES
-('ABC1234', 'Honda',   'Civic',    'Prata',  2, 2),
-('DEF5678', 'Toyota',  'Corolla',  'Preto',  2, 2);
-
--- Dona Zefinha (id_user: 4) — Morador
-INSERT INTO `veiculos` (`placa`, `marca`, `modelo`, `cor`, `id_user`, `id_user_cad`) VALUES
-('GHI9012', 'Fiat',    'Uno',      'Branco', 4, 2),
-('JKL3456', 'Chevrolet', 'Onix',   'Vermelho', 4, 2);

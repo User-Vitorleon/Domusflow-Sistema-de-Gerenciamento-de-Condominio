@@ -107,46 +107,6 @@ require_once __DIR__ . '/../layout/sidebar.php';
     <?php endif; ?>
 
     <br>
-
-    <?php if (($usuario['previlegio'] ?? 0) == 2): ?>
-        <h3 class="section-title">Solicitações de Reserva Pendentes</h3>
-        
-        <?php if (empty($reservasParaAprovar)): ?>
-            <div class="empty-state">
-                <div class="empty-state-icon"><i class='bx bx-check-shield'></i></div>
-                <h5>Tudo em dia!</h5>
-                <p>Nenhuma reserva aguardando sua aprovação.</p>
-            </div>
-        <?php else: ?>
-            <?php foreach ($reservasParaAprovar as $res): 
-                // Corrigido para usar $res que vem do foreach
-                $sexoMorador = $res['sexo'] ?? 'M';
-                $avatar = ($sexoMorador === 'M')
-                    ? 'https://png.pngtree.com/png-vector/20231019/ourmid/pngtree-user-profile-avatar-png-image_10211467.png'
-                    : 'https://images.icon-icons.com/3708/PNG/512/girl_female_woman_person_people_avatar_icon_230018.png';
-            ?>
-                <div class="morador-card">
-                    <img src="<?= $avatar ?>" alt="avatar" class="morador-avatar">
-                    <div class="morador-info">
-                        <strong><?= htmlspecialchars($res['nome_morador']) ?></strong>
-                        <span>
-                            Local: <strong><?= htmlspecialchars($res['local']) ?></strong> 
-                            <br>
-                            
-                            Dia: <?= date('d/m/Y', strtotime($res['data_reserva'])) ?> | 
-                            Apartamento: <?= htmlspecialchars($res['apto'] ?? 'N/A') ?> Bloco: <?= htmlspecialchars($res['bloco'] ?? 'N/A') ?>
-                        </span>
-                    </div>
-
-                    <form action="<?= BASE_URL ?>/reservas/decidir" method="POST" class="morador-actions">
-                        <input type="hidden" name="id_reserva" value="<?= $res['id_reserva'] ?>">
-                        <button type="submit" name="acao" value="aceitar" class="btn-success-sm">Aprovar</button>
-                        <button type="submit" name="acao" value="negar" class="btn-danger-sm">Negar</button>
-                    </form>
-                </div>
-            <?php endforeach; ?>
-        <?php endif; ?>
-    <?php endif; ?>
 </main>
 
 <script>
