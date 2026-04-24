@@ -10,8 +10,5 @@ define('BRASIL_API_FERIADOS', 'https://brasilapi.com.br/api/feriados/v1/');
 define('HASH_SALT', 'DomusFlow@Salt#2025!Fixo$1234ab');
 
 function hashSenha(string $senha): string {
-    return password_hash($senha, PASSWORD_BCRYPT, [
-        'cost' => 10,
-        'salt' => HASH_SALT
-    ]);
+    return password_hash($senha, PASSWORD_BCRYPT, ['cost' => 10]);
 }

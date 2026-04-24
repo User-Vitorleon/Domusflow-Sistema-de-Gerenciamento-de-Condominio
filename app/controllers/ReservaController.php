@@ -2,10 +2,14 @@
 require_once __DIR__ . '/../services/ReservaService.php';
 require_once __DIR__ . '/../services/LocalService.php';
 require_once __DIR__ . '/../repositories/MoradorRepository.php';
+require_once __DIR__ . '/../repositories/ReservaRepository.php';
+require_once __DIR__ . '/../repositories/LocalRepository.php';
+require_once __DIR__ . '/../services/EmailService.php';
 
 class ReservaController {
     private ReservaService $reservaService;
     private LocalService   $localService;
+    
 
     public function __construct() {
         $this->reservaService = new ReservaService();
@@ -21,21 +25,13 @@ class ReservaController {
 
         $reservasParaAprovar = [];
         if (($usuario['previlegio'] ?? 0) == 2) {
-            $reservasParaAprovar = $this->reservaService->listarPendentesGeral();
+            $pagina       = (int)($_GET['pagina'] ?? 1);
+            $porPagina    = 10;
+            $total        = $this->reservaService->contarPendentesGeral();
+            $totalPaginas = (int)ceil($total / $porPagina);
+            $offset       = ($pagina - 1) * $porPagina;
+            $reservasParaAprovar = $this->reservaService->listarPendentesGeral($offset, $porPagina);
         }
-
-        $reservasParaAprovar = [];
-            if (($usuario['previlegio'] ?? 0) == 2) {
-                $pagina = (int)($_GET['pagina'] ?? 1);
-                $reservasParaAprovar = $this->reservaService->listarPendentesGeral();
-                $totalPendentes = count($reservasParaAprovar);
-                $porPagina = 10;
-                $totalPaginas = (int)ceil($totalPendentes / $porPagina);
-                $offset = ($pagina - 1) * $porPagina;
-                $reservasParaAprovar = array_slice($reservasParaAprovar, $offset, $porPagina);
-            }
-
-        require_once __DIR__ . '/../../resources/views/reserva/index.php';
 
         require_once __DIR__ . '/../../resources/views/reserva/index.php';
     }
@@ -71,19 +67,45 @@ class ReservaController {
     }
 
     public function decidir(): void
-    {
-        $idReserva = $_POST['id_reserva'] ?? null;
-        $acao      = $_POST['acao'] ?? null;
+{
+    $idReserva = (int)($_POST['id_reserva'] ?? 0);
+    $acao      = $_POST['acao'] ?? null;
 
-        if ($idReserva && $acao) {
-            $reservaRepo = new ReservaRepository();
-            $novoStatus = ($acao === 'aceitar') ? 'L' : 'R';
-            $reservaRepo->atualizarStatus((int)$idReserva, $novoStatus);
+    if ($idReserva && $acao) {
+        $reservaRepo = new ReservaRepository();
+        $novoStatus  = ($acao === 'aceitar') ? 'A' : 'N';
+        $reservaRepo->atualizarStatus($idReserva, $novoStatus);
+
+       
+        $reserva = $reservaRepo->findById($idReserva);
+        if ($reserva) {
+            $moradorRepo  = new MoradorRepository();
+            $morador      = $moradorRepo->findById($reserva['id_user']);
+            $localRepo    = new LocalRepository();
+            $local        = $localRepo->findById($reserva['id_local']);
+            $emailService = new EmailService();
+
+            if ($acao === 'aceitar') {
+                $emailService->reservaConfirmada(
+                    $morador['email'],
+                    $morador['nome'],
+                    $local['local'],
+                    $reserva['data_reserva']
+                );
+            } else {
+                $emailService->reservaNegada(
+                    $morador['email'],
+                    $morador['nome'],
+                    $local['local'],
+                    $reserva['data_reserva']
+                );
+            }
         }
-
-        header('Location: ' . BASE_URL . '/reserva');
-        exit();
     }
+
+    header('Location: ' . BASE_URL . '/reserva');
+    exit();
+}
 
         
 }

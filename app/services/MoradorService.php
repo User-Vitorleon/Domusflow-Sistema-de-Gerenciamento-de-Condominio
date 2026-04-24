@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../repositories/MoradorRepository.php';
+require_once __DIR__ . '/EmailService.php';
 
 class MoradorService
 {
@@ -42,7 +43,9 @@ class MoradorService
             $_SESSION['usuario_id']   = (int)$idNovoUsuario;
             $_SESSION['usuario_nome'] = $dados['nome'];
       
-            
+            $emailservice = new EmailService();
+            $emailservice->boasVindas($dados['email'], $dados['nome']);
+
             return ['sucesso' => true];
         }
 
@@ -66,6 +69,14 @@ class MoradorService
         $novoStatus = ($acao === 'aceitar') ? 'L' : 'B';
         $this->repo->atualizarStatus($id, $novoStatus);
 
+        $morador = $this->repo->findById($id);
+        $emailservice = new EmailService();
+        if ($acao === 'aceitar'){
+            $emailservice->contaAprovada($morador['email'], $morador['nome']);
+        }else{
+            $emailservice->contaNegada($morador['email'], $morador['nome']);
+        }
+        
         return [
             'sucesso' => true, 
             'status'  => ($acao === 'aceitar') ? 'liberado' : 'negado'

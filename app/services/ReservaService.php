@@ -1,16 +1,20 @@
 <?php
 require_once __DIR__ . '/../repositories/ReservaRepository.php';
 require_once __DIR__ . '/../repositories/LocalRepository.php';
+require_once __DIR__ . '/../repositories/MoradorRepository.php';
+require_once __DIR__ . '/EmailService.php';
 
 class ReservaService
 {
     private ReservaRepository $reservaRepo;
     private LocalRepository   $localRepo;
+    private MoradorRepository $moradorRepo;
 
     public function __construct()
     {
         $this->reservaRepo = new ReservaRepository();
         $this->localRepo   = new LocalRepository();
+        $this->moradorRepo = new MoradorRepository(); 
     }
 
     public function salvar(array $dados, int $id_user): array
@@ -62,8 +66,6 @@ class ReservaService
             </script>";
     exit;
 }
-
-        // ── Salva ─────────────────────────────────────
         $this->reservaRepo->save([
             'id_local'     => (int)$dados['id_local'],
             'id_user'      => $id_user,
@@ -71,6 +73,16 @@ class ReservaService
             'hora_ini'     => $dados['hora_ini'],
             'hora_fim'     => $dados['hora_fim'],
         ]);
+
+        $morador = $this->moradorRepo->findById($id_user);
+
+        $emailService = new EmailService();
+        $emailService->reservaPendente($morador['email'], 
+                                       $morador['nome'], 
+                                       $local['local'], 
+                                       $dados ['data_reserva'], 
+                                       $dados['hora_ini'], 
+                                       $dados['hora_fim']);
 
         return ['sucesso' => true];
     }
@@ -85,8 +97,11 @@ class ReservaService
         return $this->reservaRepo->findByUsuario($id_user);
     }
 
-    public function listarPendentesGeral(): array
-{
-    return $this->reservaRepo->buscarReservasPendentesGeral();
-}
+    public function listarPendentesGeral(int $offset = 0, int $limite = 10): array{
+        return $this->reservaRepo->buscarReservasPendentesGeral($offset, $limite);
+    }
+
+    public function contarPendentesGeral(): int{
+        return $this->reservaRepo->countPendentesGeral();
+    }
 }

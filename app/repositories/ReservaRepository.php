@@ -29,7 +29,7 @@ class ReservaRepository
             SELECT COUNT(*) FROM reservas
             WHERE id_local     = :id_local
               AND data_reserva = :data
-              AND status       = 'L'
+              AND status       = 'A'
               AND hora_ini     < :hora_fim
               AND hora_fim     > :hora_ini
         ");
@@ -48,7 +48,7 @@ class ReservaRepository
             SELECT COUNT(*) FROM reservas
             WHERE id_user      = :id_user
               AND data_reserva = :data
-              AND status       = 'P'
+              AND status       = 'P' 
         ");
         $stmt->execute([':id_user' => $id_user, ':data' => $data]);
         return (int)$stmt->fetchColumn() > 0;
@@ -66,17 +66,26 @@ class ReservaRepository
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function buscarReservasPendentesGeral(): array
-    {
+   public function buscarReservasPendentesGeral(int $offset = 0, int $limite = 10): array{
         $sql = "SELECT r.*, l.local, l.capacidade, m.nome as nome_morador, m.apto, m.bloco, m.sexo 
                 FROM reservas r
                 INNER JOIN locais_festivos l ON r.id_local = l.id_local
                 INNER JOIN morador m ON r.id_user = m.id_user 
                 WHERE r.status = 'P' 
-                ORDER BY r.data_reserva ASC";
+                ORDER BY r.data_reserva ASC
+                LIMIT :limite OFFSET :offset";
         $stmt = $this->pdo->prepare($sql); 
+        $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function countPendentesGeral(): int
+    {
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM reservas WHERE status = 'P'");
+        $stmt->execute();
+        return (int)$stmt->fetchColumn();
     }
 
     public function atualizarStatus(int $id, string $status): bool
@@ -107,5 +116,18 @@ class ReservaRepository
             $dados[(int)$row['mes'] - 1] = (int)$row['total'];
         }
         return $dados;
+    }
+
+    public function findById(int $id): ?array{
+        $stmt = $this->pdo->prepare("
+            SELECT r.*, l.local, m.email, m.nome as nome_morador
+            FROM reservas r
+            INNER JOIN locais_festivos l ON r.id_local = l.id_local
+            INNER JOIN morador m ON r.id_user = m.id_user
+            WHERE r.id_reserva = :id
+        ");
+        $stmt->execute([':id' => $id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result ?: null;
     }
 }
