@@ -7,8 +7,6 @@ unset($_SESSION['erro_cadastro']);
 ?>
 
 <div class="cadastro-wrapper">
-
-    <!-- Lado esquerdo — decorativo -->
     <div class="cadastro-left">
         <div class="cadastro-brand">
             <svg class="cadastro-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -24,7 +22,6 @@ unset($_SESSION['erro_cadastro']);
                 Crie sua conta em menos de 2 minutos e aguarde<br>
                 a aprovação do síndico para acessar o sistema.
             </p>
-
             <ul class="cadastro-steps">
                 <li class="cadastro-step">
                     <span class="step-num">1</span>
@@ -50,15 +47,12 @@ unset($_SESSION['erro_cadastro']);
             </ul>
         </div>
     </div>
-
-    <!-- Lado direito — formulário -->
     <div class="cadastro-right">
         <div class="cadastro-form-wrap">
             <div class="cadastro-form-header">
                 <h4>Criar conta</h4>
                 <p>Após o cadastro, aguarde a aprovação do síndico.</p>
             </div>
-
             <?php if ($erro): ?>
                 <div class="df-alert df-alert-error">
                     <i class='bx bx-error-circle'></i>
@@ -67,8 +61,6 @@ unset($_SESSION['erro_cadastro']);
             <?php endif; ?>
 
             <form action="<?= BASE_URL ?>/cadastro/salvar" method="POST">
-
-                <!-- Identificação -->
                 <p class="form-section-label">Identificação</p>
                 <div class="df-grid-2">
                     <div class="df-field">
@@ -81,9 +73,7 @@ unset($_SESSION['erro_cadastro']);
                         <input type="text" name="user_cpf" id="user_cpf"
                             placeholder="000.000.000-00" maxlength="14" required>
                     </div>
-                </div>
-
-                <!-- Unidade -->
+                </div>               
                 <p class="form-section-label">Unidade</p>
                 <div class="df-grid-3">
                     <div class="df-field">
@@ -105,8 +95,6 @@ unset($_SESSION['erro_cadastro']);
                         </select>
                     </div>
                 </div>
-
-                <!-- Contato -->
                 <p class="form-section-label">Contato</p>
                 <div class="df-grid-2">
                     <div class="df-field">
@@ -129,8 +117,6 @@ unset($_SESSION['erro_cadastro']);
                             placeholder="(00) 00000-0000" maxlength="15">
                     </div>
                 </div>
-
-                <!-- Segurança -->
                 <p class="form-section-label">Segurança</p>
                 <div class="df-grid-2">
                     <div class="df-field">
@@ -144,7 +130,6 @@ unset($_SESSION['erro_cadastro']);
                             placeholder="••••••••" required>
                     </div>
                 </div>
-
                 <div class="df-actions">
                     <a href="<?= BASE_URL ?>/" class="btn-ghost">
                         <i class='bx bx-arrow-back'></i> Voltar ao login

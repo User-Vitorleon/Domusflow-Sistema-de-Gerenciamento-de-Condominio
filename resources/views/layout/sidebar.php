@@ -22,16 +22,12 @@ $avatar        = ($usuario['sexo'] === 'M')
 
     <div class="menu-bar">
         <ul class="menu-links">
-
-            <!-- dashboard — todos os perfis -->
             <li class="nav-link <?= $paginaAtiva === 'dashboard' ? 'active' : '' ?>">
                 <a href="<?= BASE_URL ?>/dashboard">
                     <i class='bx bxs-dashboard'></i>
                     <span class="nav-text">Dashboard</span>
                 </a>
             </li>
-
-            <!-- reservas — morador e síndico -->
             <?php if (in_array($prev, [1, 2, 4])): ?>
                 <li class="nav-link <?= $paginaAtiva === 'reserva' ? 'active' : '' ?>">
                     <a href="<?= BASE_URL ?>/reserva">
@@ -40,8 +36,6 @@ $avatar        = ($usuario['sexo'] === 'M')
                     </a>
                 </li>
             <?php endif; ?>
-
-            <!-- novos usuários — síndico e admin -->
             <?php if (in_array($prev, [2, 4])): ?>
                 <li class="nav-link <?= $paginaAtiva === 'moradores' ? 'active' : '' ?>">
                     <a href="<?= BASE_URL ?>/moradores/pendentes">
@@ -51,22 +45,18 @@ $avatar        = ($usuario['sexo'] === 'M')
                 </li>
             <?php endif; ?>
 
-            <!-- veículos — todos os perfis (cada um vê o que pode) -->
             <li class="nav-link <?= $paginaAtiva === 'veiculo' ? 'active' : '' ?>">
                 <a href="<?= BASE_URL ?>/veiculo">
                     <i class='bx bx-car'></i>
                     <span class="nav-text">Veículos</span>
                 </a>
             </li>
-
-            <li class="nav-link <?= $paginaAtiva === 'dashboard' ? 'active' : '' ?>">
+            <li class="nav-link <?= $paginaAtiva === 'perfil' ? 'active' : '' ?>">
                 <a href="<?= BASE_URL ?>/cadastro/update">
-                    <i class='bx bxs-dashboard'></i>
+                    <i class='bx bx-user-circle'></i>
                     <span class="nav-text">Atualizar Dados</span>
                 </a>
             </li>
-
-            <!-- consulta rápida por placa — porteiro e admin -->
             <?php if (in_array($prev, [3, 4])): ?>
                 <li class="nav-link <?= $paginaAtiva === 'consulta-veiculo' ? 'active' : '' ?>">
                     <a href="<?= BASE_URL ?>/veiculo/consultar">
@@ -75,10 +65,7 @@ $avatar        = ($usuario['sexo'] === 'M')
                     </a>
                 </li>
             <?php endif; ?>
-
         </ul>
-
-        <!-- perfil + logout no rodapé da sidebar -->
         <a href="<?= BASE_URL ?>/logout" class="sidebar-profile">
             <img src="<?= $avatar ?>" alt="avatar">
             <div class="profile-info">
