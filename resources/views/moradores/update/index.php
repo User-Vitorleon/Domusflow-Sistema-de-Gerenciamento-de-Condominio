@@ -10,8 +10,6 @@ require_once __DIR__ . '/../../layout/sidebar.php';
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <div class="perfil-wrapper">
   <div class="perfil-card">
-
-    <!-- Cabeçalho do perfil -->
     <div class="d-flex align-items-center gap-3 mb-1">
       <img
         src="<?= ($usuario['sexo'] === 'M')
@@ -29,7 +27,6 @@ require_once __DIR__ . '/../../layout/sidebar.php';
       </div>
     </div>
 
-    <!-- Alerta de erro -->
     <?php if (!empty($_SESSION['erro_update'])): ?>
       <div class="alert-erro">
         <i class='bx bx-error-circle'></i>
@@ -38,7 +35,6 @@ require_once __DIR__ . '/../../layout/sidebar.php';
       <?php unset($_SESSION['erro_update']); ?>
     <?php endif; ?>
 
-    <!-- Formulário de atualização -->
     <form action="<?= BASE_URL ?>/cadastro/update/salvar" method="POST">
 
       <p class="section-title">Informações pessoais</p>
@@ -89,9 +85,8 @@ require_once __DIR__ . '/../../layout/sidebar.php';
 
     <hr class="divider">
 
-    <!-- Zona de perigo -->
     <div class="danger-zone">
-      <h6><i class='bx bx-shield-x me-1'></i> Zona de perigo</h6>
+      <h6><i class='bx bx-shield-x me-1'></i>Apagar Conta</h6>
       <div class="danger-btns">
 
         <form action="<?= BASE_URL ?>/moradores/inativar" method="POST" style="flex:1"
