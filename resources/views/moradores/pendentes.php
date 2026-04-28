@@ -24,26 +24,25 @@ require_once __DIR__ . '/../layout/sidebar.php';
             <p>Nenhuma solicitação pendente no momento.</p>
         </div>
     <?php else: ?>
-        <div class="morador-list">
-            <?php foreach ($moradores as $m):
-                $avatar = ($m['sexo'] === 'M')
-                    ? 'https://png.pngtree.com/png-vector/20231019/ourmid/pngtree-user-profile-avatar-png-image_10211467.png'
-                    : 'https://images.icon-icons.com/3708/PNG/512/girl_female_woman_person_people_avatar_icon_230018.png';
-            ?>
-                <div class="morador-card">
-                    <img src="<?= $avatar ?>" alt="avatar" class="morador-avatar">
-                    <div class="morador-info">
-                        <strong><?= htmlspecialchars($m['nome']) ?></strong>
-                        <span>CPF: <?= htmlspecialchars($m['cpf']) ?> · Ap <?= htmlspecialchars($m['apto']) ?> · Bloco <?= htmlspecialchars($m['bloco']) ?></span>
-                    </div>
-                    <form action="<?= BASE_URL ?>/moradores/liberar" method="POST" class="morador-actions">
-                        <input type="hidden" name="id_morador" value="<?= $m['id_user'] ?>">
-                        <button type="submit" name="acao" value="aceitar" class="btn-success-sm">Aceitar</button>
-                        <button type="submit" name="acao" value="negar" class="btn-danger-sm">Negar</button>
-                    </form>
+    <div class="morador-list">
+        <?php 
+        $avatar = 'https://static.vecteezy.com/ti/vetor-gratis/p1/21548095-padrao-perfil-cenario-avatar-do-utilizador-avatar-icone-pessoa-icone-cabeca-icone-perfil-cenario-icones-padrao-anonimo-do-utilizador-masculino-e-femea-homem-de-negocios-foto-espaco-reservado-social-rede-avatar-retrato-gratis-vetor.jpg';
+        foreach ($moradores as $m): 
+        ?>
+            <div class="morador-card">
+                <img src="<?= $avatar ?>" alt="avatar" class="morador-avatar">
+                <div class="morador-info">
+                    <strong><?= htmlspecialchars($m['nome']) ?></strong>
+                    <span>CPF: <?= htmlspecialchars($m['cpf']) ?> · Ap <?= htmlspecialchars($m['apto']) ?> · Bloco <?= htmlspecialchars($m['bloco']) ?></span>
                 </div>
-            <?php endforeach; ?>
-        </div>
+                <form action="<?= BASE_URL ?>/moradores/liberar" method="POST" class="morador-actions">
+                    <input type="hidden" name="id_morador" value="<?= $m['id_user'] ?>">
+                    <button type="submit" name="acao" value="aceitar" class="btn-success-sm">Aceitar</button>
+                    <button type="submit" name="acao" value="negar" class="btn-danger-sm">Negar</button>
+                </form>
+            </div>
+        <?php endforeach; ?>
+    </div>
         <?php if ($totalPaginas > 1): ?>
         <nav class="mt-3 d-flex justify-content-center">
             <ul class="pagination">

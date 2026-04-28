@@ -2,9 +2,7 @@
 $paginaAtiva   = $paginaAtiva ?? '';
 $prev          = $usuario['previlegio'] ?? 1;
 $primeiro_nome = explode(' ', $usuario['nome'])[0];
-$avatar        = ($usuario['sexo'] === 'M')
-    ? 'https://png.pngtree.com/png-vector/20231019/ourmid/pngtree-user-profile-avatar-png-image_10211467.png'
-    : 'https://images.icon-icons.com/3708/PNG/512/girl_female_woman_person_people_avatar_icon_230018.png';
+$avatar        = 'https://static.vecteezy.com/ti/vetor-gratis/p1/21548095-padrao-perfil-cenario-avatar-do-utilizador-avatar-icone-pessoa-icone-cabeca-icone-perfil-cenario-icones-padrao-anonimo-do-utilizador-masculino-e-femea-homem-de-negocios-foto-espaco-reservado-social-rede-avatar-retrato-gratis-vetor.jpg';
 ?>
 <nav class="sidebar">
     <header class="sidebar-header">

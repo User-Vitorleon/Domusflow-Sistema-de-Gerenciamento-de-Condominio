@@ -6,7 +6,6 @@ class Morador {
     public string $apto;
     public string $bloco;
     public string $email;
-    public string $sexo;
     public string $telefone;
     public ?string $telefone_recado;
     public string $status;    // P=Pendente, L=Liberado, B=Bloqueado
@@ -32,7 +31,6 @@ class Morador {
         $m->apto            = $data['apto']              ?? '';
         $m->bloco           = $data['bloco']             ?? '';
         $m->email           = $data['email']             ?? '';
-        $m->sexo            = $data['sexo']              ?? 'M';
         $m->telefone        = $data['telefone']          ?? '';
         $m->telefone_recado = $data['tell_recado']       ?? null;
         $m->status          = $data['status']            ?? 'P';

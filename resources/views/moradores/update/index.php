@@ -12,9 +12,7 @@ require_once __DIR__ . '/../../layout/sidebar.php';
   <div class="perfil-card">
     <div class="d-flex align-items-center gap-3 mb-1">
       <img
-        src="<?= ($usuario['sexo'] === 'M')
-          ? 'https://png.pngtree.com/png-vector/20231019/ourmid/pngtree-user-profile-avatar-png-image_10211467.png'
-          : 'https://images.icon-icons.com/3708/PNG/512/girl_female_woman_person_people_avatar_icon_230018.png' ?>"
+        src="https://static.vecteezy.com/ti/vetor-gratis/p1/21548095-padrao-perfil-cenario-avatar-do-utilizador-avatar-icone-pessoa-icone-cabeca-icone-perfil-cenario-icones-padrao-anonimo-do-utilizador-masculino-e-femea-homem-de-negocios-foto-espaco-reservado-social-rede-avatar-retrato-gratis-vetor.jpg";
         class="perfil-avatar" alt="avatar">
       <div>
         <p class="perfil-nome"><?= htmlspecialchars($usuario['nome']) ?></p>

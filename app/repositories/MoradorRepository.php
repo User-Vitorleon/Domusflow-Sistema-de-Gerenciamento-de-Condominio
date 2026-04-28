@@ -47,9 +47,9 @@ class MoradorRepository
     {
         $stmt = $this->pdo->prepare(
             "INSERT INTO morador
-                (identificador, nome, apto, bloco, cpf, email, sexo, telefone, tell_recado, senha, status)
+                (identificador, nome, apto, bloco, cpf, email, telefone, tell_recado, senha, status)
              VALUES
-                (:iden, :nome, :apto, :bloco, :cpf, :email, :sexo, :cell, :recado, :senha, :status)"
+                (:iden, :nome, :apto, :bloco, :cpf, :email, :cell, :recado, :senha, :status)"
         );
 
         $sucesso = $stmt->execute([
@@ -59,7 +59,6 @@ class MoradorRepository
             ':bloco'  => $data['bloco'],
             ':cpf'    => $data['cpf'],
             ':email'  => $data['email'],
-            ':sexo'   => $data['sexo'],
             ':cell'   => $data['telefone'],
             ':recado' => $data['telefone_recado'] ?? null,
             ':senha'  => $data['senha'],

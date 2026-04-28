@@ -35,7 +35,6 @@ class MoradorController
             'apto'            => $_POST['user_apto']           ?? '',
             'bloco'           => $_POST['user_bloco']          ?? '',
             'email'           => $_POST['user_email']          ?? '',
-            'sexo'            => $_POST['user_sexo']           ?? 'M',
             'telefone'        => $_POST['user_cell']           ?? '',
             'telefone_recado' => $_POST['user_recado']         ?? null,
             'senha'           => $_POST['user_senha']          ?? '',

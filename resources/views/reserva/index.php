@@ -114,9 +114,7 @@ $prev = $usuario['previlegio'] ?? 1;
             <?php foreach ($reservasParaAprovar as $res): 
                 // Corrigido para usar $res que vem do foreach
                 $sexoMorador = $res['sexo'] ?? 'M';
-                $avatar = ($sexoMorador === 'M')
-                    ? 'https://png.pngtree.com/png-vector/20231019/ourmid/pngtree-user-profile-avatar-png-image_10211467.png'
-                    : 'https://images.icon-icons.com/3708/PNG/512/girl_female_woman_person_people_avatar_icon_230018.png';
+                $avatar = 'https://static.vecteezy.com/ti/vetor-gratis/p1/21548095-padrao-perfil-cenario-avatar-do-utilizador-avatar-icone-pessoa-icone-cabeca-icone-perfil-cenario-icones-padrao-anonimo-do-utilizador-masculino-e-femea-homem-de-negocios-foto-espaco-reservado-social-rede-avatar-retrato-gratis-vetor.jpg';
             ?>
                 <div class="morador-card">
                     <img src="<?= $avatar ?>" alt="avatar" class="morador-avatar">
