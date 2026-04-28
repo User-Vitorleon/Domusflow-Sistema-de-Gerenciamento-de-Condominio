@@ -18,13 +18,30 @@ require_once __DIR__ . '/../layout/sidebar.php';
         <p class="text-muted">Você ainda não possui reservas efetuadas.</p>
     <?php else: ?>
         <?php foreach ($minhasReservas as $reserva): 
-            $corFundo = ($reserva['status'] == 'L') ? '#DCFCE7' : '#FEF2F2'; 
-            $corTexto = ($reserva['status'] == 'L') ? '#16A34A' : '#EF4444'; 
-            $textoStatus = ($reserva['status'] == 'L') ? 'Liberado' : 'Pendente';
+            switch ($reserva['status']) {
+        case 'A':
+            $corFundo   = '#DCFCE7';
+            $corTexto   = '#16A34A';
+            $textoStatus = 'Aprovada';
+            $icone      = 'bx-check-circle';
+            break;
+        case 'N':
+            $corFundo   = '#FEF2F2';
+            $corTexto   = '#EF4444';
+            $textoStatus = 'Negada';
+            $icone      = 'bx-x-circle';
+            break;
+        default: // 'P'
+            $corFundo   = '#FEF9C3';
+            $corTexto   = '#CA8A04';
+            $textoStatus = 'Pendente';
+            $icone      = 'bx-time';
+            break;
+    }
         ?>
         <div class="kpi-card kpi-card-feriado" style="margin-bottom: 15px;">
             <div class="kpi-icon" style="background: <?= $corFundo ?>; color: <?= $corTexto ?>;">
-                <i class='bx bx-calendar-check'></i>
+                <i class='bx <?= $icone ?>'></i>
             </div>
             <div>
                 <p class="kpi-label">Local Reservado</p>

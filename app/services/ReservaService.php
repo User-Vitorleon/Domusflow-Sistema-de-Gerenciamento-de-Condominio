@@ -55,17 +55,12 @@ class ReservaService
         }
 
         // ── Morador já tem reserva pendente no dia ────
-        $jaPendente = $this->reservaRepo->existePendenteNoDia(
-            $id_user,
-            $dados['data_reserva']
-        );
+        $jaPendente = $this->reservaRepo->existeReservaPendente($id_user);
         if ($jaPendente) {
-        echo "<script>
-                alert('Você já possui uma reserva pendente nesta data.');
-                window.history.back();
-            </script>";
-    exit;
-}
+            return ['sucesso' => false, 'mensagem' => 'Já possui uma reserva pendente. Aguarde a aprovação do sindico antes de fazer uma nova !'];
+        }
+
+
         $this->reservaRepo->save([
             'id_local'     => (int)$dados['id_local'],
             'id_user'      => $id_user,

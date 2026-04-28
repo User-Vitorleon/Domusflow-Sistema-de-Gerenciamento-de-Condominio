@@ -130,6 +130,20 @@ class EmailService
         ";
         return $this->enviar($destinatario, $nome, $assunto, $corpo);
     }
+
+    Public function reservaNegadaConflito(string $destinatario, string $nome, string $local, string $data): bool {
+        $assunto = 'Reserva não disponível';
+        $corpo = "
+        <h2>Olá, {$nome}!</h2>
+            <p>Infelizmente sua reserva não pôde ser confirmada.</p>
+            <p>O local <strong>{$local}</strong> já foi reservado por outro morador para o dia <strong>{$data}</strong>.</p>
+            <p>Que tal escolher outro dia ou local? Acesse o sistema e faça uma nova reserva!</p>
+            <br>
+            <hr>
+        <p>Atenciosamente,<br><strong>Equipe DomusFlow</strong></p>
+        ";
+        return $this->enviar($destinatario, $nome, $assunto, $corpo);
+    }
 }
 
 ?>

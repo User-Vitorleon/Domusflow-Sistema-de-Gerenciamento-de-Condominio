@@ -32,7 +32,6 @@ class MoradorService
             'apto'            => $dados['apto'],
             'bloco'           => $dados['bloco'],
             'email'           => $dados['email'],
-            'sexo'            => $dados['sexo'],
             'telefone'        => $dados['telefone'],
             'telefone_recado' => $dados['telefone_recado'] ?? null,
             'senha'           => hashSenha($dados['senha']),

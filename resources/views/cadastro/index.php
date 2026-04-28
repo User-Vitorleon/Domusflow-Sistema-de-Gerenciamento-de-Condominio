@@ -86,14 +86,6 @@ unset($_SESSION['erro_cadastro']);
                         <input type="text" name="user_bloco"
                             placeholder="A" maxlength="3" required>
                     </div>
-                    <div class="df-field">
-                        <label>Sexo</label>
-                        <select name="user_sexo" required>
-                            <option value="" disabled selected>Selecione</option>
-                            <option value="M">Masculino</option>
-                            <option value="F">Feminino</option>
-                        </select>
-                    </div>
                 </div>
                 <p class="form-section-label">Contato</p>
                 <div class="df-grid-2">

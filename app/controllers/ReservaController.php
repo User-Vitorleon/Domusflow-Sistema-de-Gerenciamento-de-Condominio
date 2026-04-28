@@ -66,8 +66,7 @@ class ReservaController {
         }
     }
 
-    public function decidir(): void
-{
+    public function decidir(): void{
     $idReserva = (int)($_POST['id_reserva'] ?? 0);
     $acao      = $_POST['acao'] ?? null;
 
@@ -92,6 +91,23 @@ class ReservaController {
                     $local['local'],
                     $reserva['data_reserva']
                 );
+
+                $conflitantes = $reservaRepo->negarConflitantes(
+                    $reserva['id_local'],
+                    $reserva['data_reserva'],
+                    $reserva['hora_ini'],
+                    $reserva['hora_fim'],
+                    $idReserva
+                );
+
+                foreach ($conflitantes as $c) {
+                    $emailService->reservaNegadaConflito(
+                        $c['email'],
+                        $c['nome_morador'],
+                        $local['local'],
+                        $reserva['data_reserva']
+                    );
+                }
             } else {
                 $emailService->reservaNegada(
                     $morador['email'],
@@ -105,7 +121,6 @@ class ReservaController {
 
     header('Location: ' . BASE_URL . '/reserva');
     exit();
-}
-
-        
+}  
+      
 }
