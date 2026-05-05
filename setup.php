@@ -22,6 +22,7 @@ try {
         'sindico@domusflow.com',
         'porteiro@domusflow.com',
         'zefinha@domusflow.com',
+        'alexandrebarbosa25@email.com',
     ];
 
     foreach ($emails as $email) {

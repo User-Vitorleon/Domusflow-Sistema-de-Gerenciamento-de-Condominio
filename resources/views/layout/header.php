@@ -26,6 +26,7 @@ if (isset($usuario) && is_array($usuario)) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/app.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/header.css">
     <?php if ($cssExtra): ?>
         <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/<?= $cssExtra ?>">
     <?php endif; ?>
@@ -38,45 +39,56 @@ if (isset($usuario) && is_array($usuario)) {
 
     <?php if (!$semTopo && $primeiro_nome): ?>
         <header class="df-topbar">
+            <div class="df-topbar-inner">
 
-            <!-- Esquerda: logo + Painel -->
-            <a href="<?= BASE_URL ?>/painel" class="df-topbar-home" aria-label="Ir para o Painel">
-                <img src="<?= BASE_URL ?>/public/assets/img/logo_icon.jpg"
-                    alt="DomusFlow" class="df-topbar-home-logo"
-                    onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
-                <!-- fallback ícone casa -->
-                <svg style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z" />
-                    <path d="M9 21V12h6v9" />
-                </svg>
-                <span class="df-topbar-home-label">Painel</span>
-            </a>
-
-            <!-- Centro: título da página -->
-            <span class="df-topbar-title"><?= htmlspecialchars($paginaTitulo) ?></span>
-
-            <!-- Direita: nome + apto/bloco + sair -->
-            <div class="df-topbar-user">
-                <div class="df-topbar-userinfo">
-                    <span class="df-topbar-name"><?= htmlspecialchars($primeiro_nome) ?></span>
-                    <?php if ($apto || $bloco): ?>
-                        <span class="df-topbar-apto">
-                            <?php if ($bloco): ?>&nbsp;Bloco. <?= htmlspecialchars($bloco) ?><?php endif; ?>
-                            <?php if ($apto):  ?>&nbsp;Ap. <?= htmlspecialchars($apto) ?><?php endif; ?>
-                        </span>
-                    <?php endif; ?>
-                </div>
-                <a href="<?= BASE_URL ?>/logout" class="df-topbar-logout" aria-label="Sair">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                <a href="<?= BASE_URL ?>/painel" class="df-topbar-home" aria-label="Ir para o Painel">
+                    <img src="<?= BASE_URL ?>/public/assets/img/logo_icon.jpg"
+                        alt="DomusFlow" class="df-topbar-home-logo"
+                        onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+                    <svg style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                        <polyline points="16 17 21 12 16 7" />
-                        <line x1="21" y1="12" x2="9" y2="12" />
+                        <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z" />
+                        <path d="M9 21V12h6v9" />
                     </svg>
-                    <span class="df-topbar-logout-label">Sair</span>
+                    <span class="df-topbar-home-label">Painel</span>
                 </a>
-            </div>
 
+                <span class="df-topbar-title"><?= htmlspecialchars($paginaTitulo) ?></span>
+
+                <div class="df-topbar-user">
+                    <div class="df-topbar-userinfo">
+
+                        <!-- Linha 1: badge + nome -->
+                        <div class="df-topbar-name-row">
+                            <?php
+                            $perfis = [1 => 'Morador(a)', 2 => 'Síndico(a)', 3 => 'Funcionário(a)', 4 => 'Admin'];
+                            $prev   = $usuario['previlegio'] ?? 1;
+                            $label  = $perfis[$prev] ?? 'Morador';
+                            ?>
+                            <span class="df-topbar-role df-topbar-role--<?= $prev ?>"><?= $label ?></span>
+                            <span class="df-topbar-name"><?= htmlspecialchars($primeiro_nome) ?></span>
+                        </div>
+
+                        <!-- Linha 2: bloco + apto -->
+                        <?php if ($apto || $bloco): ?>
+                            <span class="df-topbar-apto">
+                                <?php if ($bloco): ?>Bl. <?= htmlspecialchars($bloco) ?><?php endif; ?>
+                                <?php if ($apto): ?>&nbsp;Ap. <?= htmlspecialchars($apto) ?><?php endif; ?>
+                            </span>
+                        <?php endif; ?>
+
+                    </div>
+                    <a href="<?= BASE_URL ?>/logout" class="df-topbar-logout" aria-label="Sair">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                            <polyline points="16 17 21 12 16 7" />
+                            <line x1="21" y1="12" x2="9" y2="12" />
+                        </svg>
+                        <span class="df-topbar-logout-label">Sair</span>
+                    </a>
+                </div>
+
+            </div>
         </header>
     <?php endif; ?>

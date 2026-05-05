@@ -2,18 +2,21 @@
 require_once __DIR__ . '/../repositories/LocalRepository.php';
 require_once __DIR__ . '/../repositories/MoradorRepository.php';
 
-class LocalService {
+class LocalService
+{
     private LocalRepository   $localRepo;
     private MoradorRepository $moradorRepo;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->localRepo   = new LocalRepository();
         $this->moradorRepo = new MoradorRepository();
     }
 
-    public function cadastrar(array $dados, int $id_logado): array {
+    public function cadastrar(array $dados, int $id_logado): array
+    {
         $solicitante = $this->moradorRepo->findById($id_logado);
-        if (!$solicitante || $solicitante['previlegio'] != 2) {
+        if (!$solicitante || !in_array($solicitante['previlegio'] ?? 0, [2, 4])) {
             return ['sucesso' => false, 'mensagem' => 'Sem permissão.'];
         }
 

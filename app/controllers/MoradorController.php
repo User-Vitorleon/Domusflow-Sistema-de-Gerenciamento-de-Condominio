@@ -16,9 +16,9 @@ class MoradorController
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-    
-        session_unset(); 
-        
+
+        session_unset();
+
         require_once __DIR__ . '/../../resources/views/cadastro/index.php';
     }
 
@@ -87,33 +87,33 @@ class MoradorController
 
     private function requireSindico(): void
     {
-        if (!isset($_SESSION['usuario_id']) || ($_SESSION['usuario_previlegio'] ?? 0) != 2) {
-            header('Location: ' . BASE_URL . '/');
+        if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['usuario_previlegio'] ?? 0, [2, 4])) {
+            header('Location: ' . BASE_URL . '/painel');
             exit();
         }
     }
 
-    public function formUpdate(): void 
+    public function formUpdate(): void
     {
-        if(!isset($_SESSION['usuario_id'])){
+        if (!isset($_SESSION['usuario_id'])) {
             header('Location: ' . BASE_URL . '/');
             exit();
         }
 
-        $repo    = new MoradorRepository();    
+        $repo    = new MoradorRepository();
         $usuario = $repo->findById((int)$_SESSION['usuario_id']);
 
         require_once __DIR__ . '/../../resources/views/moradores/update/index.php';
     }
 
-    public function updateSalvar(): void 
+    public function updateSalvar(): void
     {
-        if($_SERVER['REQUEST_METHOD'] !== 'POST'){
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: ' . BASE_URL . '/cadastro/update');
             exit();
         }
 
-        $resultado = $this->service->atualizar ([
+        $resultado = $this->service->atualizar([
             'id'           => $_SESSION['usuario_id'],
             'nome'         => $_POST['user_nome'] ?? '',
             'email'        => $_POST['user_email'] ?? '',
@@ -126,25 +126,25 @@ class MoradorController
         ]);
 
         if ($resultado['sucesso']) {
-            header('Location: ' . BASE_URL . '/dashboard');
+            header('Location: ' . BASE_URL . '/painel');
         } else {
             $_SESSION['erro_update'] = $resultado['mensagem'];
             header('Location: ' . BASE_URL . '/cadastro/update');
         }
         exit();
-
     }
 
-    public function inativar(): void {
+    public function inativar(): void
+    {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-        
+
         if (!isset($_SESSION['usuario_id'])) {
             header('Location: ' . BASE_URL . '/');
-            exit(); 
+            exit();
         }
-        
+
         $repo = new MoradorRepository();
         $id = $_SESSION['usuario_id'];
         $repo->atualizarStatus($id, 'B');
@@ -154,32 +154,30 @@ class MoradorController
         session_start();
         $_SESSION['erro_login'] = 'Esta conta está inativa. Entre em contato com o síndico.';
         header('Location: ' . BASE_URL . '/');
-        exit(); 
+        exit();
     }
 
-    public function deletar(): void {
+    public function deletar(): void
+    {
         if (!isset($_SESSION['usuario_id'])) {
             header('Location: ' . BASE_URL . '/');
-            exit(); 
-        }
-            $this->service->deletar([
-                'id'         => $_SESSION['usuario_id'],
-                'nome'       => '***',
-                'email'      => '***',
-                'apto'       => '***',
-                'bloco'      => '***',
-                'telefone'   => '***',
-                'tell_recado'=> '***',
-                'senha'      => '***',
-                'cpf'        => '***'
-            ]);
-
-            session_unset();
-            session_destroy();
-            header('Location: ' . BASE_URL . '/');
             exit();
+        }
+        $this->service->deletar([
+            'id'         => $_SESSION['usuario_id'],
+            'nome'       => '***',
+            'email'      => '***',
+            'apto'       => '***',
+            'bloco'      => '***',
+            'telefone'   => '***',
+            'tell_recado' => '***',
+            'senha'      => '***',
+            'cpf'        => '***'
+        ]);
+
+        session_unset();
+        session_destroy();
+        header('Location: ' . BASE_URL . '/');
+        exit();
     }
-
-
-
 }

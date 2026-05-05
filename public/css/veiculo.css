@@ -1,3 +1,7 @@
+/* ═══════════════════════════════════════════
+   DomusFlow — veiculo.css
+═══════════════════════════════════════════ */
+
 /* título das seções dentro do card */
 .section-title {
     font-size: 16px;
@@ -47,15 +51,132 @@
     color: var(--text);
 }
 
-/* card que exibe o resultado da consulta por placa */
+/* ── Badge principal na tabela ── */
+.badge-principal {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    white-space: nowrap;
+}
+
+.badge-principal::before {
+    content: '★';
+    font-size: 10px;
+}
+
+/* ── Checkbox principal estilizado ── */
+.df-field-check {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.df-field-check input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.df-field-check label {
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    margin: 0;
+}
+
+/* ── Contador de veículos ── */
+.veiculo-counter {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+}
+
+.veiculo-counter-bar {
+    display: flex;
+    gap: 4px;
+}
+
+.veiculo-counter-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--border);
+}
+
+.veiculo-counter-dot.usado {
+    background: var(--primary);
+}
+
+/* resultado da consulta */
 .resultado-card {
     margin-top: 24px;
 }
 
-/* valor em destaque no resultado */
 .resultado-valor {
     font-size: 15px;
     font-weight: 500;
     color: var(--text);
     margin: 0;
+}
+
+/* paginação */
+.df-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+}
+
+.df-page-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 10px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--white);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    transition: background var(--transition), border-color var(--transition), color var(--transition);
+}
+
+.df-page-btn:hover:not(.disabled):not(.active) {
+    background: var(--bg);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.df-page-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+    pointer-events: none;
+}
+
+.df-page-btn.disabled {
+    opacity: .4;
+    pointer-events: none;
+}
+
+.df-page-ellipsis {
+    color: var(--text-muted);
+    font-size: 13px;
+    padding: 0 4px;
 }

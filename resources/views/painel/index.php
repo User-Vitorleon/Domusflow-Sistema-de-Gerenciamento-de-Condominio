@@ -19,10 +19,14 @@ if (in_array($prev, [3, 4])) {
     $modulos[] = ['titulo' => 'Consultar Placa', 'sub' => 'Pesquise qualquer veículo pela placa',              'href' => BASE_URL . '/veiculo/consultar',   'icon' => 'search'];
 }
 if (in_array($prev, [2, 4])) {
-    $modulos[] = ['titulo' => 'Novos Usuários',  'sub' => 'Aprove ou recuse solicitações de novos moradores',  'href' => BASE_URL . '/moradores/pendentes', 'icon' => 'user-check'];
+    $modulos[] = ['titulo' => 'Novos Usuários', 'sub' => 'Aprove ou recuse solicitações de novos moradores', 'href' => BASE_URL . '/moradores/pendentes', 'icon' => 'user-check'];
 }
-$modulos[]     = ['titulo' => 'Veículos',        'sub' => 'Cadastre e gerencie seus veículos',                 'href' => BASE_URL . '/veiculo',             'icon' => 'car'];
-$modulos[]     = ['titulo' => 'Atualizar Dados', 'sub' => 'Edite seu perfil e dados pessoais',                 'href' => BASE_URL . '/cadastro/update',     'icon' => 'user'];
+
+if (in_array($prev, [1, 2, 4])) {
+    $modulos[] = ['titulo' => 'Veículos', 'sub' => 'Cadastre e gerencie seus veículos', 'href' => BASE_URL . '/veiculo', 'icon' => 'car'];
+}
+
+$modulos[] = ['titulo' => 'Atualizar Dados', 'sub' => 'Edite seu perfil e dados pessoais', 'href' => BASE_URL . '/cadastro/update', 'icon' => 'user'];
 ?>
 
 <main class="pn-page">
