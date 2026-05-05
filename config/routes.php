@@ -1,6 +1,6 @@
 <?php
 $uri = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
-$uri = preg_replace('#^Domusflow_novo/?#i', '', $uri);
+$uri = preg_replace('#^Domusflow-Sistema-de-Gerenciamento-de-Condominio/?#i', '', $uri);
 $uri = trim($uri, '/');
 
 $routes = [
@@ -14,7 +14,7 @@ $routes = [
     // moradores
     'cadastro'               => ['MoradorController',   'formCadastro'],
     'cadastro/salvar'        => ['MoradorController',   'salvar'],
-    'cadastro/update'        => ['MoradorController',   'formUpdate'  ],
+    'cadastro/update'        => ['MoradorController',   'formUpdate'],
     'cadastro/update/salvar' => ['Moradorcontroller',   'updateSalvar'],
     'moradores/pendentes'    => ['MoradorController',   'pendentes'],
     'moradores/liberar'      => ['MoradorController',   'liberar'],
@@ -23,6 +23,7 @@ $routes = [
 
     // Dashboard
     'dashboard'           => ['DashboardController', 'index'],
+    'painel'              => ['PainelController',    'index'],
 
     // Reservas
     'reserva'             => ['ReservaController',   'index'],

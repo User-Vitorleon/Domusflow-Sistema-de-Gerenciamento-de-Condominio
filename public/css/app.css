@@ -1,10 +1,3 @@
-/* ═══════════════════════════════════════════════════
-   DomusFlow — app.css (Global)
-   Reset · Variáveis · Sidebar · Botões · Forms · Cards
-═══════════════════════════════════════════════════ */
-
-
-/* ── Reset ────────────────────────────────────────── */
 *,
 *::before,
 *::after {
@@ -13,15 +6,32 @@
     padding: 0;
 }
 
+
 html {
     -webkit-font-smoothing: antialiased;
     scroll-behavior: smooth;
 }
 
 
-/* ── Variáveis ────────────────────────────────────── */
+img {
+    display: block;
+    max-width: 100%;
+}
+
+
+a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+
+a:hover {
+    color: var(--primary-dark);
+}
+
+
+/* ── Tokens ─────────────────────────────── */
 :root {
-    /* Cores principais */
     --primary-dark: #11446E;
     --primary: #0F80B6;
     --primary-light: #0E9FD1;
@@ -29,37 +39,38 @@ html {
     --secondary-light: #88B1C3;
     --gradient: linear-gradient(135deg, #11446E, #0E9FD1);
 
-    /* Neutros */
+
     --white: #FFFFFF;
     --bg: #F5F7FA;
     --border: #D1D5DB;
     --text-muted: #374151;
     --text: #111827;
 
-    /* Feedback */
+
     --success: #22C55E;
     --warning: #F59E0B;
     --error: #EF4444;
     --info: #3B82F6;
 
-    /* Forma e elevação */
+
     --radius: 10px;
     --radius-lg: 16px;
     --shadow: 0 1px 3px rgba(0, 0, 0, .08), 0 4px 16px rgba(0, 0, 0, .06);
     --shadow-md: 0 4px 24px rgba(15, 128, 182, .12);
     --transition: 180ms ease;
 
-    /* Tipografia */
-    --font: -apple-system, BlinkMacSystemFont, "SF Pro Display",
-        "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
 
-    /* Sidebar */
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Helvetica Neue", Arial, sans-serif;
+
+
     --sidebar-w: 240px;
     --sidebar-collapsed: 68px;
+    --topbar-h: 58px;
 }
 
 
-/* ── Base ─────────────────────────────────────────── */
+/* ── Base ───────────────────────────────── */
 body {
     font-family: var(--font);
     font-size: 15px;
@@ -68,28 +79,166 @@ body {
     line-height: 1.6;
 }
 
-img {
-    display: block;
-    max-width: 100%;
+
+/* ══════════════════════════════════════════
+   TOPBAR — fundo branco, borda sutil
+══════════════════════════════════════════ */
+/* ── TOPBAR ── */
+.df-topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 300;
+    height: var(--topbar-h);
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    /* 3 colunas simétricas */
+    align-items: center;
+    padding: 0 20px;
 }
 
-a {
-    color: var(--primary);
-    text-decoration: none;
+
+/* Esquerda — logo + Painel */
+.df-topbar-home {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--primary-dark);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 5px 8px;
+    border-radius: 7px;
+    width: fit-content;
+    /* não estica */
+    transition: background var(--transition);
 }
 
-a:hover {
+
+.df-topbar-home:hover {
+    background: #f0f4f8;
     color: var(--primary-dark);
 }
 
 
-/* ── Sidebar ──────────────────────────────────────── */
+.df-topbar-home-logo {
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+    border-radius: 5px;
+}
+
+
+.df-topbar-home svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+
+/* Centro — título */
+.df-topbar-title {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -.1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 8px;
+}
+
+
+/* Direita — userinfo + sair */
+.df-topbar-user {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    /* cola à direita */
+    gap: 6px;
+}
+
+
+.df-topbar-userinfo {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    line-height: 1.25;
+}
+
+
+.df-topbar-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+}
+
+
+.df-topbar-apto {
+    font-size: 11px;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+
+.df-topbar-logout {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 5px 8px;
+    border-radius: 7px;
+    transition: background var(--transition), color var(--transition);
+}
+
+
+.df-topbar-logout svg {
+    width: 17px;
+    height: 17px;
+    flex-shrink: 0;
+}
+
+
+.df-topbar-logout:hover {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+
+@media (max-width: 520px) {
+    .df-topbar {
+        grid-template-columns: auto 1fr auto;
+    }
+
+
+    .df-topbar-home-label,
+    .df-topbar-logout-label,
+    .df-topbar-userinfo {
+        display: none;
+    }
+
+
+    .df-topbar-title {
+        font-size: 13px;
+    }
+}
+
+
+/* ══════════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════════ */
 .sidebar {
     position: fixed;
-    top: 0;
+    top: var(--topbar-h);
     left: 0;
     width: var(--sidebar-w);
-    height: 100vh;
+    height: calc(100vh - var(--topbar-h));
     background: var(--primary-dark);
     display: flex;
     flex-direction: column;
@@ -98,17 +247,20 @@ a:hover {
     overflow: hidden;
 }
 
+
 .sidebar.close {
     width: var(--sidebar-collapsed);
 }
+
 
 .sidebar-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 16px;
+    padding: 16px 14px;
     border-bottom: 1px solid rgba(255, 255, 255, .08);
 }
+
 
 .brand {
     display: flex;
@@ -117,11 +269,12 @@ a:hover {
     overflow: hidden;
 }
 
+
 .brand-icon {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     background: var(--gradient);
-    border-radius: 10px;
+    border-radius: 9px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -129,22 +282,25 @@ a:hover {
     color: #fff;
 }
 
+
 .brand-icon svg {
-    width: 18px;
-    height: 18px;
+    width: 17px;
+    height: 17px;
 }
+
 
 .brand-name {
     color: #fff;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     white-space: nowrap;
-    letter-spacing: -.2px;
 }
+
 
 .sidebar.close .brand-name {
     display: none;
 }
+
 
 .toggle {
     color: rgba(255, 255, 255, .6);
@@ -154,18 +310,21 @@ a:hover {
     transition: color var(--transition);
 }
 
+
 .toggle:hover {
     color: #fff;
 }
+
 
 .menu-bar {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 12px 0;
+    padding: 10px 0;
     overflow: hidden;
 }
+
 
 .menu-links {
     list-style: none;
@@ -175,26 +334,26 @@ a:hover {
     padding: 0 8px;
 }
 
-/* ── Nav Links — fix pointer-events ──────────────── */
+
 .nav-link a {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 10px 12px;
+    gap: 11px;
+    padding: 9px 11px;
     border-radius: var(--radius);
     color: rgba(255, 255, 255, .65);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     transition: background var(--transition), color var(--transition);
     white-space: nowrap;
     pointer-events: auto;
-    /* link sempre clicável */
 }
+
 
 .nav-link a * {
     pointer-events: none;
-    /* filhos não interceptam o clique */
 }
+
 
 .nav-link a:hover,
 .nav-link.active a {
@@ -202,20 +361,24 @@ a:hover {
     color: #fff;
 }
 
+
 .nav-link.active a {
     background: var(--primary);
 }
 
+
 .nav-link i {
-    font-size: 18px;
+    font-size: 17px;
     flex-shrink: 0;
     width: 20px;
     text-align: center;
 }
 
+
 .nav-text {
     transition: opacity var(--transition);
 }
+
 
 .sidebar.close .nav-text {
     opacity: 0;
@@ -223,36 +386,39 @@ a:hover {
 }
 
 
-/* ── Sidebar Profile ──────────────────────────────── */
 .sidebar-profile {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 12px 16px;
+    padding: 12px 14px;
     border-top: 1px solid rgba(255, 255, 255, .08);
     cursor: pointer;
     transition: background var(--transition);
     overflow: hidden;
 }
 
+
 .sidebar-profile:hover {
     background: rgba(255, 255, 255, .06);
 }
 
+
 .sidebar-profile img {
-    width: 34px;
-    height: 34px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     object-fit: cover;
     flex-shrink: 0;
     border: 2px solid rgba(255, 255, 255, .2);
 }
 
+
 .profile-info {
     flex: 1;
     overflow: hidden;
     white-space: nowrap;
 }
+
 
 .profile-name {
     display: block;
@@ -261,17 +427,20 @@ a:hover {
     font-weight: 600;
 }
 
+
 .profile-sub {
     display: block;
     color: rgba(255, 255, 255, .5);
     font-size: 11px;
 }
 
+
 .logout-icon {
     color: rgba(255, 255, 255, .4);
-    font-size: 18px;
+    font-size: 17px;
     flex-shrink: 0;
 }
+
 
 .sidebar.close .profile-info,
 .sidebar.close .logout-icon {
@@ -279,92 +448,109 @@ a:hover {
 }
 
 
-/* ── Main Content ─────────────────────────────────── */
+/* ── Main Content ───────────────────────── */
 .main-content {
     margin-left: var(--sidebar-w);
     padding: 32px;
+    padding-top: calc(var(--topbar-h) + 24px);
     min-height: 100vh;
     transition: margin-left var(--transition);
 }
+
 
 .sidebar.close~.main-content {
     margin-left: var(--sidebar-collapsed);
 }
 
+
 .page-header {
-    margin-bottom: 28px;
+    margin-bottom: 24px;
 }
+
 
 .page-header h2 {
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: -.4px;
-}
-
-.page-header p {
-    color: var(--text-muted);
-    font-size: 14px;
-    margin-top: 2px;
-}
-
-
-/* ── Card Genérico ────────────────────────────────── */
-.df-card {
-    background: var(--white);
-    border-radius: var(--radius-lg);
-    padding: 32px;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border);
-}
-
-.df-card-header {
-    margin-bottom: 28px;
-}
-
-.df-card-header h4 {
-    font-size: 20px;
+    font-size: 21px;
     font-weight: 700;
     letter-spacing: -.3px;
 }
 
+
+.page-header p {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-top: 2px;
+}
+
+
+/* ══════════════════════════════════════════
+   COMPONENTES
+══════════════════════════════════════════ */
+
+
+/* Card */
+.df-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+}
+
+
+.df-card-header {
+    margin-bottom: 22px;
+}
+
+
+.df-card-header h4 {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -.2px;
+}
+
+
 .df-card-header p {
     color: var(--text-muted);
     font-size: 13px;
-    margin-top: 4px;
+    margin-top: 3px;
 }
 
 
-/* ── Formulários ──────────────────────────────────── */
+/* Forms */
 .df-field {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    margin-bottom: 16px;
+    gap: 5px;
+    margin-bottom: 14px;
 }
+
 
 .df-field label {
     font-size: 13px;
     font-weight: 500;
 }
 
+
 .df-field .optional {
     color: var(--text-muted);
     font-weight: 400;
 }
 
+
 .df-field input,
 .df-field select,
 .df-field textarea {
-    padding: 10px 14px;
+    padding: 9px 13px;
     border: 1px solid var(--border);
     border-radius: var(--radius);
     font-family: var(--font);
     font-size: 14px;
     color: var(--text);
     background: var(--white);
-    transition: border-color var(--transition), box-shadow var(--transition);
     outline: none;
+    transition: border-color var(--transition), box-shadow var(--transition);
 }
+
 
 .df-field input:focus,
 .df-field select:focus {
@@ -372,39 +558,43 @@ a:hover {
     box-shadow: 0 0 0 3px rgba(15, 128, 182, .12);
 }
 
+
 .df-field input[readonly] {
     background: var(--bg);
     color: var(--text-muted);
 }
 
+
 .df-grid-2 {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    gap: 14px;
 }
+
 
 .df-grid-3 {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    gap: 16px;
+    gap: 14px;
 }
+
 
 .df-actions {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
-    margin-top: 24px;
-    padding-top: 20px;
+    margin-top: 20px;
+    padding-top: 18px;
     border-top: 1px solid var(--border);
 }
 
 
-/* ── Botões ───────────────────────────────────────── */
+/* Buttons */
 .btn-primary {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 22px;
+    padding: 9px 20px;
     background: var(--gradient);
     color: #fff;
     border: none;
@@ -414,8 +604,8 @@ a:hover {
     font-weight: 600;
     cursor: pointer;
     transition: opacity var(--transition), box-shadow var(--transition);
-    letter-spacing: -.1px;
 }
+
 
 .btn-primary:hover {
     opacity: .9;
@@ -423,16 +613,18 @@ a:hover {
     color: #fff;
 }
 
+
 .btn-primary.w-100,
 .btn-ghost.w-100 {
     width: 100%;
 }
 
+
 .btn-ghost {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 22px;
+    padding: 9px 20px;
     background: transparent;
     color: var(--text-muted);
     border: 1px solid var(--border);
@@ -444,55 +636,61 @@ a:hover {
     transition: background var(--transition), color var(--transition);
 }
 
+
 .btn-ghost:hover {
     background: var(--bg);
     color: var(--text);
 }
 
+
 .btn-success-sm {
-    padding: 6px 14px;
+    padding: 5px 12px;
     background: #F0FDF4;
     color: #16A34A;
     border: 1px solid #BBF7D0;
-    border-radius: 8px;
+    border-radius: 7px;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     transition: background var(--transition);
 }
+
 
 .btn-success-sm:hover {
     background: #DCFCE7;
 }
 
+
 .btn-danger-sm {
-    padding: 6px 14px;
+    padding: 5px 12px;
     background: #FEF2F2;
     color: #DC2626;
     border: 1px solid #FECACA;
-    border-radius: 8px;
+    border-radius: 7px;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     transition: background var(--transition);
 }
+
 
 .btn-danger-sm:hover {
     background: #FEE2E2;
 }
 
 
-/* ── Alertas ──────────────────────────────────────── */
+/* Alerts */
 .df-alert {
-    padding: 12px 16px;
+    padding: 11px 14px;
     border-radius: var(--radius);
     font-size: 13px;
     font-weight: 500;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     display: flex;
     align-items: center;
     gap: 8px;
 }
+
 
 .df-alert-error {
     background: #FEF2F2;
@@ -500,11 +698,13 @@ a:hover {
     border: 1px solid #FECACA;
 }
 
+
 .df-alert-success {
     background: #F0FDF4;
     color: #16A34A;
     border: 1px solid #BBF7D0;
 }
+
 
 .df-alert-warning {
     background: #FFFBEB;
@@ -512,70 +712,76 @@ a:hover {
     border: 1px solid #FDE68A;
 }
 
+
 .df-alert.d-none {
     display: none;
 }
 
 
-/* ── Divider ──────────────────────────────────────── */
+/* Misc */
 .df-divider {
     border: none;
     border-top: 1px solid var(--border);
-    margin: 20px 0;
+    margin: 18px 0;
 }
 
 
-/* ── Empty State ──────────────────────────────────── */
 .empty-state {
     text-align: center;
-    padding: 60px 24px;
+    padding: 56px 20px;
     color: var(--text-muted);
 }
 
+
 .empty-state i {
-    font-size: 48px;
+    font-size: 44px;
     color: var(--border);
-    margin-bottom: 12px;
+    margin-bottom: 10px;
 }
+
 
 .empty-state h5 {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--text);
-    margin-bottom: 6px;
+    margin-bottom: 5px;
 }
+
 
 .empty-state p {
-    font-size: 14px;
+    font-size: 13px;
 }
 
 
-/* ── Moradores ────────────────────────────────────── */
+/* Moradores */
 .morador-list {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
+
 .morador-card {
     background: var(--white);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    padding: 14px 18px;
+    padding: 13px 16px;
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 13px;
     box-shadow: var(--shadow);
 }
 
+
 .morador-avatar {
-    width: 44px;
-    height: 44px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
     object-fit: cover;
     flex-shrink: 0;
     border: 2px solid var(--border);
 }
+
 
 .morador-info {
     flex: 1;
@@ -584,15 +790,18 @@ a:hover {
     gap: 2px;
 }
 
+
 .morador-info strong {
     font-size: 14px;
     font-weight: 600;
 }
 
+
 .morador-info span {
     font-size: 12px;
     color: var(--text-muted);
 }
+
 
 .morador-actions {
     display: flex;
@@ -600,11 +809,14 @@ a:hover {
 }
 
 
-/* ── Responsivo ───────────────────────────────────── */
+/* ══════════════════════════════════════════
+   RESPONSIVO
+══════════════════════════════════════════ */
 @media (max-width: 768px) {
     .sidebar {
         width: var(--sidebar-collapsed);
     }
+
 
     .brand-name,
     .nav-text,
@@ -613,13 +825,18 @@ a:hover {
         display: none;
     }
 
+
     .main-content {
         margin-left: var(--sidebar-collapsed);
-        padding: 20px 16px;
+        padding: 18px 14px;
+        padding-top: calc(var(--topbar-h) + 14px);
     }
+
 
     .df-grid-2,
     .df-grid-3 {
         grid-template-columns: 1fr;
     }
 }
+
+;
