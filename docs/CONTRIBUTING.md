@@ -1,79 +1,87 @@
-# DomusFlow — Guia de Instalação
+# DomusFlow — Guia de Contribuição
 
-## Pré-requisitos
+## Colaboradores
 
-- [XAMPP](https://www.apachefriends.org/) com Apache + MySQL rodando
-- PHP 8.0 ou superior
-- Git instalado
+| Colaborador | Papel |
+|---|---|
+| **Vitor Leon** | Maintainer — aprova e merga PRs na `main` |
+| **Victor Nogueira** | Contribuidor — abre `feature/` e PR para revisão |
 
-***
+---
 
-## 1. Clone o repositório
+## Ambiente de desenvolvimento
 
-Clone diretamente dentro de `htdocs/` na branch principal:
+Consulte o [Guia de Instalação](README.md) para configurar o XAMPP, importar o banco e rodar o projeto localmente antes de contribuir.
+
+---
+
+## Fluxo de branches
+
+A branch principal é a `main`. Nunca commite diretamente nela.
+
+```
+main
+ └── feature/nome-da-funcionalidade   ← você trabalha aqui
+```
+
+### Nomeando sua branch
+
+| Prefixo | Uso |
+|---|---|
+| `feature/` | Nova funcionalidade |
+| `fix/` | Correção de bug |
+| `css/` | Ajustes de estilo |
+| `docs/` | Documentação |
 
 ```bash
-git clone -b feature/ui-redesign-v2 https://github.com/User-Vitorleon/Domusflow-Sistema-de-Gerenciamento-de-Condominio.git .
+# Criar e entrar na branch
+git checkout main
+git pull origin main
+git checkout -b feature/modulo-visitantes
 ```
 
-***
+---
 
-## 2. Importe o banco de dados
+## Padrão de commits
 
-1. Acesse `http://localhost/phpmyadmin`
-2. Clique em **Importar**
-3. Selecione `database/domusflow_bd.sql`
-4. Clique em **Executar**
-
-***
-
-## 3. Configure os arquivos
-
-**`config/app.php`** — ajuste o `BASE_URL` com o nome exato da sua pasta:
-
-```php
-define('BASE_URL', '/Domusflow_novo');
-```
-
-**`config/database.php`** — confirme as credenciais do MySQL:
-
-```php
-$host = 'localhost';
-$user = 'root';
-$pass = ''; // padrão XAMPP
-```
-
-***
-
-## 4. Gere os hashes de senha
-
-Acesse no navegador:
+Use mensagens curtas e descritivas no infinitivo:
 
 ```
-http://localhost/Domusflow_novo/setup.php
+feat: adiciona cadastro de visitante
+fix: corrige validação de CPF duplicado
+css: ajusta layout da tabela de moradores
+docs: atualiza guia de instalação
 ```
 
-> **Apague o `setup.php` após executar.**
+---
 
-***
+## Estrutura de arquivos
 
-## 5. Acesse o sistema
+| Caminho | O que vai aqui |
+|---|---|
+| `public/css/app.css` | CSS global |
+| `public/css/[tela].css` | CSS por tela |
+| `public/js/[tela].js` | JS por tela |
+| `repositories/` | Queries SQL |
+| `services/` | Lógica de negócio |
+| `config/` | Configurações (não versionar credenciais) |
 
-```
-http://localhost/Domusflow_novo
-```
+---
 
-***
+## Perfis de acesso
 
-## Credenciais padrão
+| Valor | Perfil | Descrição |
+|:---:|---|---|
+| `1` | Morador | Acesso básico |
+| `2` | Síndico | Gestão do condomínio |
+| `3` | Funcionários | Consultas operacionais |
+| `4` | Admin | Acesso total |
 
-| Perfil   | CPF              | Senha  | Privilégio |
-|----------|------------------|--------|------------|
-| Admin    | `000.000.000-00` | `123456` | 4 |
-| Síndico  | `432.099.578-35` | `123456` | 2 |
-| Porteiro | `111.111.111-11` | `123456` | 3 |
-| Morador  | `117.604.018-97` | `123456` | 1 |
+---
 
-> APENAS PARA TESTES !
+## Boas práticas
 
-***
+- Nunca suba `config/database.php` com credenciais reais
+- Apague `setup.php` após gerar os hashes de senha
+- Teste localmente antes de abrir o PR
+- Mantenha uma `feature/` por funcionalidade — não misture mudanças não relacionadas
