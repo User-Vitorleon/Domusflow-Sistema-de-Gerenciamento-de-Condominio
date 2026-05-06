@@ -3,7 +3,6 @@ $paginaTitulo = 'Reservas';
 $paginaAtiva  = 'reserva';
 $jsExtra      = 'reserva.js';
 require_once __DIR__ . '/../layout/header.php';
-require_once __DIR__ . '/../layout/sidebar.php';
 $prev = $usuario['previlegio'] ?? 1;
 ?>
 
@@ -103,7 +102,7 @@ $prev = $usuario['previlegio'] ?? 1;
 
     <?php if (($usuario['previlegio'] ?? 0) == 2): ?>
         <h3 class="section-title">Solicitações de Reserva Pendentes</h3>
-        
+
         <?php if (empty($reservasParaAprovar)): ?>
             <div class="empty-state">
                 <div class="empty-state-icon"><i class='bx bx-check-shield'></i></div>
@@ -111,7 +110,7 @@ $prev = $usuario['previlegio'] ?? 1;
                 <p>Nenhuma reserva aguardando sua aprovação.</p>
             </div>
         <?php else: ?>
-            <?php foreach ($reservasParaAprovar as $res): 
+            <?php foreach ($reservasParaAprovar as $res):
                 // Corrigido para usar $res que vem do foreach
                 $sexoMorador = $res['sexo'] ?? 'M';
                 $avatar = 'https://static.vecteezy.com/ti/vetor-gratis/p1/21548095-padrao-perfil-cenario-avatar-do-utilizador-avatar-icone-pessoa-icone-cabeca-icone-perfil-cenario-icones-padrao-anonimo-do-utilizador-masculino-e-femea-homem-de-negocios-foto-espaco-reservado-social-rede-avatar-retrato-gratis-vetor.jpg';
@@ -121,10 +120,10 @@ $prev = $usuario['previlegio'] ?? 1;
                     <div class="morador-info">
                         <strong><?= htmlspecialchars($res['nome_morador']) ?></strong>
                         <span>
-                            Local: <strong><?= htmlspecialchars($res['local']) ?></strong> 
+                            Local: <strong><?= htmlspecialchars($res['local']) ?></strong>
                             <br>
-                            
-                            Dia: <?= date('d/m/Y', strtotime($res['data_reserva'])) ?> | 
+
+                            Dia: <?= date('d/m/Y', strtotime($res['data_reserva'])) ?> |
                             Apartamento: <?= htmlspecialchars($res['apto'] ?? 'N/A') ?> Bloco: <?= htmlspecialchars($res['bloco'] ?? 'N/A') ?>
                         </span>
                     </div>
@@ -154,13 +153,13 @@ $prev = $usuario['previlegio'] ?? 1;
                             );
                             if (!$mostrar):
                                 if ($i == 2 || $i == $totalPaginas - 1):
-                            ?>
-                            <li class="page-item disabled"><span class="page-link">...</span></li>
-                        <?php
-                            endif;
-                            continue;
-                            endif;
                         ?>
+                                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                            <?php
+                                endif;
+                                continue;
+                            endif;
+                            ?>
                             <li class="page-item <?= $i === $pagina ? 'active' : '' ?>">
                                 <a class="page-link" href="?pagina=<?= $i ?>"><?= $i ?></a>
                             </li>

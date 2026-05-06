@@ -4,7 +4,6 @@ $paginaAtiva  = 'dashboard';
 $cssExtra = 'dashboard.css';
 $jsExtra = 'dashboard.js';
 require_once __DIR__ . '/../layout/header.php';
-require_once __DIR__ . '/../layout/sidebar.php';
 ?>
 
 <main class="main-content" id="app">
@@ -17,43 +16,43 @@ require_once __DIR__ . '/../layout/sidebar.php';
     <?php if (empty($minhasReservas)): ?>
         <p class="text-muted">Você ainda não possui reservas efetuadas.</p>
     <?php else: ?>
-        <?php foreach ($minhasReservas as $reserva): 
+        <?php foreach ($minhasReservas as $reserva):
             switch ($reserva['status']) {
-        case 'A':
-            $corFundo   = '#DCFCE7';
-            $corTexto   = '#16A34A';
-            $textoStatus = 'Aprovada';
-            $icone      = 'bx-check-circle';
-            break;
-        case 'N':
-            $corFundo   = '#FEF2F2';
-            $corTexto   = '#EF4444';
-            $textoStatus = 'Negada';
-            $icone      = 'bx-x-circle';
-            break;
-        default: // 'P'
-            $corFundo   = '#FEF9C3';
-            $corTexto   = '#CA8A04';
-            $textoStatus = 'Pendente';
-            $icone      = 'bx-time';
-            break;
-    }
+                case 'A':
+                    $corFundo   = '#DCFCE7';
+                    $corTexto   = '#16A34A';
+                    $textoStatus = 'Aprovada';
+                    $icone      = 'bx-check-circle';
+                    break;
+                case 'N':
+                    $corFundo   = '#FEF2F2';
+                    $corTexto   = '#EF4444';
+                    $textoStatus = 'Negada';
+                    $icone      = 'bx-x-circle';
+                    break;
+                default: // 'P'
+                    $corFundo   = '#FEF9C3';
+                    $corTexto   = '#CA8A04';
+                    $textoStatus = 'Pendente';
+                    $icone      = 'bx-time';
+                    break;
+            }
         ?>
-        <div class="kpi-card kpi-card-feriado" style="margin-bottom: 15px;">
-            <div class="kpi-icon" style="background: <?= $corFundo ?>; color: <?= $corTexto ?>;">
-                <i class='bx <?= $icone ?>'></i>
+            <div class="kpi-card kpi-card-feriado" style="margin-bottom: 15px;">
+                <div class="kpi-icon" style="background: <?= $corFundo ?>; color: <?= $corTexto ?>;">
+                    <i class='bx <?= $icone ?>'></i>
+                </div>
+                <div>
+                    <p class="kpi-label">Local Reservado</p>
+                    <h3 class="kpi-value kpi-value-sm">
+                        <?= htmlspecialchars($reserva['local']) ?>
+                    </h3>
+                    <span class="kpi-sub">
+                        Data: <?= date('d/m/Y', strtotime($reserva['data_reserva'])) ?> |
+                        <strong>Status: <?= $textoStatus ?></strong>
+                    </span>
+                </div>
             </div>
-            <div>
-                <p class="kpi-label">Local Reservado</p>
-                <h3 class="kpi-value kpi-value-sm">
-                    <?= htmlspecialchars($reserva['local']) ?>
-                </h3>
-                <span class="kpi-sub">
-                    Data: <?= date('d/m/Y', strtotime($reserva['data_reserva'])) ?> | 
-                    <strong>Status: <?= $textoStatus ?></strong>
-                </span>
-            </div>
-        </div>
         <?php endforeach; ?>
     <?php endif; ?>
 
@@ -129,9 +128,9 @@ require_once __DIR__ . '/../layout/sidebar.php';
 <script>
     // Passa os dados para o dashboard.js (Gráficos)
     window.APP_DASHBOARD = <?= json_encode([
-        'chartLabels' => $chartLabels,
-        'chartDados'  => $chartDados
-    ]) ?>;
+                                'chartLabels' => $chartLabels,
+                                'chartDados'  => $chartDados
+                            ]) ?>;
 </script>
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>

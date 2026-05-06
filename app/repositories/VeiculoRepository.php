@@ -12,13 +12,13 @@ class VeiculoRepository
     public function findAll(): array
     {
         $stmt = $this->pdo->query("
-            SELECT v.*, 
+            SELECT v.*,
                    dono.nome      AS nome_morador,
                    cad.nome       AS cadastrado_por
             FROM veiculos v
             JOIN morador dono ON dono.id_user = v.id_user
             JOIN morador cad  ON cad.id_user  = v.id_user_cad
-            ORDER BY v.created_at DESC
+            ORDER BY v.principal DESC, v.created_at DESC
         ");
         return $stmt->fetchAll();
     }
@@ -34,7 +34,7 @@ class VeiculoRepository
             JOIN morador dono ON dono.id_user = v.id_user
             JOIN morador cad  ON cad.id_user  = v.id_user_cad
             WHERE v.id_user = :id
-            ORDER BY v.created_at DESC
+            ORDER BY v.principal DESC, v.created_at DESC
         ");
         $stmt->execute([':id' => $id_user]);
         return $stmt->fetchAll();
@@ -59,6 +59,22 @@ class VeiculoRepository
         return $stmt->fetch() ?: null;
     }
 
+    public function findById(int $id): ?array
+    {
+        $stmt = $this->pdo->prepare("
+        SELECT v.*,
+               dono.nome  AS nome_morador,
+               dono.apto  AS apto,
+               dono.bloco AS bloco
+        FROM veiculos v
+        JOIN morador dono ON dono.id_user = v.id_user
+        WHERE v.id_veiculo = :id
+        LIMIT 1
+    ");
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetch() ?: null;
+    }
+
     public function existePlaca(string $placa): bool
     {
         $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM veiculos WHERE placa = :placa");
@@ -66,17 +82,44 @@ class VeiculoRepository
         return (int)$stmt->fetchColumn() > 0;
     }
 
+    // Conta veículos de um usuário
+    public function countByUser(int $id_user): int
+    {
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM veiculos WHERE id_user = :id");
+        $stmt->execute([':id' => $id_user]);
+        return (int)$stmt->fetchColumn();
+    }
+
+    // Desmarca todos os veículos principais de um usuário
+    public function desmarcarPrincipal(int $id_user): bool
+    {
+        $stmt = $this->pdo->prepare("
+            UPDATE veiculos SET principal = 0 WHERE id_user = :id
+        ");
+        return $stmt->execute([':id' => $id_user]);
+    }
+
+    // Marca um veículo como principal
+    public function marcarPrincipal(int $id_veiculo): bool
+    {
+        $stmt = $this->pdo->prepare("
+            UPDATE veiculos SET principal = 1 WHERE id_veiculo = :id
+        ");
+        return $stmt->execute([':id' => $id_veiculo]);
+    }
+
     public function save(array $data): int|bool
     {
         $stmt = $this->pdo->prepare("
-            INSERT INTO veiculos (placa, marca, modelo, cor, id_user, id_user_cad)
-            VALUES (:placa, :marca, :modelo, :cor, :id_user, :id_user_cad)
+            INSERT INTO veiculos (placa, marca, modelo, cor, principal, id_user, id_user_cad)
+            VALUES (:placa, :marca, :modelo, :cor, :principal, :id_user, :id_user_cad)
         ");
         $sucesso = $stmt->execute([
             ':placa'       => strtoupper($data['placa']),
             ':marca'       => $data['marca'],
             ':modelo'      => $data['modelo'],
             ':cor'         => $data['cor'],
+            ':principal'   => $data['principal'] ?? 0,
             ':id_user'     => $data['id_user'],
             ':id_user_cad' => $data['id_user_cad'],
         ]);
@@ -86,7 +129,7 @@ class VeiculoRepository
     public function update(int $id, array $data): bool
     {
         $stmt = $this->pdo->prepare("
-            UPDATE veiculos 
+            UPDATE veiculos
             SET placa = :placa, marca = :marca, modelo = :modelo, cor = :cor
             WHERE id_veiculo = :id
         ");

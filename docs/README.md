@@ -1,76 +1,69 @@
 # DomusFlow
 
-Sistema de gerenciamento de condomínio desenvolvido com **PHP puro**, **PDO** e **MySQL**.  
-O projeto segue uma estrutura simples em **MVC** e roda localmente com **XAMPP**
+Sistema de gerenciamento de condomínio desenvolvido com **PHP puro**, **PDO** e **MySQL**, seguindo arquitetura **MVC** e rodando localmente com **XAMPP**.
 
 ---
 
-## stack
+## Stack
 
-- php 8+
-- mysql / mariadb
-- pdo
-- xampp
-- javascript
-- chart.js
-- vue 3
-- boxicons
+- PHP 8+
+- MySQL / MariaDB + PDO
+- JavaScript + Chart.js
+- Bootstrap 5
+- Boxicons
+- XAMPP
 
 ---
 
-## como rodar
+## Como rodar
 
-1. clone o projeto dentro de `C:/xampp/htdocs/`
-2. importe o banco `database/migrations/domusflow_bd.sql` no phpMyAdmin
-3. ajuste o `BASE_URL` em `config/app.php`
-4. confira a conexão em `config/database.php`
-5. acesse `http://localhost/Domusflow_novo/setup.php`
-6. apague o `setup.php`
-7. abra `http://localhost/Domusflow_novo`
-
----
-
-## usuários padrão
-
-| perfil | privilégio | login | senha |
-|---|---:|---|---|
-| admin | 4 | `000.000.000-00` | `123456` |
-| síndico | 2 | `432.099.578-35` | `123456` |
-| porteiro | 3 | `111.111.111-11` | `123456` |
-| morador | 1 | `117.604.018-97` | `123456` |
-
-> após importar o banco, execute o `setup.php` para gerar os hashes corretamente na máquina local.
+1. Clone dentro de `C:/xampp/htdocs/`
+2. Importe `database/migrations/domusflow_bd.sql` no phpMyAdmin
+3. Importe `database/migrations/domusflow_seed.sql` para popular o banco com dados de exemplo
+4. Ajuste `BASE_URL` em `config/app.php`
+5. Confira a conexão em `config/database.php`
+6. Execute `http://localhost/Domusflow-Sistema-de-Gerenciamento-de-Condominio/setup.php`
+7. **Apague o `setup.php`** após executar
+8. Acesse `http://localhost/Domusflow-Sistema-de-Gerenciamento-de-Condominio`
 
 ---
 
-## módulos principais
+## Usuários padrão
 
-- autenticação com controle por perfil 
-- cadastro e aprovação de moradores
-- reservas de locais
-- dashboard com indicadores
-- controle de veículos:
-  - cadastro de veículos
-  - consulta por placa
-  - visualização por perfil
+| Perfil | Privilégio | CPF | Senha |
+|---|:---:|---|---|
+| Admin | 4 | `000.000.000-00` | `123456` |
+| Síndico | 2 | `432.099.578-35` | `123456` |
+| Porteiro | 3 | `111.111.111-11` | `123456` |
+| Morador | 1 | `117.604.018-97` | `123456` |
 
 ---
 
-## perfis de acesso
+## Perfis de acesso
 
-| perfil | acesso principal |
+| Perfil | Acesso |
 |---|---|
-| morador | dashboard, reservas e visualização dos próprios veículos |
-| síndico | dashboard, reservas, aprovação de moradores e veículos |
-| porteiro | dashboard, cadastro de veículos e consulta por placa |
-| admin | acesso total ao sistema |
+| **Morador** `1` | Dashboards, veículos (próprios, máx. 2), reservas, atualizar dados |
+| **Síndico** `2` | Dashboards, veículos, reservas, aprovação de moradores, dashboard |
+| **Porteiro** `3` | Dashboards, vonsulta de veículo por placa, atualizar dados |
+| **Admin** `4` | Acesso total |
 
 ---
 
-## estrutura
+## Módulos
+
+- **Autenticação** — login por CPF + senha, controle por perfil
+- **Moradores** — cadastro com aprovação pelo síndico/admin
+- **Veículos** — cadastro (máx. 2 por morador), consulta por placa, veículo principal
+- **Reservas** — solicitação e gestão de espaços comuns
+- **Dashboard** — indicadores do condomínio
+- **Parâmetros** — configurações gerais (em desenvolvimento)
+
+---
+
+## Estrutura
 
 ```text
-Domusflow_novo/
 ├── app/
 │   ├── controllers/
 │   ├── models/
@@ -80,46 +73,27 @@ Domusflow_novo/
 │   ├── app.php
 │   ├── database.php
 │   └── routes.php
-├── database/
-│   └── migrations/
+├── database/migrations/
 ├── public/
-│   ├── css/
-│   ├── js/
-│   └── assets/
-├── resources/
-│   └── views/
-├── docs/
+│   ├── css/        → app.css, header.css, painel.css, [tela].css
+│   ├── js/         → [tela].js
+│   └── assets/img/
+├── resources/views/
 └── index.php
 ```
 
-A regra do projeto é simples:
-- `controller` recebe a requisição
-- `service` trata a lógica
-- `repository` faz o sql
-- `view` mostra a interface
+**Fluxo MVC:**
+`controller` → recebe requisição → `service` → regra de negócio → `repository` → SQL → `view` → interface
 
 ---
 
-## banco de dados
+## Banco de dados
 
-Tabelas principais:
+| Tabela | Descrição |
+|---|---|
+| `morador` | Usuários do sistema |
+| `veiculos` | Veículos dos moradores |
+| `reservas` | Reservas de espaços |
+| `locais_festivos` | Espaços disponíveis para reserva |
 
-- `morador`
-- `locais_festivos`
-- `reservas`
-- `veiculos` 
-
-O campo `previlegio` usa:
-- `1` = morador
-- `2` = síndico
-- `3` = porteiro
-- `4` = admin
-
----
-
-## padrão de arquivos
-
-- css global em `public/css/app.css`
-- js global em `public/js/app.js`
-- css e js específicos por página em arquivos separados
-- sql apenas nos `repositories`
+Campo `previlegio`: `1` Morador · `2` Síndico · `3` Funcionário · `4` Admin

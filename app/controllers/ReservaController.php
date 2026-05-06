@@ -6,17 +6,20 @@ require_once __DIR__ . '/../repositories/ReservaRepository.php';
 require_once __DIR__ . '/../repositories/LocalRepository.php';
 require_once __DIR__ . '/../services/EmailService.php';
 
-class ReservaController {
+class ReservaController
+{
     private ReservaService $reservaService;
     private LocalService   $localService;
-    
 
-    public function __construct() {
+
+    public function __construct()
+    {
         $this->reservaService = new ReservaService();
         $this->localService   = new LocalService();
     }
 
-    public function index(): void {
+    public function index(): void
+    {
         $this->requireAuth();
 
         $repo    = new MoradorRepository();
@@ -24,7 +27,7 @@ class ReservaController {
         $locais  = $this->reservaService->listarLocaisDisponiveis();
 
         $reservasParaAprovar = [];
-        if (($usuario['previlegio'] ?? 0) == 2) {
+        if (!in_array($usuario['previlegio'] ?? 0, [2, 4])) {
             $pagina       = (int)($_GET['pagina'] ?? 1);
             $porPagina    = 10;
             $total        = $this->reservaService->contarPendentesGeral();
@@ -36,7 +39,8 @@ class ReservaController {
         require_once __DIR__ . '/../../resources/views/reserva/index.php';
     }
 
-    public function salvar(): void {
+    public function salvar(): void
+    {
         $this->requireAuth();
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -44,7 +48,7 @@ class ReservaController {
             exit();
         }
 
-        if (($_SESSION['usuario_previlegio'] ?? 1) == 2) {
+        if (!in_array($_SESSION['usuario_previlegio'] ?? 1, [2, 4])) {
             $resultado = $this->localService->cadastrar($_POST, (int)$_SESSION['usuario_id']);
         } else {
             $resultado = $this->reservaService->salvar($_POST, (int)$_SESSION['usuario_id']);
@@ -59,68 +63,69 @@ class ReservaController {
         exit();
     }
 
-    private function requireAuth(): void {
+    private function requireAuth(): void
+    {
         if (!isset($_SESSION['usuario_id'])) {
             header('Location: ' . BASE_URL . '/');
             exit();
         }
     }
 
-    public function decidir(): void{
-    $idReserva = (int)($_POST['id_reserva'] ?? 0);
-    $acao      = $_POST['acao'] ?? null;
+    public function decidir(): void
+    {
+        $idReserva = (int)($_POST['id_reserva'] ?? 0);
+        $acao      = $_POST['acao'] ?? null;
 
-    if ($idReserva && $acao) {
-        $reservaRepo = new ReservaRepository();
-        $novoStatus  = ($acao === 'aceitar') ? 'A' : 'N';
-        $reservaRepo->atualizarStatus($idReserva, $novoStatus);
+        if ($idReserva && $acao) {
+            $reservaRepo = new ReservaRepository();
+            $novoStatus  = ($acao === 'aceitar') ? 'A' : 'N';
+            $reservaRepo->atualizarStatus($idReserva, $novoStatus);
 
-       
-        $reserva = $reservaRepo->findById($idReserva);
-        if ($reserva) {
-            $moradorRepo  = new MoradorRepository();
-            $morador      = $moradorRepo->findById($reserva['id_user']);
-            $localRepo    = new LocalRepository();
-            $local        = $localRepo->findById($reserva['id_local']);
-            $emailService = new EmailService();
 
-            if ($acao === 'aceitar') {
-                $emailService->reservaConfirmada(
-                    $morador['email'],
-                    $morador['nome'],
-                    $local['local'],
-                    $reserva['data_reserva']
-                );
+            $reserva = $reservaRepo->findById($idReserva);
+            if ($reserva) {
+                $moradorRepo  = new MoradorRepository();
+                $morador      = $moradorRepo->findById($reserva['id_user']);
+                $localRepo    = new LocalRepository();
+                $local        = $localRepo->findById($reserva['id_local']);
+                $emailService = new EmailService();
 
-                $conflitantes = $reservaRepo->negarConflitantes(
-                    $reserva['id_local'],
-                    $reserva['data_reserva'],
-                    $reserva['hora_ini'],
-                    $reserva['hora_fim'],
-                    $idReserva
-                );
+                if ($acao === 'aceitar') {
+                    $emailService->reservaConfirmada(
+                        $morador['email'],
+                        $morador['nome'],
+                        $local['local'],
+                        $reserva['data_reserva']
+                    );
 
-                foreach ($conflitantes as $c) {
-                    $emailService->reservaNegadaConflito(
-                        $c['email'],
-                        $c['nome_morador'],
+                    $conflitantes = $reservaRepo->negarConflitantes(
+                        $reserva['id_local'],
+                        $reserva['data_reserva'],
+                        $reserva['hora_ini'],
+                        $reserva['hora_fim'],
+                        $idReserva
+                    );
+
+                    foreach ($conflitantes as $c) {
+                        $emailService->reservaNegadaConflito(
+                            $c['email'],
+                            $c['nome_morador'],
+                            $local['local'],
+                            $reserva['data_reserva']
+                        );
+                    }
+                } else {
+                    $emailService->reservaNegada(
+                        $morador['email'],
+                        $morador['nome'],
                         $local['local'],
                         $reserva['data_reserva']
                     );
                 }
-            } else {
-                $emailService->reservaNegada(
-                    $morador['email'],
-                    $morador['nome'],
-                    $local['local'],
-                    $reserva['data_reserva']
-                );
             }
         }
-    }
 
-    header('Location: ' . BASE_URL . '/reserva');
-    exit();
-}  
-      
+        header('Location: ' . BASE_URL . '/reserva');
+        exit();
+    }
 }

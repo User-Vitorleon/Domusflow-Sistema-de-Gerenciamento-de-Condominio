@@ -4,7 +4,6 @@ $paginaAtiva  = 'perfil';
 $cssExtra     = 'perfil.css';
 $cssTela      = 'morador.css';
 require_once __DIR__ . '/../../layout/header.php';
-require_once __DIR__ . '/../../layout/sidebar.php';
 ?>
 
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -12,14 +11,14 @@ require_once __DIR__ . '/../../layout/sidebar.php';
   <div class="perfil-card">
     <div class="d-flex align-items-center gap-3 mb-1">
       <img
-        src="https://static.vecteezy.com/ti/vetor-gratis/p1/21548095-padrao-perfil-cenario-avatar-do-utilizador-avatar-icone-pessoa-icone-cabeca-icone-perfil-cenario-icones-padrao-anonimo-do-utilizador-masculino-e-femea-homem-de-negocios-foto-espaco-reservado-social-rede-avatar-retrato-gratis-vetor.jpg";
+        src="https://static.vecteezy.com/ti/vetor-gratis/p1/21548095-padrao-perfil-cenario-avatar-do-utilizador-avatar-icone-pessoa-icone-cabeca-icone-perfil-cenario-icones-padrao-anonimo-do-utilizador-masculino-e-femea-homem-de-negocios-foto-espaco-reservado-social-rede-avatar-retrato-gratis-vetor.jpg" ;
         class="perfil-avatar" alt="avatar">
       <div>
         <p class="perfil-nome"><?= htmlspecialchars($usuario['nome']) ?></p>
         <span class="perfil-badge">
           <?php
-            $labels = [1 => 'Morador', 2 => 'Síndico', 3 => 'Porteiro', 4 => 'Admin'];
-            echo $labels[$usuario['previlegio']] ?? 'Usuário';
+          $labels = [1 => 'Morador', 2 => 'Síndico', 3 => 'Porteiro', 4 => 'Admin'];
+          echo $labels[$usuario['previlegio']] ?? 'Usuário';
           ?>
         </span>
       </div>

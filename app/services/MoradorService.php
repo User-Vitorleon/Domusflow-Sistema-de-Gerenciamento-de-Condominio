@@ -14,8 +14,8 @@ class MoradorService
 
     public function cadastrar(array $dados): array
     {
-    
-        $cpf = preg_replace('/[^0-9]/', '', $dados['cpf']); 
+
+        $cpf = preg_replace('/[^0-9]/', '', $dados['cpf']);
 
 
         if ($dados['senha'] !== $dados['conf_senha']) {
@@ -35,13 +35,13 @@ class MoradorService
             'telefone'        => $dados['telefone'],
             'telefone_recado' => $dados['telefone_recado'] ?? null,
             'senha'           => hashSenha($dados['senha']),
-            'status'          => 'P' 
+            'status'          => 'P'
         ]);
 
         if ($idNovoUsuario) {
             $_SESSION['usuario_id']   = (int)$idNovoUsuario;
             $_SESSION['usuario_nome'] = $dados['nome'];
-      
+
             $emailservice = new EmailService();
             $emailservice->boasVindas($dados['email'], $dados['nome']);
 
@@ -59,9 +59,8 @@ class MoradorService
 
     public function liberarOuBloquear(int $id, string $acao, int $id_logado): array
     {
-    
         $solicitante = $this->repo->findById($id_logado);
-        if (!$solicitante || ($solicitante['previlegio'] ?? 0) != 2) {
+        if (!$solicitante || !in_array($solicitante['previlegio'] ?? 0, [2, 4])) {
             return ['sucesso' => false, 'mensagem' => 'Você não tem permissão para realizar esta ação.'];
         }
 
@@ -70,37 +69,38 @@ class MoradorService
 
         $morador = $this->repo->findById($id);
         $emailservice = new EmailService();
-        if ($acao === 'aceitar'){
+        if ($acao === 'aceitar') {
             $emailservice->contaAprovada($morador['email'], $morador['nome']);
-        }else{
+        } else {
             $emailservice->contaNegada($morador['email'], $morador['nome']);
         }
-        
+
         return [
-            'sucesso' => true, 
+            'sucesso' => true,
             'status'  => ($acao === 'aceitar') ? 'liberado' : 'negado'
         ];
     }
 
-    public function atualizar(array $dadosUpdate): array{
+    public function atualizar(array $dadosUpdate): array
+    {
 
-        if (empty($dadosUpdate['nome'])){
+        if (empty($dadosUpdate['nome'])) {
             return ['sucesso' => false, 'mensagem' => 'Por favor, preencha o campo nome !'];
         }
 
-        if (empty($dadosUpdate['email'])){
+        if (empty($dadosUpdate['email'])) {
             return ['sucesso' => false, 'mensagem' => 'Por favor, preencha o campo Email !'];
         }
 
-        if (empty($dadosUpdate['bloco'])){
+        if (empty($dadosUpdate['bloco'])) {
             return ['sucesso' => false, 'mensagem' => 'Por favor, preencha o campo com o Bloco que reside !'];
         }
 
-        if (empty($dadosUpdate['apto'])){
+        if (empty($dadosUpdate['apto'])) {
             return ['sucesso' => false, 'mensagem' => 'Por favor, preencha o campo com o numero do Apto que reside !'];
         }
 
-        if (empty($dadosUpdate['telefone'])){
+        if (empty($dadosUpdate['telefone'])) {
             return ['sucesso' => false, 'mensagem' => 'Por favor, preencha o campo com seu numero para contato !'];
         }
 
@@ -111,10 +111,10 @@ class MoradorService
         return $atualizado
             ? ['sucesso' => true]
             : ['sucesso' => false, 'mensagem' => 'Erro ao atualizar. Tente novamente.'];
-
     }
 
-    public function deletar(array $dados): array{
+    public function deletar(array $dados): array
+    {
         $this->repo->deletarDados($dados['id']);
         return ['sucesso' => true];
     }

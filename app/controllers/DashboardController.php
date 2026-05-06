@@ -59,7 +59,7 @@ class DashboardController
         // --- A partir daqui, só entra quem é status 'L' (Liberado) ---
 
         $idLogado = $_SESSION['usuario_id'];
-        
+
         // Reservas específicas do morador logado
         $minhasReservas = $this->reservaRepo->buscarReservasPorUsuario($idLogado);
 
@@ -72,17 +72,15 @@ class DashboardController
         // Dados do Gráfico
         $anoAtual    = (int)date('Y');
         $chartDados  = $this->reservaRepo->countPorMes($anoAtual);
-        $chartLabels = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+        $chartLabels = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
         // Variável opcional para o Síndico (Privilégio 2)
         $reservasParaAprovar = [];
-        if (($usuario['previlegio'] ?? 0) == 2) {
+        if (!in_array($usuario['previlegio'] ?? 0, [2, 4])) {
             $reservasParaAprovar = $this->reservaRepo->buscarReservasPendentesGeral();
         }
 
         // Chama a View
         require_once __DIR__ . '/../../resources/views/dashboard/index.php';
     }
-
-    
 }

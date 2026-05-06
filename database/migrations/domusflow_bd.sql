@@ -81,10 +81,11 @@ CREATE TABLE IF NOT EXISTS `reservas` (
 -- ── Tabela Veiculos ──────────────────────────────────────
 CREATE TABLE IF NOT EXISTS `veiculos` (
   `id_veiculo`   INT(11)      NOT NULL AUTO_INCREMENT,
-  `placa`        VARCHAR(10)  NOT NULL,
+  `placa`        VARCHAR(7)   NOT NULL,
   `marca`        VARCHAR(60)  NOT NULL,
   `modelo`       VARCHAR(60)  NOT NULL,
   `cor`          VARCHAR(30)  NOT NULL,
+  `principal`    TINYINT(1)   NOT NULL DEFAULT 0,
   `id_user`      INT(11)      NOT NULL,
   `id_user_cad`  INT(11)      NOT NULL,
   `created_at`   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
