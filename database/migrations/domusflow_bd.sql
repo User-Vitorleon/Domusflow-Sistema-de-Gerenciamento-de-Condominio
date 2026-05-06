@@ -94,3 +94,33 @@ CREATE TABLE IF NOT EXISTS `veiculos` (
   CONSTRAINT `fk_veiculo_morador`   FOREIGN KEY (`id_user`)     REFERENCES `morador` (`id_user`),
   CONSTRAINT `fk_veiculo_cadastrou` FOREIGN KEY (`id_user_cad`) REFERENCES `morador` (`id_user`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `faturas` (
+  `id_fatura` int(11) NOT NULL,
+  `id_user` int(11) DEFAULT NULL,
+  `data` date DEFAULT NULL,
+  `valor_total` double DEFAULT NULL,
+  `descricao` varchar(100) DEFAULT NULL,
+  `id_user_cad` int(11) DEFAULT NULL,
+  `created_at` date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `lancamentos` (
+  `modelo` varchar(50) NOT NULL,
+  `valor` double NOT NULL,
+  `descricao` varchar(100) NOT NULL,
+  `id_user` int(11) NOT NULL,
+  `data_vencimento` date NOT NULL,
+  `status` varchar(1) NOT NULL,
+  `data_lancamento` date NOT NULL,
+  `id_user_cad` int(11) NOT NULL,
+  `id_lancamento` int(11) NOT NULL,
+  `id_fatura` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+
+CREATE TABLE `taxas_padrao` (
+  `id_taxa` int(11) NOT NULL,
+  `descricao` varchar(100) DEFAULT NULL,
+  `valor` double DEFAULT NULL,
+  `status` varchar(2) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
