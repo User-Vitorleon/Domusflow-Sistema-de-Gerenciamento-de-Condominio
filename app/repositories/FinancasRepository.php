@@ -16,7 +16,7 @@
         public function salvarTaxas(array $dados):bool{
             $stmt = $this->pdo->prepare("INSERT INTO taxas_padrao (descricao, valor, status) VALUES (:descricao, :valor, 'A')");
 
-            $inserido = $stmt->execute([
+            return $stmt->execute([
                 ':descricao'    => $dados['descricao'],
                 ':valor'        => $dados['valor'],
             ]);
@@ -87,6 +87,15 @@
 
             return false;
         }
+
+        public function totalPendente(int $id_user): float {
+            $stmt = $this->pdo->prepare("SELECT COALESCE(SUM(valor), 0) FROM lancamentos WHERE id_user = :id_user 
+                                        AND status = 'P' AND id_fatura IS NULL"); // COALESCE SERVE PARA CASO NAO TENHA VALORES PENDENTES, RETORNA 0 INVES DE NULL
+            $stmt->execute([':id_user' => $id_user]);
+            return (float)$stmt->fetchColumn();
+        }
+
+
     }
 
 ?>

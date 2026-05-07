@@ -18,7 +18,7 @@ class VeiculoRepository
             FROM veiculos v
             JOIN morador dono ON dono.id_user = v.id_user
             JOIN morador cad  ON cad.id_user  = v.id_user_cad
-            ORDER BY v.principal DESC, v.created_at DESC
+            ORDER BY v.created_at DESC
         ");
         return $stmt->fetchAll();
     }

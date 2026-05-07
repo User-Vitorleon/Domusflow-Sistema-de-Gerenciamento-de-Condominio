@@ -41,7 +41,6 @@ $routes = [
     'api/feriados'        => ['FeriadoController',   'index'],
 
     // Finanças
-
     'financeiro/taxas'              => ['FinancasController',     'taxasCad'],
     'financeiro/taxas/salvar'       => ['FinancasController',     'salvarTaxas'],
     'financeiro/lancamento'         => ['FinancasController',     'lancamento'],

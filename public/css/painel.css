@@ -20,6 +20,10 @@ body::before {
     opacity: 0.45;
 }
 
+.dropdown-menu {
+    z-index: 9999;
+}
+
 
 /* ── WRAPPER ── */
 .pn-page {

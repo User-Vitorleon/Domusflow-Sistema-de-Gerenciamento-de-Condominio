@@ -158,9 +158,6 @@ $cores = [
                                 <tr>
                                     <td>
                                         <strong><?= htmlspecialchars($v['placa']) ?></strong>
-                                        <?php if ($v['principal']): ?>
-                                            <span class="badge-principal">Principal</span>
-                                        <?php endif; ?>
                                     </td>
                                     <td><?= htmlspecialchars($v['marca']) ?></td>
                                     <td><?= htmlspecialchars($v['modelo']) ?></td>
