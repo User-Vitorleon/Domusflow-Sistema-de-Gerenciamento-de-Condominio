@@ -3,43 +3,44 @@ class FeriadoService
 {
     public function getFeriadosPorAno(int $ano): array
     {
-        $url      = BRASIL_API_FERIADOS . $ano;
+        $url = BRASIL_API_FERIADOS . $ano;
         $response = @file_get_contents($url);
-        if ($response === false) return [];
+
+        if ($response === false) {
+            return [];
+        }
+
         return json_decode($response, true) ?? [];
     }
 
     public function getProximoFeriado(): ?array
     {
-        $hoje    = date('Y-m-d');
-        $ano     = (int)date('Y');
-        $feriados = $this->getFeriadosPorAno($ano);
+        $proximos = $this->getProximosFeriados(1);
+        return $proximos[0] ?? null;
+    }
 
-        // Filtra feriados a partir de hoje
-        $proximos = array_filter($feriados, fn($f) => $f['date'] >= $hoje);
+    public function getProximosFeriados(int $limite = 3): array
+    {
+        $hoje = date('Y-m-d');
+        $anoAtual = (int) date('Y');
+        $feriados = array_merge(
+            $this->getFeriadosPorAno($anoAtual),
+            $this->getFeriadosPorAno($anoAtual + 1)
+        );
 
-        if (!empty($proximos)) {
-            $proximo = array_values($proximos)[0];
-            // Calcula dias restantes
-            $diff = (new DateTime($proximo['date']))->diff(new DateTime($hoje));
-            $proximo['dias_restantes'] = (int)$diff->days;
-            // Formata data para pt-BR
-            $proximo['data_formatada'] = (new DateTime($proximo['date']))
-                ->format('d/m/Y');
-            return $proximo;
+        $proximos = array_filter($feriados, function ($feriado) use ($hoje) {
+            return isset($feriado['date']) && $feriado['date'] >= $hoje;
+        });
+
+        $proximos = array_values($proximos);
+        $proximos = array_slice($proximos, 0, $limite);
+
+        foreach ($proximos as &$feriado) {
+            $diff = (new DateTime($feriado['date']))->diff(new DateTime($hoje));
+            $feriado['dias_restantes'] = (int) $diff->days;
+            $feriado['data_formatada'] = (new DateTime($feriado['date']))->format('d/m/Y');
         }
 
-        // Se não houver mais feriados no ano, busca o primeiro do próximo ano
-        $feriados = $this->getFeriadosPorAno($ano + 1);
-        if (!empty($feriados)) {
-            $proximo = $feriados[0];
-            $diff = (new DateTime($proximo['date']))->diff(new DateTime($hoje));
-            $proximo['dias_restantes'] = (int)$diff->days;
-            $proximo['data_formatada'] = (new DateTime($proximo['date']))
-                ->format('d/m/Y');
-            return $proximo;
-        }
-
-        return null;
+        return $proximos;
     }
 }

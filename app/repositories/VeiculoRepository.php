@@ -147,4 +147,55 @@ class VeiculoRepository
         $stmt = $this->pdo->prepare("DELETE FROM veiculos WHERE id_veiculo = :id");
         return $stmt->execute([':id' => $id]);
     }
+
+    public function countAll(): int
+    {
+        $stmt = $this->pdo->query("SELECT COUNT(id_veiculo) FROM veiculos");
+        return (int) $stmt->fetchColumn();
+    }
+
+    public function topMarcas(int $limite = 3): array
+    {
+        $stmt = $this->pdo->prepare("
+        SELECT marca, COUNT(id_veiculo) AS total
+        FROM veiculos
+        WHERE marca IS NOT NULL AND marca <> ''
+        GROUP BY marca
+        ORDER BY total DESC, marca ASC
+        LIMIT :limite
+    ");
+        $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function topCores(int $limite = 3): array
+    {
+        $stmt = $this->pdo->prepare("
+        SELECT cor, COUNT(id_veiculo) AS total
+        FROM veiculos
+        WHERE cor IS NOT NULL AND cor <> ''
+        GROUP BY cor
+        ORDER BY total DESC, cor ASC
+        LIMIT :limite
+    ");
+        $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function topModelos(int $limite = 3): array
+    {
+        $stmt = $this->pdo->prepare("
+        SELECT modelo, COUNT(id_veiculo) AS total
+        FROM veiculos
+        WHERE modelo IS NOT NULL AND modelo <> ''
+        GROUP BY modelo
+        ORDER BY total DESC, modelo ASC
+        LIMIT :limite
+    ");
+        $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

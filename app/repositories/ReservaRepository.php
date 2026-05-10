@@ -42,10 +42,11 @@ class ReservaRepository
         return (int)$stmt->fetchColumn() > 0;
     }
 
-    public function negarConflitantes(int $id_local, string $data, string $hora_ini, string $hora_fim, int $id_reserva_aprovada): array{
-      
-      $hora_fim_mais_2 = date('H:i:s', strtotime($hora_fim . ' +2 hours'));
-      $stmt = $this->pdo->prepare("SELECT r.*, m.email, m.nome as nome_morador
+    public function negarConflitantes(int $id_local, string $data, string $hora_ini, string $hora_fim, int $id_reserva_aprovada): array
+    {
+
+        $hora_fim_mais_2 = date('H:i:s', strtotime($hora_fim . ' +2 hours'));
+        $stmt = $this->pdo->prepare("SELECT r.*, m.email, m.nome as nome_morador
         FROM reservas r
         INNER JOIN morador m ON r.id_user = m.id_user
         WHERE r.id_local      = :id_local
@@ -53,7 +54,7 @@ class ReservaRepository
         AND r.status        = 'P'
         AND r.id_reserva   != :id_aprovada
         AND r.hora_ini     >= :hora_ini
-        AND r.hora_ini      < :hora_fim_mais_2"); 
+        AND r.hora_ini      < :hora_fim_mais_2");
 
         $stmt->execute([
             ':id_local'    => $id_local,
@@ -65,26 +66,53 @@ class ReservaRepository
 
         $conflitantes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        foreach ($conflitantes as $r){
+        foreach ($conflitantes as $r) {
             $this->atualizarStatus($r['id_reserva'], 'N');
         }
 
         return $conflitantes;
     }
 
-    public function buscarReservasPorUsuario($id_user): array
+    public function buscarReservasDashboardPorUsuario(int $idUser): array
     {
-        $sql = "SELECT r.*, l.local, l.capacidade 
-                FROM reservas r
-                INNER JOIN locais_festivos l ON r.id_local = l.id_local
-                WHERE r.id_user = :id 
-                ORDER BY r.data_reserva ASC";
+        $sql = "
+        SELECT
+            r.id_reserva,
+            r.data_reserva,
+            r.hora_ini,
+            r.hora_fim,
+            r.status,
+            r.nome_user_aprov,
+            l.local
+        FROM reservas r
+        INNER JOIN locais_festivos l ON l.id_local = r.id_local
+        WHERE r.id_user = :id_user
+          AND (
+                r.data_reserva >= CURDATE()
+                OR r.id_reserva = (
+                    SELECT r2.id_reserva
+                    FROM reservas r2
+                    WHERE r2.id_user = r.id_user
+                      AND r2.data_reserva < CURDATE()
+                    ORDER BY r2.data_reserva DESC, r2.hora_fim DESC, r2.id_reserva DESC
+                    LIMIT 1
+                )
+          )
+        ORDER BY
+            CASE WHEN r.data_reserva < CURDATE() THEN 0 ELSE 1 END,
+            r.data_reserva ASC,
+            r.hora_ini ASC
+        LIMIT 15
+    ";
+
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['id' => $id_user]);
+        $stmt->execute([':id_user' => $idUser]);
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-   public function buscarReservasPendentesGeral(int $offset = 0, int $limite = 10): array{
+    public function buscarReservasPendentesGeral(int $offset = 0, int $limite = 10): array
+    {
         $sql = "SELECT r.*, l.local, l.capacidade, m.nome as nome_morador, m.apto, m.bloco 
                 FROM reservas r
                 INNER JOIN locais_festivos l ON r.id_local = l.id_local
@@ -92,18 +120,18 @@ class ReservaRepository
                 WHERE r.status = 'P' 
                 ORDER BY r.data_reserva ASC
                 LIMIT :limite OFFSET :offset";
-        $stmt = $this->pdo->prepare($sql); 
+        $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function existeReservaPendente(int $id_user): bool 
+    public function existeReservaPendente(int $id_user): bool
     {
-      $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM reservas WHERE id_user = :id_user and status = 'P'");
-      $stmt->execute([':id_user' => $id_user]);
-      return (int)$stmt->fetchColumn() > 0;     
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM reservas WHERE id_user = :id_user and status = 'P'");
+        $stmt->execute([':id_user' => $id_user]);
+        return (int)$stmt->fetchColumn() > 0;
     }
 
     public function countPendentesGeral(): int
@@ -143,7 +171,8 @@ class ReservaRepository
         return $dados;
     }
 
-    public function findById(int $id): ?array{
+    public function findById(int $id): ?array
+    {
         $stmt = $this->pdo->prepare("
             SELECT r.*, l.local, m.email, m.nome as nome_morador
             FROM reservas r
@@ -154,5 +183,31 @@ class ReservaRepository
         $stmt->execute([':id' => $id]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result ?: null;
+    }
+
+    public function buscarReservasSemana(int $limite = 5): array
+    {
+        $stmt = $this->pdo->prepare("
+        SELECT
+            r.id_reserva,
+            r.data_reserva,
+            r.hora_ini,
+            r.hora_fim,
+            r.status,
+            l.local,
+            m.nome AS nome_morador,
+            m.apto,
+            m.bloco
+        FROM reservas r
+        INNER JOIN locais_festivos l ON l.id_local = r.id_local
+        INNER JOIN morador m ON m.id_user = r.id_user
+        WHERE r.data_reserva BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)
+        ORDER BY r.data_reserva ASC, r.hora_ini ASC
+        LIMIT :limite
+    ");
+        $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

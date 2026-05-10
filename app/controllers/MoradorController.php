@@ -54,16 +54,27 @@ class MoradorController
     {
         $this->requireSindico();
 
-        $repo      = new MoradorRepository();
-        $usuario   = $repo->findById((int)$_SESSION['usuario_id']);
+        $repo    = new MoradorRepository();
+        $usuario = $repo->findById((int)$_SESSION['usuario_id']);
 
-        $pagina      = (int)($_GET['pagina'] ?? 1);
-        $porPagina   = 10;
-        $todos        = $this->service->listarPendentes();
-        $total        = count($todos);
+        $pagina = max(1, (int)($_GET['pagina'] ?? 1));
+        $porPagina = 15;
+
+        $filtros = [
+            'nome' => trim($_GET['nome'] ?? ''),
+            'bloco' => trim($_GET['bloco'] ?? ''),
+            'apto' => trim($_GET['apto'] ?? ''),
+            'cpf' => trim($_GET['cpf'] ?? ''),
+            'data_solicitacao' => trim($_GET['data_solicitacao'] ?? ''),
+            'ordenar' => trim($_GET['ordenar'] ?? 'nome'),
+            'direcao' => trim($_GET['direcao'] ?? 'asc'),
+        ];
+
+        $total = $repo->countPendentesComFiltros($filtros);
         $totalPaginas = (int)ceil($total / $porPagina);
-        $offset       = ($pagina - 1) * $porPagina;
-        $moradores    = array_slice($todos, $offset, $porPagina);
+        $offset = ($pagina - 1) * $porPagina;
+
+        $moradores = $repo->findPendentesComFiltros($filtros, $porPagina, $offset);
 
         require_once __DIR__ . '/../../resources/views/moradores/pendentes.php';
     }

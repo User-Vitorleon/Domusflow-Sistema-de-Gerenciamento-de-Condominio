@@ -2,6 +2,9 @@
 require_once __DIR__ . '/../repositories/MoradorRepository.php';
 require_once __DIR__ . '/../repositories/ReservaRepository.php';
 require_once __DIR__ . '/../repositories/LocalRepository.php';
+require_once __DIR__ . '/../repositories/OcorrenciaRepository.php';
+require_once __DIR__ . '/../repositories/VeiculoRepository.php';
+require_once __DIR__ . '/../repositories/FinancasRepository.php';
 require_once __DIR__ . '/../services/FeriadoService.php';
 
 class DashboardController
@@ -9,14 +12,20 @@ class DashboardController
     private $moradorRepo;
     private $reservaRepo;
     private $localRepo;
+    private $ocorrenciaRepo;
+    private $veiculoRepo;
+    private $financasRepo;
     private $feriadoService;
 
     public function __construct()
     {
         $this->moradorRepo    = new MoradorRepository();
         $this->reservaRepo    = new ReservaRepository();
-        $this->localRepo      = new LocalRepository();
-        $this->feriadoService = new FeriadoService();
+        $this->localRepo       = new LocalRepository();
+        $this->ocorrenciaRepo  = new OcorrenciaRepository();
+        $this->veiculoRepo     = new VeiculoRepository();
+        $this->financasRepo    = new FinancasRepository();
+        $this->feriadoService  = new FeriadoService();
     }
 
     public function index(): void
@@ -61,13 +70,31 @@ class DashboardController
         $idLogado = $_SESSION['usuario_id'];
 
         // Reservas específicas do morador logado
-        $minhasReservas = $this->reservaRepo->buscarReservasPorUsuario($idLogado);
+        $minhasReservas = $this->reservaRepo->buscarReservasDashboardPorUsuario($idLogado);
 
         // KPIs para os cards
-        $reservasPendentes = $this->reservaRepo->countByStatus('P');
-        $locaisDisponiveis = $this->localRepo->countDisponiveis();
-        $moradoresAtivos   = $this->moradorRepo->countByStatus('L');
-        $proximoFeriado    = $this->feriadoService->getProximoFeriado();
+        $reservasPendentes   = $this->reservaRepo->countByStatus('P');
+        $locaisDisponiveis   = $this->localRepo->countDisponiveis();
+        $moradoresAtivos     = $this->moradorRepo->countByStatus('L');
+        $moradoresPendentes  = $this->moradorRepo->countByStatus('P');
+        $moradoresStatus     = $this->moradorRepo->contarPorStatus();
+        $proximoFeriado      = $this->feriadoService->getProximoFeriado();
+        $ocorrenciasFuncionario = $this->ocorrenciaRepo->contarPorStatus();
+        $totalVeiculos          = $this->veiculoRepo->countAll();
+        $topMarcasVeiculos      = $this->veiculoRepo->topMarcas(3);
+        $topCoresVeiculos       = $this->veiculoRepo->topCores(3);
+        $topModelosVeiculos     = $this->veiculoRepo->topModelos(3);
+        $proximosFeriados = $this->feriadoService->getProximosFeriados(3);
+        $ocorrenciasMorador = $this->ocorrenciaRepo->contarPorStatusUsuario($idLogado);
+        $ocorrenciasGeral = $this->ocorrenciaRepo->contarPorStatus();
+        $reservasSemana   = $this->reservaRepo->buscarReservasSemana(5);
+        $locaisTotal      = $this->localRepo->countDisponiveis();
+        $totalPendenteGeral      = $this->financasRepo->totalGeralPendente();
+        $countLancPendentes      = $this->financasRepo->countLancamentosPendentes();
+        $countInadimplentes      = $this->financasRepo->countMoradoresInadimplentes();
+        $countFaturas            = $this->financasRepo->countFaturasGeradas();
+        $ultimosMoradores        = $this->financasRepo->ultimosMoradoresCadastrados(5);
+
 
         // Dados do Gráfico
         $anoAtual    = (int)date('Y');
@@ -80,7 +107,28 @@ class DashboardController
             $reservasParaAprovar = $this->reservaRepo->buscarReservasPendentesGeral();
         }
 
+        // Determina a view baseada no privilégio
+        $previlegio = (int) $usuario['previlegio'];
+
+        switch ($previlegio) {
+            case 1:
+                $viewFile = 'dashboard/morador.php';
+                break;
+            case 3:
+                $viewFile = 'dashboard/funcionario.php';
+                break;
+            case 2:
+                $viewFile = 'dashboard/sindico.php';
+                break;
+            case 4:
+                $viewFile = 'dashboard/admin.php';
+                break;
+            default:
+                $viewFile = 'dashboard/index.php';
+                break;
+        }
+
         // Chama a View
-        require_once __DIR__ . '/../../resources/views/dashboard/index.php';
+        require_once __DIR__ . '/../../resources/views/' . $viewFile;
     }
 }

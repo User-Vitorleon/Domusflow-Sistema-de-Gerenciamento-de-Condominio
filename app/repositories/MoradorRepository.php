@@ -16,11 +16,12 @@ class MoradorRepository
         return $stmt->fetch() ?: null;
     }
 
-    public function findAtivos(): array{
-    $stmt = $this->pdo->query(
-        "SELECT * FROM morador WHERE status = 'L' AND previlegio = 1"
-    );
-    return $stmt->fetchAll();
+    public function findAtivos(): array
+    {
+        $stmt = $this->pdo->query(
+            "SELECT * FROM morador WHERE status = 'L' AND previlegio = 1"
+        );
+        return $stmt->fetchAll();
     }
 
     public function findByCpf(string $cpf): ?array
@@ -46,8 +47,113 @@ class MoradorRepository
 
     public function findPendentes(): array
     {
-        $stmt = $this->pdo->query("SELECT * FROM morador WHERE status = 'P' ORDER BY nome ASC");
+        $stmt = $this->pdo->query("
+        SELECT id_user, nome, apto, bloco, cpf, created_at
+        FROM morador
+        WHERE status = 'P'
+        ORDER BY nome ASC
+    ");
         return $stmt->fetchAll();
+    }
+
+    public function findPendentesComFiltros(array $filtros, int $limit, int $offset): array
+    {
+        $sql = "
+        SELECT id_user, nome, apto, bloco, cpf, created_at
+        FROM morador
+        WHERE status = 'P'
+    ";
+
+        $params = [];
+
+        if (!empty($filtros['nome'])) {
+            $sql .= " AND nome LIKE :nome";
+            $params[':nome'] = '%' . $filtros['nome'] . '%';
+        }
+
+        if (!empty($filtros['bloco'])) {
+            $sql .= " AND bloco LIKE :bloco";
+            $params[':bloco'] = '%' . $filtros['bloco'] . '%';
+        }
+
+        if (!empty($filtros['apto'])) {
+            $sql .= " AND apto LIKE :apto";
+            $params[':apto'] = '%' . $filtros['apto'] . '%';
+        }
+
+        if (!empty($filtros['cpf'])) {
+            $sql .= " AND cpf LIKE :cpf";
+            $params[':cpf'] = '%' . $filtros['cpf'] . '%';
+        }
+
+        if (!empty($filtros['data_solicitacao'])) {
+            $sql .= " AND DATE(created_at) = :data_solicitacao";
+            $params[':data_solicitacao'] = $filtros['data_solicitacao'];
+        }
+
+        $colunasPermitidas = [
+            'nome' => 'nome',
+            'cpf' => 'cpf',
+            'bloco' => 'bloco'
+        ];
+
+        $ordenar = $colunasPermitidas[$filtros['ordenar'] ?? 'nome'] ?? 'nome';
+        $direcao = strtolower($filtros['direcao'] ?? 'asc') === 'desc' ? 'DESC' : 'ASC';
+
+        $sql .= " ORDER BY {$ordenar} {$direcao} LIMIT :limit OFFSET :offset";
+
+        $stmt = $this->pdo->prepare($sql);
+
+        foreach ($params as $chave => $valor) {
+            $stmt->bindValue($chave, $valor);
+        }
+
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    public function countPendentesComFiltros(array $filtros): int
+    {
+        $sql = "
+        SELECT COUNT(*)
+        FROM morador
+        WHERE status = 'P'
+    ";
+
+        $params = [];
+
+        if (!empty($filtros['nome'])) {
+            $sql .= " AND nome LIKE :nome";
+            $params[':nome'] = '%' . $filtros['nome'] . '%';
+        }
+
+        if (!empty($filtros['bloco'])) {
+            $sql .= " AND bloco LIKE :bloco";
+            $params[':bloco'] = '%' . $filtros['bloco'] . '%';
+        }
+
+        if (!empty($filtros['apto'])) {
+            $sql .= " AND apto LIKE :apto";
+            $params[':apto'] = '%' . $filtros['apto'] . '%';
+        }
+
+        if (!empty($filtros['cpf'])) {
+            $sql .= " AND cpf LIKE :cpf";
+            $params[':cpf'] = '%' . $filtros['cpf'] . '%';
+        }
+
+        if (!empty($filtros['data_solicitacao'])) {
+            $sql .= " AND DATE(created_at) = :data_solicitacao";
+            $params[':data_solicitacao'] = $filtros['data_solicitacao'];
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+
+        return (int)$stmt->fetchColumn();
     }
 
     public function save(array $data): int|bool
@@ -112,38 +218,40 @@ class MoradorRepository
         return $stmt->fetchAll();
     }
 
-    public function atualizarDados(array $update){
-        if (empty($update['senha'])){
+    public function atualizarDados(array $update)
+    {
+        if (empty($update['senha'])) {
             $stmt = $this->pdo->prepare(
                 "UPDATE morador SET nome = :nome, email = :email, apto = :apto, bloco = :bloco, telefone = :telefone, tell_recado = :tell_recado WHERE id_user = :id"
-                );
-                return $stmt->execute([
-                            'nome' => $update['nome'],
-                            'email' => $update['email'],
-                            'apto' => $update['apto'],
-                            'bloco' => $update['bloco'], 
-                            'telefone' => $update['telefone'],
-                            'tell_recado' => $update['tell_recado'],
-                            'id' => $update['id']
-                    ]);
-        }else{
+            );
+            return $stmt->execute([
+                'nome' => $update['nome'],
+                'email' => $update['email'],
+                'apto' => $update['apto'],
+                'bloco' => $update['bloco'],
+                'telefone' => $update['telefone'],
+                'tell_recado' => $update['tell_recado'],
+                'id' => $update['id']
+            ]);
+        } else {
             $stmt = $this->pdo->prepare(
                 "UPDATE morador SET nome = :nome, email = :email, apto = :apto, bloco = :bloco, telefone = :telefone, tell_recado = :tell_recado, senha = :senha WHERE id_user = :id"
-                );
-                return $stmt->execute([
-                            'nome' => $update['nome'],
-                            'email' => $update['email'],
-                            'apto' => $update['apto'],
-                            'bloco' => $update['bloco'], 
-                            'telefone' => $update['telefone'],
-                            'tell_recado' => $update['tell_recado'],
-                            'senha' => $update['senha'],
-                            'id' => $update['id']
-                    ]);
+            );
+            return $stmt->execute([
+                'nome' => $update['nome'],
+                'email' => $update['email'],
+                'apto' => $update['apto'],
+                'bloco' => $update['bloco'],
+                'telefone' => $update['telefone'],
+                'tell_recado' => $update['tell_recado'],
+                'senha' => $update['senha'],
+                'id' => $update['id']
+            ]);
         }
     }
-    
-    public function deletarDados(int $id): bool {
+
+    public function deletarDados(int $id): bool
+    {
         $stmt = $this->pdo->prepare(
             "UPDATE morador SET 
                 nome        = :nome,
@@ -162,6 +270,25 @@ class MoradorRepository
             ':id'    => $id
         ]);
     }
+
+    public function contarPorStatus(): array
+    {
+        $stmt = $this->pdo->query("
+            SELECT status, COUNT(id_user) AS total
+            FROM morador
+            GROUP BY status
+        ");
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $map = ['P' => 0, 'L' => 0, 'I' => 0, 'B' => 0, 'E' => 0];
+
+        foreach ($rows as $row) {
+            $key = strtoupper(trim($row['status']));
+            if (isset($map[$key])) {
+                $map[$key] = (int) $row['total'];
+            }
+        }
+
+        return $map;
+    }
 }
-
-

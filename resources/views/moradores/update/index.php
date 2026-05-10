@@ -1,31 +1,32 @@
 <?php
 $paginaTitulo = 'Meu Perfil';
 $paginaAtiva  = 'perfil';
-$cssExtra     = 'perfil.css';
 $cssTela      = 'morador.css';
 require_once __DIR__ . '/../../layout/header.php';
 ?>
 
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<div class="perfil-wrapper">
-  <div class="perfil-card">
-    <div class="d-flex align-items-center gap-3 mb-1">
-      <img
-        src="https://static.vecteezy.com/ti/vetor-gratis/p1/21548095-padrao-perfil-cenario-avatar-do-utilizador-avatar-icone-pessoa-icone-cabeca-icone-perfil-cenario-icones-padrao-anonimo-do-utilizador-masculino-e-femea-homem-de-negocios-foto-espaco-reservado-social-rede-avatar-retrato-gratis-vetor.jpg" ;
-        class="perfil-avatar" alt="avatar">
-      <div>
-        <p class="perfil-nome"><?= htmlspecialchars($usuario['nome']) ?></p>
-        <span class="perfil-badge">
-          <?php
-          $labels = [1 => 'Morador', 2 => 'Síndico', 3 => 'Porteiro', 4 => 'Admin'];
-          echo $labels[$usuario['previlegio']] ?? 'Usuário';
-          ?>
-        </span>
+<div class="main-content">
+  <div class="df-page">
+    <div class="df-card perfil-card">
+
+      <div class="perfil-topo">
+        <img
+          src="https://static.vecteezy.com/ti/vetor-gratis/p1/21548095-padrao-perfil-cenario-avatar-do-utilizador-avatar-icone-pessoa-icone-cabeca-icone-perfil-cenario-icones-padrao-anonimo-do-utilizador-masculino-e-female-homem-de-negocios-foto-espaco-reservado-social-rede-avatar-retrato-gratis-vetor.jpg"
+          class="perfil-avatar" alt="avatar">
+        <div>
+          <p class="perfil-nome"><?= htmlspecialchars($usuario['nome']) ?></p>
+          <span class="perfil-badge">
+            <?php
+            $labels = [1 => 'Morador', 2 => 'Síndico', 3 => 'Porteiro', 4 => 'Admin'];
+            echo $labels[$usuario['previlegio']] ?? 'Usuário';
+            ?>
+          </span>
+        </div>
       </div>
     </div>
 
     <?php if (!empty($_SESSION['erro_update'])): ?>
-      <div class="alert-erro">
+      <div class="df-alert df-alert-error">
         <i class='bx bx-error-circle'></i>
         <?= htmlspecialchars($_SESSION['erro_update']) ?>
       </div>
@@ -86,14 +87,14 @@ require_once __DIR__ . '/../../layout/header.php';
       <h6><i class='bx bx-shield-x me-1'></i>Apagar Conta</h6>
       <div class="danger-btns">
 
-        <form action="<?= BASE_URL ?>/moradores/inativar" method="POST" style="flex:1"
+        <form action="<?= BASE_URL ?>/moradores/inativar" method="POST" class="perfil-danger-form"
           onsubmit="return confirm('Deseja inativar sua conta? Você não conseguirá mais acessar o sistema.')">
           <button type="submit" class="btn-inativar w-100">
             <i class='bx bx-pause-circle me-1'></i> Inativar conta
           </button>
         </form>
 
-        <form action="<?= BASE_URL ?>/moradores/deletar" method="POST" style="flex:1"
+        <form action="<?= BASE_URL ?>/moradores/deletar" method="POST" class="perfil-danger-form"
           onsubmit="return confirm('Atenção! Esta ação é irreversível. Seus dados serão apagados permanentemente.')">
           <button type="submit" class="btn-deletar w-100">
             <i class='bx bx-trash me-1'></i> Apagar conta

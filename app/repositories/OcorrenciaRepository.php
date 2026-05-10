@@ -308,4 +308,42 @@ class OcorrenciaRepository
     ");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function contarPorStatusUsuario(int $idUser): array
+    {
+        $stmt = $this->pdo->prepare("
+        SELECT status, COUNT(id_ocorrencia) AS total
+        FROM ocorrencias
+        WHERE id_user = :id_user
+        GROUP BY status
+    ");
+        $stmt->execute([':id_user' => $idUser]);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $map = [
+            'aberto' => 0,
+            'andamento' => 0,
+            'resolvido' => 0,
+            'cancelado' => 0
+        ];
+
+        foreach ($rows as $row) {
+            switch ($row['status']) {
+                case 'A':
+                    $map['aberto'] = (int) $row['total'];
+                    break;
+                case 'E':
+                    $map['andamento'] = (int) $row['total'];
+                    break;
+                case 'R':
+                    $map['resolvido'] = (int) $row['total'];
+                    break;
+                case 'C':
+                    $map['cancelado'] = (int) $row['total'];
+                    break;
+            }
+        }
+
+        return $map;
+    }
 }
