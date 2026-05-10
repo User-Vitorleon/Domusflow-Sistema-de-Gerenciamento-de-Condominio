@@ -41,12 +41,24 @@ $routes = [
     'api/feriados'        => ['FeriadoController',   'index'],
 
     // Finanças
-    'financeiro/taxas'              => ['FinancasController',     'taxasCad'],
-    'financeiro/taxas/salvar'       => ['FinancasController',     'salvarTaxas'],
-    'financeiro/lancamento'         => ['FinancasController',     'lancamento'],
-    'financeiro/lancamento/salvar'  => ['FinancasController',     'salvarLancamento'],
-    'financeiro/historico'          => ['FinancasController',     'historico'],
-    'financeiro/fatura/gerar'       => ['FinancasController',     'gerarFatura'],    
+    'financeiro/taxas'                => ['FinancasController',     'taxasCad'],
+    'financeiro/taxas/salvar'         => ['FinancasController',     'salvarTaxas'],
+    'financeiro/lancamento'           => ['FinancasController',     'lancamento'],
+    'financeiro/lancamento/salvar'    => ['FinancasController',     'salvarLancamento'],
+    'financeiro/historico'            => ['FinancasController',     'historico'],
+    'financeiro/fatura/gerar'         => ['FinancasController',     'gerarFatura'],
+    'financeiro/lancamento/verificar' => ['FinancasController',     'verificarDuplicado'],
+
+    // Ocorrências
+    'ocorrencia'            => ['OcorrenciaController', 'index'],
+    'ocorrencia/abrir'      => ['OcorrenciaController', 'abrir'],
+    'ocorrencia/cancelar'   => ['OcorrenciaController', 'cancelar'],
+    'ocorrencia/tramitar-morador' => ['OcorrenciaController', 'tramitarMorador'],
+    'ocorrencia/painel'     => ['OcorrenciaController', 'painel'],
+    'ocorrencia/tramitar'   => ['OcorrenciaController', 'tramitar'],
+    'ocorrencia/detalhes'   => ['OcorrenciaController', 'detalhes'],
+
+
 ];
 
 if (isset($routes[$uri])) {

@@ -14,6 +14,14 @@ if (isset($usuario) && is_array($usuario)) {
     $apto          = $usuario['apto']  ?? null;
     $bloco         = $usuario['bloco'] ?? null;
 }
+
+// ── Sino: conta notificações não lidas ──────────────────────────
+$sino_count = 0;
+if (!$semTopo && isset($_SESSION['usuario_id'])) {
+    require_once __DIR__ . '/../../../app/repositories/OcorrenciaRepository.php';
+    $sinoRepo   = new OcorrenciaRepository();
+    $sino_count = $sinoRepo->contarNaoLidas((int)$_SESSION['usuario_id']);
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -27,6 +35,7 @@ if (isset($usuario) && is_array($usuario)) {
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/app.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/header.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/ocorrencia.css">
     <?php if ($cssExtra): ?>
         <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/<?= $cssExtra ?>">
     <?php endif; ?>
@@ -56,6 +65,19 @@ if (isset($usuario) && is_array($usuario)) {
                 <span class="df-topbar-title"><?= htmlspecialchars($paginaTitulo) ?></span>
 
                 <div class="df-topbar-user">
+
+                    <!-- ── Sino de Ocorrências ── -->
+                    <a href="<?= BASE_URL ?>/ocorrencia" class="oc-sino" title="Minhas Ocorrências" aria-label="Ocorrências">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                        </svg>
+                        <?php if ($sino_count > 0): ?>
+                            <span class="oc-sino-badge"><?= $sino_count > 9 ? '9+' : $sino_count ?></span>
+                        <?php endif; ?>
+                    </a>
+
                     <div class="df-topbar-userinfo">
 
                         <!-- Linha 1: badge + nome -->
@@ -78,6 +100,7 @@ if (isset($usuario) && is_array($usuario)) {
                         <?php endif; ?>
 
                     </div>
+
                     <a href="<?= BASE_URL ?>/logout" class="df-topbar-logout" aria-label="Sair">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

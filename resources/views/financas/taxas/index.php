@@ -33,6 +33,10 @@ require_once __DIR__ . '/../../layout/header.php';
                     <label>Valor (R$)</label>
                     <input type="number" name="valor" step="0.01" min="0" placeholder="0,00" required>
                 </div>
+                <div class="df-field">
+                    <label>Modulo</label>
+                    <input type="text" name="modulo" step="0.01" min="0" placeholder="Taxa ? Multa ?" required>
+                </div>
             </div>
             <div class="df-actions">
                 <button type="reset" class="btn-ghost">Limpar</button>
@@ -55,16 +59,16 @@ require_once __DIR__ . '/../../layout/header.php';
                 <table class="df-table">
                     <thead>
                         <tr>
-                            <th>#</th>
                             <th>Descrição</th>
                             <th>Valor</th>
                             <th>Status</th>
+                            <th>Cadastrado por:</th>
+                            <th>Data Cadastro</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($taxas as $taxa): ?>
                             <tr>
-                                <td><?= $taxa['id_taxa'] ?></td>
                                 <td><?= htmlspecialchars($taxa['descricao']) ?></td>
                                 <td>R$ <?= number_format($taxa['valor'], 2, ',', '.') ?></td>
                                 <td>
@@ -72,6 +76,8 @@ require_once __DIR__ . '/../../layout/header.php';
                                         <?= $taxa['status'] === 'A' ? 'Ativa' : 'Inativa' ?>
                                     </span>
                                 </td>
+                                <td><?= htmlspecialchars($taxa['usuario_cad']) ?></td>
+                                <td><?= date('d/m/Y', strtotime($taxa['data_cad'])) ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

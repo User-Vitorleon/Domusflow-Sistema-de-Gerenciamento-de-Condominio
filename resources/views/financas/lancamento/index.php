@@ -37,52 +37,151 @@ $prev = $usuario['previlegio'] ?? 1;
     <div class="df-card" style="margin-bottom: 24px;">
         <h3 class="section-title">Registrar Lançamento</h3>
         <form action="<?= BASE_URL ?>/financeiro/lancamento/salvar" method="POST">
-            <div class="df-grid-2">
-                <div class="df-field">
-                    <label>Tipo</label>
-                    <select name="modelo" required>
-                        <option value="">Selecione...</option>
-                        <option value="taxa">Taxa</option>
-                        <option value="multa">Multa</option>
-                    </select>
-                </div>
-                <div class="df-field">
-                    <label>Valor (R$)</label>
-                    <input type="number" name="valor" step="0.01" min="0" placeholder="0,00" required>
-                </div>
-            </div>
-            <div class="df-grid-2">
-                <div class="df-field">
-                    <label>Descrição</label>
-                    <input type="text" name="descricao" placeholder="Ex: Taxa de condomínio Jan/2026" required>
-                </div>
-                <div class="df-field">
-                    <label>Morador</label>
-                    <select name="id_user" required>
-                        <option value="">Selecione...</option>
-                        <?php foreach ($moradores as $m): ?>
-                            <option value="<?= $m['id_user'] ?>">
-                                <?= htmlspecialchars($m['nome']) ?> — Ap <?= $m['apto'] ?> · Bloco <?= $m['bloco'] ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-            </div>
-            <div class="df-grid-2">
-                <div class="df-field">
-                    <label>Data de Vencimento</label>
-                    <input type="date" name="data_venc" required>
-                </div>
-                <div class="df-field">
-                    <label>Data de Lançamento</label>
-                    <input type="date" name="data_lanc" value="<?= date('Y-m-d') ?>" required>
-                </div>
-            </div>
-            <div class="df-actions">
-                <button type="reset" class="btn-ghost">Limpar</button>
-                <button type="submit" class="btn-primary">Registrar</button>
-            </div>
-        </form>
+    
+    <div class="df-grid-2">
+        <div class="df-field">
+            <label>Tipo</label>
+            <select name="modelo" id="tipo" required onchange="filtrarTaxas()">
+                <option value="">Selecione...</option>
+                <option value="taxa">Taxa</option>
+                <option value="multa">Multa</option>
+            </select>
+        </div>
+        <div class="df-field">
+            <label>Valor (R$)</label>
+            <input type="number" name="valor" id="valor" step="0.01" min="0" placeholder="0,00" readonly required>
+        </div>
+    </div>
+
+    <div class="df-grid-2">
+        <div class="df-field">
+            <label>Descrição</label>
+            <select name="descricao" id="descricao" required onchange="preencherValor()">
+                <option value="">Selecione o tipo primeiro...</option>
+            </select>
+        </div>
+        <div class="df-field" id="campo_morador">
+            <label>Morador</label>
+            <select name="id_user" required>
+                <option value="">Selecione...</option>
+                <?php foreach ($moradores as $m): ?>
+                    <option value="<?= $m['id_user'] ?>">
+                        <?= htmlspecialchars($m['nome']) ?> — Ap <?= $m['apto'] ?> · Bloco <?= $m['bloco'] ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+    </div>
+
+    <div class="df-grid-2">
+        <div class="df-field">
+            <label>Data de Vencimento</label>
+            <input type="date" name="data_venc" id="data_venc" required>
+        </div>
+        <div class="df-field">
+            <label>Data de Lançamento</label>
+            <input type="date" name="data_lanc" value="<?= date('Y-m-d') ?>" required>
+        </div>
+    </div>
+    <div class="df-field" style="margin-top: 10px;">
+        <label>
+            <input type="checkbox" name="todos_moradores" id="todos_moradores" value="1" onchange="toggleMorador()">
+            Lançar para todos os moradores ativos
+        </label>
+    </div>
+
+    <div class="df-actions">
+        <button type="reset" class="btn-ghost" onclick="resetForm()">Limpar</button>
+        <button type="submit" class="btn-primary">Registrar</button>
+    </div>
+</form>
+
+<script>
+    
+    const todasTaxas = <?= json_encode($todasTaxas) ?>;
+    console.log(todasTaxas);
+
+    
+function filtrarTaxas() {
+    const tipo      = document.getElementById('tipo').value;
+    const select    = document.getElementById('descricao');
+    const valorInput = document.getElementById('valor');
+
+    select.innerHTML = '<option value="">Selecione...</option>';
+    valorInput.value = '';
+
+    if (!tipo) return;
+
+    const filtradas = todasTaxas.filter(t => t.modulo.toLowerCase() === tipo);
+
+    if (filtradas.length === 0) {
+        select.innerHTML = '<option value="">Nenhum cadastrado</option>';
+        return;
+    }
+
+    filtradas.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value       = t.descricao;
+        opt.textContent = t.descricao;
+        opt.dataset.valor = t.valor;
+        select.appendChild(opt);
+    });
+}
+
+function preencherValor() {
+    const select = document.getElementById('descricao');
+    const opt    = select.options[select.selectedIndex];
+    document.getElementById('valor').value = opt.dataset.valor ?? '';
+}
+
+function resetForm() {
+    document.getElementById('descricao').innerHTML = '<option value="">Selecione o tipo primeiro...</option>';
+    document.getElementById('valor').value = '';
+}
+
+
+function toggleMorador() {
+    const checkbox = document.getElementById('todos_moradores');
+    const campo    = document.getElementById('campo_morador');
+    campo.style.display = checkbox.checked ? 'none' : 'block';
+    const select = campo.querySelector('select');
+    select.required = !checkbox.checked;
+}
+
+document.querySelector('form[action*="lancamento/salvar"]').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = this;
+
+    const dados = new FormData(form);
+
+    fetch('<?= BASE_URL ?>/financeiro/lancamento/verificar', {
+        method: 'POST',
+        body: dados
+    })
+    .then(r => r.json())
+    .then(res => {
+         console.log(res);
+        if (res.duplicado) {
+            let msg = 'Já existe um lançamento com esses parâmetros em aberto neste mês.';
+            if (res.quantidade) {
+                msg += ` (${res.quantidade} morador(es) afetado(s))`;
+            }
+            msg += '\n\nDeseja continuar mesmo assim?';
+
+            if (confirm(msg)) {
+                form.submit();
+            }
+        } else {
+            form.submit();
+        }
+    })
+    .catch(() => {
+        // em caso de erro na verificação, envia mesmo assim
+        form.submit();
+    });
+});
+
+</script>
     </div>
     <?php endif; ?>
 

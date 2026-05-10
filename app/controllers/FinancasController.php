@@ -37,6 +37,7 @@ class FinancasController{
             $resultado = $this->repo->salvarTaxas([ // enviamos os paramentos para a repository
             'descricao'         => $_POST['descricao']        ?? '',
             'valor'             => $_POST['valor']            ?? '',
+            'modulo'            => $_POST['modulo']           ?? '',
             ]);
             
             if ($resultado) { // redirecionamento em caso de erro ou sucesso
@@ -60,36 +61,53 @@ class FinancasController{
         $previlegio = (int)$_SESSION['usuario_previlegio'];
 
         $lancamentos = $this->repo->lancamento($id_user, $previlegio); // enviamos para a repository
-
+        $todasTaxas = $this->repo->listarTodasTaxasAtivas();
+        
         $repo      = new MoradorRepository();
         $usuario   = $repo->findById((int)$_SESSION['usuario_id']);
         $moradores = $repo->findAll();
+        
 
         require_once __DIR__ . '/../../resources/views/financas/lancamento/index.php';
     }
 
-    public function salvarLancamento():void{
-        if ($_SESSION['usuario_previlegio'] == 2 AND $_SERVER['REQUEST_METHOD'] === 'POST'){ // verifica se esta logado / é sindico / e foi recebido via post
-           $salvar = $this->repo->salvarLancamento([
-                'modelo'      => $_POST['modelo'],
-                'valor'       => $_POST['valor'],
-                'descricao'   => $_POST['descricao'],
-                'id_user'     => $_POST['id_user'],
-                'data_venc'   => $_POST['data_venc'],
-                'data_lanc'   => $_POST['data_lanc'],
-            ], (int)$_SESSION['usuario_id']); // ← segundo parâmetro aqui fora do array
-
-            if ($salvar) { // redirecionamento em caso de sucesso / erro 
-                header('Location: ' . BASE_URL . '/financeiro/lancamento');
-            } else {
-                $_SESSION['erro_taxa'] = 'Erro ao cadastrar taxa.';
-                header('Location: ' . BASE_URL . '/financeiro/lancamento');
-            }          
-        }else{
-            header('Location: ' . BASE_URL . '/');
-        }
-            exit();
+public function salvarLancamento(): void
+{
+    if ($_SESSION['usuario_previlegio'] != 2 || $_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header('Location: ' . BASE_URL . '/');
+        exit();
     }
+
+    $dados = [
+        'modelo'    => $_POST['modelo'],
+        'valor'     => $_POST['valor'],
+        'descricao' => $_POST['descricao'],
+        'data_venc' => $_POST['data_venc'],
+        'data_lanc' => $_POST['data_lanc'],
+    ];
+
+    if (isset($_POST['todos_moradores'])) {
+        // lança para todos os moradores ativos
+        $moradorRepo = new MoradorRepository();
+        $moradores   = $moradorRepo->findAtivos();
+
+        foreach ($moradores as $m) {
+            $this->repo->salvarLancamento(
+                array_merge($dados, ['id_user' => $m['id_user']]),
+                (int)$_SESSION['usuario_id']
+            );
+        }
+    } else {
+        // lança só para o morador selecionado
+        $this->repo->salvarLancamento(
+            array_merge($dados, ['id_user' => $_POST['id_user']]),
+            (int)$_SESSION['usuario_id']
+        );
+    }
+
+    header('Location: ' . BASE_URL . '/financeiro/lancamento');
+    exit();
+}
     
 
     public function historico():void{
@@ -145,6 +163,34 @@ $usuario = $repo->findById((int)$_SESSION['usuario_id']);
 
     header('Location: ' . BASE_URL . '/financeiro/lancamento');
     exit();
+    }
+
+    public function verificarDuplicado(): void {
+        header ('Content-Type: application/json');
+
+        $modelo    = $_POST['modelo']    ?? '';
+        $descricao = $_POST['descricao'] ?? '';
+        $data_venc = $_POST['data_venc'] ?? '';
+        $id_user   = (int)($_POST['id_user'] ?? 0);
+
+        if (isset($_POST['todos_moradores'])){
+            $moradorRepo = new MoradorRepository();
+            $moradores   = $moradorRepo->findAtivos();
+            $duplicados  = 0;
+
+
+
+            foreach($moradores as $m){
+                if ($this->repo->existeLancamentoNoMes($modelo, $descricao, $m['id_user'], $data_venc)){
+                    $duplicados++;
+                }
+                echo json_encode(['duplicado' => $duplicados > 0, 'quantidade' => $duplicados]);
+            }
+        } else {
+            $duplicado = $this->repo->existeLancamentoNoMes($modelo, $descricao, $id_user, $data_venc);
+            echo json_encode(['duplicado' => $duplicado]);
+        }
+        exit();
     }
 
 }

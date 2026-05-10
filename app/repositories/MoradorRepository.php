@@ -16,6 +16,13 @@ class MoradorRepository
         return $stmt->fetch() ?: null;
     }
 
+    public function findAtivos(): array{
+    $stmt = $this->pdo->query(
+        "SELECT * FROM morador WHERE status = 'L' AND previlegio = 1"
+    );
+    return $stmt->fetchAll();
+    }
+
     public function findByCpf(string $cpf): ?array
     {
         $stmt = $this->pdo->prepare("SELECT * FROM morador WHERE cpf = :cpf LIMIT 1");

@@ -14,12 +14,25 @@
         }
 
         public function salvarTaxas(array $dados):bool{
-            $stmt = $this->pdo->prepare("INSERT INTO taxas_padrao (descricao, valor, status) VALUES (:descricao, :valor, 'A')");
-
+            $stmt = $this->pdo->prepare("INSERT INTO taxas_padrao (descricao, valor, status, usuario_cad, data_cad, modulo) VALUES (:descricao, :valor, 'A', :usuario_cad, CURDATE(), :modulo)");
+//                                                                                                                                                                    
             return $stmt->execute([
                 ':descricao'    => $dados['descricao'],
                 ':valor'        => $dados['valor'],
+                ':usuario_cad'  => $_SESSION['usuario_nome'],
+                ':modulo'       => $dados['modulo'],
             ]);
+        }
+
+        public function taxasPorModulo(string $modulo): array{
+            $stmt = $this->pdo->prepare("SELECT * FROM taxas_padrao WHERE status = 'A' AND modulo = :modulo");
+            $stmt->execute([':modulo' => $modulo]);
+            return $stmt-fetchAll();
+        }
+
+        public function listarTodasTaxasAtivas(): array{
+            $stmt = $this->pdo->query("SELECT * FROM taxas_padrao WHERE status = 'A' ORDER BY modulo, descricao");
+            return $stmt->fetchAll();
         }
 
         public function lancamento(int $id, int $previlegio): array{
@@ -49,6 +62,26 @@
                 ':data_lanc'   => $dados['data_lanc'],
                 ':id_user_cad' => $id,
             ]);
+        }
+
+        public function existeLancamentoNoMes(string $modelo, string $descricao, int $id_user, string $data_venc): bool{
+            $stmt = $this->pdo->prepare("
+            SELECT COUNT(*) FROM lancamentos 
+            WHERE modelo    = :modelo
+            AND descricao = :descricao
+            AND id_user   = :id_user
+            AND status    = 'P'
+            AND MONTH(data_vencimento) = MONTH(:data_venc1)
+            AND YEAR(data_vencimento)  = YEAR(:data_venc2)
+        ");
+        $stmt->execute([
+            ':modelo'     => $modelo,
+            ':descricao'  => $descricao,
+            ':id_user'    => $id_user,
+            ':data_venc1' => $data_venc,
+            ':data_venc2' => $data_venc,
+        ]);
+            return (int)$stmt->fetchColumn() > 0;
         }
 
         public function historico(int $id):array{
