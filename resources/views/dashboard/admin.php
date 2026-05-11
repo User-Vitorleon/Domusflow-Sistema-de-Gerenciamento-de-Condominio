@@ -21,7 +21,7 @@ $jsExtra      = 'dashboard.js';
                 </div>
                 <div>
                     <p class="kpi-label">Total Moradores</p>
-                    <h3 class="kpi-value"><?= (int) (($moradoresStatus['p'] ?? 0) + ($moradoresStatus['l'] ?? 0) + ($moradoresStatus['i'] ?? 0) + ($moradoresStatus['b'] ?? 0)) ?></h3>
+                    <h3 class="kpi-value"><?= (int) (($moradoresStatus['P'] ?? 0) + ($moradoresStatus['L'] ?? 0) + ($moradoresStatus['I'] ?? 0) + ($moradoresStatus['B'] ?? 0)) ?></h3>
                 </div>
             </div>
             <div class="kpi-card">

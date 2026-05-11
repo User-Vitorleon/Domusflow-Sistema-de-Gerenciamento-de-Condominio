@@ -27,7 +27,7 @@ class ReservaController
         $locais  = $this->reservaService->listarLocaisDisponiveis();
 
         $reservasParaAprovar = [];
-        if (!in_array($usuario['previlegio'] ?? 0, [2, 4])) {
+        if (in_array($usuario['previlegio'] ?? 0, [2, 4])) {
             $pagina       = (int)($_GET['pagina'] ?? 1);
             $porPagina    = 10;
             $total        = $this->reservaService->contarPendentesGeral();
@@ -39,8 +39,7 @@ class ReservaController
         require_once __DIR__ . '/../../resources/views/reserva/index.php';
     }
 
-    public function salvar(): void
-    {
+    public function salvar(): void{
         $this->requireAuth();
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -48,7 +47,7 @@ class ReservaController
             exit();
         }
 
-        if (!in_array($_SESSION['usuario_previlegio'] ?? 1, [2, 4])) {
+        if (in_array($_SESSION['usuario_previlegio'] ?? 1, [2, 4])) {
             $resultado = $this->localService->cadastrar($_POST, (int)$_SESSION['usuario_id']);
         } else {
             $resultado = $this->reservaService->salvar($_POST, (int)$_SESSION['usuario_id']);
@@ -78,10 +77,17 @@ class ReservaController
 
         if ($idReserva && $acao) {
             $reservaRepo = new ReservaRepository();
-            $novoStatus  = ($acao === 'aceitar') ? 'A' : 'N';
-            $reservaRepo->atualizarStatus($idReserva, $novoStatus);
-
-
+           
+            if ($acao === 'aceitar') {
+                $reservaRepo->aprovar(
+                    $idReserva,
+                    (int)$_SESSION['usuario_id'],
+                    $_SESSION['usuario_nome']
+                );
+            } else {
+                $reservaRepo->atualizarStatus($idReserva, 'N');
+            }
+        
             $reserva = $reservaRepo->findById($idReserva);
             if ($reserva) {
                 $moradorRepo  = new MoradorRepository();

@@ -23,6 +23,17 @@ class ReservaRepository
         ]);
     }
 
+    public function aprovar(int $id, int $id_user_aprov, string $nome_aprov): bool{
+        $stmt = $this->pdo->prepare("UPDATE reservas SET status = 'A', id_user_aprov = :id_user_aprov, nome_user_aprov = :nome_aprov, data_aprov = CURDATE(), hora_aprov = CURTIME()
+        WHERE id_reserva = :id");
+
+        return $stmt ->execute([
+            ':id_user_aprov' => $id_user_aprov,
+            ':nome_aprov'    => $nome_aprov,
+            ':id'            => $id,
+        ]);
+    }
+
     public function existeConflito(int $id_local, string $data, string $hora_ini, string $hora_fim): bool
     {
         $stmt = $this->pdo->prepare("
@@ -118,12 +129,14 @@ class ReservaRepository
                 INNER JOIN locais_festivos l ON r.id_local = l.id_local
                 INNER JOIN morador m ON r.id_user = m.id_user 
                 WHERE r.status = 'P' 
-                ORDER BY r.data_reserva ASC
+                ORDER BY r.id_reserva ASC
                 LIMIT :limite OFFSET :offset";
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 

@@ -61,10 +61,15 @@ $modulos[] = ['titulo' => 'Atualizar Dados',   'sub' => 'Edite seu perfil e dado
                 </svg>
                 <ul class="dropdown-menu" onclick="event.stopPropagation()">
                     <?php if (in_array($prev, [2, 4])): ?>
-                        <li><a class="dropdown-item" href="<?= BASE_URL ?>/financeiro/taxas">Taxas Condominiais</a></li>
-                        <li><a class="dropdown-item" href="<?= BASE_URL ?>/financeiro/lancamento">Lançamentos</a></li>
+                        <li><a class="dropdown-item" href="<?= BASE_URL ?>/financeiro/taxas" 
+                            onclick="window.location='<?= BASE_URL ?>/financeiro/taxas'">Taxas Condominiais</a></li>
+                        <li><a class="dropdown-item" href="<?= BASE_URL ?>/financeiro/lancamento"
+                            onclick="window.location='<?= BASE_URL ?>/financeiro/lancamento'">Lançamentos</a></li>
                     <?php endif; ?>
-                    <li><a class="dropdown-item" href="<?= BASE_URL ?>/financeiro/historico">Meu Histórico</a></li>
+                    <?php if ($prev == 1): ?> 
+                        <li><a class="dropdown-item" href="<?= BASE_URL ?>/financeiro/historico"
+                            onclick="window.location='<?= BASE_URL ?>/financeiro/historico'">Meu Histórico</a></li>
+                    <?php endif; ?>
                 </ul>
             </div>
         <?php endif; ?>

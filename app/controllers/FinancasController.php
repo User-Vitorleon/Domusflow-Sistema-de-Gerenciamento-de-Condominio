@@ -23,7 +23,7 @@ class FinancasController{
         $this->requireSindico();
 
         $repo    = new MoradorRepository();
-        $usuario = $repo->findById((int)$_SESSION['usuario_id']); // ← só essa linha
+        $usuario = $repo->findById((int)$_SESSION['usuario_id']); 
 
         $taxas = $this->repo->taxasCad();
 
@@ -65,7 +65,15 @@ class FinancasController{
         
         $repo      = new MoradorRepository();
         $usuario   = $repo->findById((int)$_SESSION['usuario_id']);
-        $moradores = $repo->findAll();
+        $moradores = $repo->findAtivos();
+
+
+        $pagina      = (int)($_GET['pagina'] ?? 1);
+        $porPagina   = 10;
+        $total        = $this->repo->countLancamentos($id_user, $previlegio);
+        $totalPaginas = (int)ceil($total / $porPagina);
+        $offset       = ($pagina - 1) * $porPagina;
+        $lancamentos  = $this->repo->lancamento($id_user, $previlegio, $offset, $porPagina);
         
 
         require_once __DIR__ . '/../../resources/views/financas/lancamento/index.php';
@@ -184,8 +192,8 @@ $usuario = $repo->findById((int)$_SESSION['usuario_id']);
                 if ($this->repo->existeLancamentoNoMes($modelo, $descricao, $m['id_user'], $data_venc)){
                     $duplicados++;
                 }
-                echo json_encode(['duplicado' => $duplicados > 0, 'quantidade' => $duplicados]);
             }
+            echo json_encode(['duplicado' => $duplicados > 0, 'quantidade' => $duplicados]);
         } else {
             $duplicado = $this->repo->existeLancamentoNoMes($modelo, $descricao, $id_user, $data_venc);
             echo json_encode(['duplicado' => $duplicado]);

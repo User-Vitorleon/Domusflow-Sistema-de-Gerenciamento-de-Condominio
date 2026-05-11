@@ -42,12 +42,23 @@ require_once __DIR__ . '/../../layout/header.php';
                                 <td><?= ucfirst(htmlspecialchars($h['modelo'])) ?></td>
                                 <td><?= htmlspecialchars($h['descricao']) ?></td>
                                 <td>R$ <?= number_format($h['valor'], 2, ',', '.') ?></td>
-                                <td style="color: <?= $vencido ? '#EF4444' : 'inherit' ?>">
-                                    <?= date('d/m/Y', strtotime($h['data_vencimento'])) ?>
-                                    <?= $vencido ? '<span style="font-size:0.75rem"> (Vencido)</span>' : '' ?>
-                                </td>
-                                <td>
-                                    <span style="color: #CA8A04">Pendente</span>
+                                <td><?php
+                                    $corStatus = match($h['status']) {
+                                        'P' => '#CA8A04',
+                                        'F' => '#16A34A',
+                                        'G' => '#2563EB',
+                                        default => '#6B7280'
+                                    };
+                                    $textoStatus = match($h['status']) {
+                                        'P' => 'Pendente',
+                                        'F' => 'Fatura Gerada',
+                                        'G' => 'Pago',
+                                        default => $h['status']
+                                    };
+                                    ?>
+                                    <span style="color: <?= $corStatus ?>">
+                                        <?= $textoStatus ?>
+                                    </span></td>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

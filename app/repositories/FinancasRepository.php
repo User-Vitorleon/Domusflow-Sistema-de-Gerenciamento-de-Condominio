@@ -41,20 +41,49 @@ class FinancasRepository
         return $stmt->fetchAll();
     }
 
-    public function lancamento(int $id, int $previlegio): array
+    public function lancamento(int $id, int $previlegio, int $offset = 0, int $limite = 10): array
     {
         if ($previlegio == 2 || $previlegio == 4) {
-            $stmt = $this->pdo->prepare("SELECT * FROM lancamentos order by data_vencimento");
+            $stmt = $this->pdo->prepare("
+                SELECT l.*, m.nome 
+                FROM lancamentos l 
+                INNER JOIN morador m ON l.id_user = m.id_user 
+                ORDER BY l.data_vencimento DESC
+                LIMIT :limite OFFSET :offset
+            ");
+            $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
             $stmt->execute();
             return $stmt->fetchAll();
         } else if ($previlegio == 1) {
-            $stmt = $this->pdo->prepare("SELECT * FROM lancamentos where id_user = :id order by data_vencimento");
-            $stmt->execute([':id' => $id]);
+            $stmt = $this->pdo->prepare("
+                SELECT * FROM lancamentos 
+                WHERE id_user = :id 
+                ORDER BY data_vencimento DESC
+                LIMIT :limite OFFSET :offset
+            ");
+            $stmt->bindValue(':id',     $id,     PDO::PARAM_INT);
+            $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+            $stmt->execute();
             return $stmt->fetchAll();
         } else {
             return [];
         }
     }
+
+public function countLancamentos(int $id, int $previlegio): int
+{
+    if ($previlegio == 2 || $previlegio == 4) {
+        $stmt = $this->pdo->query("SELECT COUNT(*) FROM lancamentos");
+    } else {
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM lancamentos WHERE id_user = :id");
+        $stmt->execute([':id' => $id]);
+        return (int)$stmt->fetchColumn();
+    }
+    $stmt->execute();
+    return (int)$stmt->fetchColumn();
+}
 
     public function salvarLancamento(array $dados, int $id): bool
     {
@@ -118,8 +147,7 @@ class FinancasRepository
         if ($quey) {
             $id_fatura = (int)$this->pdo->lastInsertId();
 
-            $stmt2 = $this->pdo->prepare("UPDATE lancamentos SET id_fatura = :id_fatura 
-                                                WHERE id_user = :id_user AND status = 'P' ");
+            $stmt2 = $this->pdo->prepare("UPDATE lancamentos SET id_fatura = :id_fatura, status = 'F' WHERE id_user = :id_user AND status = 'P' ");
 
             $stmt2->execute([
                 ':id_fatura' => $id_fatura,

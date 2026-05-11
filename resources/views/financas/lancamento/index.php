@@ -220,11 +220,23 @@ document.querySelector('form[action*="lancamento/salvar"]').addEventListener('su
                                 <td><?= htmlspecialchars($l['descricao']) ?></td>
                                 <td>R$ <?= number_format($l['valor'], 2, ',', '.') ?></td>
                                 <td><?= date('d/m/Y', strtotime($l['data_vencimento'])) ?></td>
-                                <td>
-                                    <span style="color: <?= $l['status'] === 'P' ? '#CA8A04' : '#16A34A' ?>">
-                                        <?= $l['status'] === 'P' ? 'Pendente' : 'Pago' ?>
-                                    </span>
-                                </td>
+                                <td><?php
+                                    $corStatus = match($l['status']) {
+                                        'P' => '#CA8A04',
+                                        'F' => '#16A34A',
+                                        'G' => '#2563EB',
+                                        default => '#6B7280'
+                                    };
+                                    $textoStatus = match($l['status']) {
+                                        'P' => 'Pendente',
+                                        'F' => 'Fatura Gerada',
+                                        'G' => 'Pago',
+                                        default => $l['status']
+                                    };
+                                    ?>
+                                    <span style="color: <?= $corStatus ?>">
+                                        <?= $textoStatus ?>
+                                    </span></td>
                                 <?php if ($prev == 2): ?>
                                     <td><?= htmlspecialchars($l['nome'] ?? 'N/A') ?></td>
                                     <td>
@@ -240,9 +252,45 @@ document.querySelector('form[action*="lancamento/salvar"]').addEventListener('su
                                 <?php endif; ?>
                             </tr>
                         <?php endforeach; ?>
+                        
                     </tbody>
                 </table>
             </div>
+            <?php if ($totalPaginas > 1): ?>
+                <nav class="mt-3 d-flex justify-content-center">
+                    <ul class="pagination">
+
+                        <li class="page-item <?= $pagina <= 1 ? 'disabled' : '' ?>">
+                            <a class="page-link" href="?pagina=<?= $pagina - 1 ?>">Anterior</a>
+                        </li>
+                        <?php
+                        $range = 2; // quantas páginas ao redor da atual
+                        for ($i = 1; $i <= $totalPaginas; $i++):
+                            $mostrar = (
+                                $i == 1 ||
+                                $i == $totalPaginas ||
+                                ($i >= $pagina - $range && $i <= $pagina + $range)
+                            );
+                            if (!$mostrar):
+                                if ($i == 2 || $i == $totalPaginas - 1):
+                        ?>
+                                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                            <?php
+                                endif;
+                                continue;
+                            endif;
+                            ?>
+                            <li class="page-item <?= $i === $pagina ? 'active' : '' ?>">
+                                <a class="page-link" href="?pagina=<?= $i ?>"><?= $i ?></a>
+                            </li>
+                        <?php endfor; ?>
+                        <li class="page-item <?= $pagina >= $totalPaginas ? 'disabled' : '' ?>">
+                            <a class="page-link" href="?pagina=<?= $pagina + 1 ?>">Próximo</a>
+                        </li>
+
+                    </ul>
+                </nav>
+            <?php endif; ?>
         <?php endif; ?>
     </div>
 </main>
