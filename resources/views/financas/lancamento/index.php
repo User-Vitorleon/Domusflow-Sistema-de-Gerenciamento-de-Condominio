@@ -191,6 +191,14 @@ document.querySelector('form[action*="lancamento/salvar"]').addEventListener('su
             <?= $prev == 2 ? 'Todos os Lançamentos' : 'Meus Lançamentos' ?>
         </h3>
 
+                   <div class="df-field" style="margin-bottom: 16px;">
+                <input type="text" id="pesquisa" 
+                value="<?= htmlspecialchars($_GET['busca'] ?? '') ?>"
+                placeholder="Pesquisar por morador, descrição ou tipo..." 
+                oninput="filtrarLancamentos()" >
+            </div>
+            <div class="morador-list">
+
         <?php if (empty($lancamentos)): ?>
             <div class="empty-state">
                 <i class='bx bx-receipt'></i>
@@ -198,88 +206,83 @@ document.querySelector('form[action*="lancamento/salvar"]').addEventListener('su
                 <p>Os lançamentos aparecerão aqui.</p>
             </div>
         <?php else: ?>
-            <div class="table-wrap">
-                <table class="df-table">
-                    <thead>
-                        <tr>
-                            <th>Tipo</th>
-                            <th>Descrição</th>
-                            <th>Valor</th>
-                            <th>Vencimento</th>
-                            <th>Status</th>
-                            <?php if ($prev == 2): ?>
-                                <th>Morador</th>
-                                <th>Ação</th>
-                            <?php endif; ?>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($lancamentos as $l): ?>
-                            <tr>
-                                <td><?= ucfirst(htmlspecialchars($l['modelo'])) ?></td>
-                                <td><?= htmlspecialchars($l['descricao']) ?></td>
-                                <td>R$ <?= number_format($l['valor'], 2, ',', '.') ?></td>
-                                <td><?= date('d/m/Y', strtotime($l['data_vencimento'])) ?></td>
-                                <td><?php
-                                    $corStatus = match($l['status']) {
-                                        'P' => '#CA8A04',
-                                        'F' => '#16A34A',
-                                        'G' => '#2563EB',
-                                        default => '#6B7280'
-                                    };
-                                    $textoStatus = match($l['status']) {
-                                        'P' => 'Pendente',
-                                        'F' => 'Fatura Gerada',
-                                        'G' => 'Pago',
-                                        default => $l['status']
-                                    };
-                                    ?>
-                                    <span style="color: <?= $corStatus ?>">
-                                        <?= $textoStatus ?>
-                                    </span></td>
+                <?php foreach ($lancamentos as $l): 
+                    $corStatus = match($l['status']) {
+                        'P' => '#CA8A04',
+                        'F' => '#16A34A',
+                        'G' => '#2563EB',
+                        default => '#6B7280'
+                    };
+                    $textoStatus = match($l['status']) {
+                        'P' => 'Pendente',
+                        'F' => 'Fatura Gerada',
+                        'G' => 'Pago',
+                        default => $l['status']
+                    };
+                    $corModelo = strtoupper($l['modelo']) === 'TAXA' ? '#2563EB' : '#DC2626';
+                    $bgModelo  = strtoupper($l['modelo']) === 'TAXA' ? '#EFF6FF' : '#FEF2F2';
+                    $iconeModelo = strtoupper($l['modelo']) === 'TAXA' ? 'bx-coin' : 'bx-error';
+                    $vencido = strtotime($l['data_vencimento']) < strtotime('today') && $l['status'] === 'P';
+                ?>
+                    <div class="morador-card" data-pesquisa="<?= strtolower($l['descricao'] . ' ' . $l['modelo'] . ' ' . ($l['nome_morador'] ?? '')) ?>">
+                        <!-- Ícone do tipo -->
+                        <div style="width:42px; height:42px; border-radius:50%; background:<?= $bgModelo ?>; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                            <i class='bx <?= $iconeModelo ?>' style="font-size:20px; color:<?= $corModelo ?>"></i>
+                        </div>
+
+                        <!-- Informações -->
+                        <div class="morador-info">
+                            <strong><?= htmlspecialchars($l['descricao']) ?></strong>
+                            <span>
+                                <span style="color:<?= $corModelo ?>; font-weight:600;">
+                                    <?= ucfirst(strtolower($l['modelo'])) ?>
+                                </span>
+                                · R$ <?= number_format($l['valor'], 2, ',', '.') ?>
+                                · Venc: <span style="color:<?= $vencido ? '#EF4444' : 'inherit' ?>; font-weight: <?= $vencido ? '600' : '400' ?>">
+                                    <?= date('d/m/Y', strtotime($l['data_vencimento'])) ?>
+                                    <?= $vencido ? '(Vencido)' : '' ?>
+                                </span>
                                 <?php if ($prev == 2): ?>
-                                    <td><?= htmlspecialchars($l['nome'] ?? 'N/A') ?></td>
-                                    <td>
-                                        <!-- Gerar fatura -->
-                                        <form action="<?= BASE_URL ?>/financeiro/fatura/gerar" method="POST" style="display:inline"
-                                            onsubmit="return confirm('Gerar fatura para este morador?')">
-                                            <input type="hidden" name="id_user" value="<?= $l['id_user'] ?>">
-                                            <button type="submit" class="btn-primary" style="padding: 4px 10px; font-size: 0.8rem;">
-                                                Gerar Fatura
-                                            </button>
-                                        </form>
-                                    </td>
+                                    · <?= htmlspecialchars($l['nome_morador'] ?? 'N/A') ?>
                                 <?php endif; ?>
-                            </tr>
-                        <?php endforeach; ?>
-                        
-                    </tbody>
-                </table>
+                            </span>
+                        </div>
+
+                        <!-- Status e Ação -->
+                        <div class="morador-actions" style="flex-direction: column; align-items: flex-end; gap: 6px;">
+                            <span style="color:<?= $corStatus ?>; font-size:13px; font-weight:600;">
+                                <?= $textoStatus ?>
+                            </span>
+                            <?php if ($prev == 2 && $l['status'] === 'P'): ?>
+                            <form action="<?= BASE_URL ?>/financeiro/fatura/gerar" method="POST"
+                                onsubmit="return confirm('Gerar fatura para este morador?')">
+                                <input type="hidden" name="id_user" value="<?= $l['id_user'] ?>">
+                                <button type="submit" class="btn-primary" style="padding:4px 10px; font-size:0.8rem;">
+                                    Gerar Fatura
+                                </button>
+                            </form>
+                        <?php endif; ?>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
             </div>
-            <?php if ($totalPaginas > 1): ?>
+
+            <?php if (($totalPaginas ?? 1) > 1): ?>
                 <nav class="mt-3 d-flex justify-content-center">
                     <ul class="pagination">
-
                         <li class="page-item <?= $pagina <= 1 ? 'disabled' : '' ?>">
                             <a class="page-link" href="?pagina=<?= $pagina - 1 ?>">Anterior</a>
                         </li>
                         <?php
-                        $range = 2; // quantas páginas ao redor da atual
+                        $range = 2;
                         for ($i = 1; $i <= $totalPaginas; $i++):
-                            $mostrar = (
-                                $i == 1 ||
-                                $i == $totalPaginas ||
-                                ($i >= $pagina - $range && $i <= $pagina + $range)
-                            );
+                            $mostrar = ($i == 1 || $i == $totalPaginas || ($i >= $pagina - $range && $i <= $pagina + $range));
                             if (!$mostrar):
-                                if ($i == 2 || $i == $totalPaginas - 1):
-                        ?>
+                                if ($i == 2 || $i == $totalPaginas - 1): ?>
                                     <li class="page-item disabled"><span class="page-link">...</span></li>
-                            <?php
-                                endif;
+                                <?php endif;
                                 continue;
-                            endif;
-                            ?>
+                            endif; ?>
                             <li class="page-item <?= $i === $pagina ? 'active' : '' ?>">
                                 <a class="page-link" href="?pagina=<?= $i ?>"><?= $i ?></a>
                             </li>
@@ -287,12 +290,23 @@ document.querySelector('form[action*="lancamento/salvar"]').addEventListener('su
                         <li class="page-item <?= $pagina >= $totalPaginas ? 'disabled' : '' ?>">
                             <a class="page-link" href="?pagina=<?= $pagina + 1 ?>">Próximo</a>
                         </li>
-
                     </ul>
                 </nav>
             <?php endif; ?>
         <?php endif; ?>
     </div>
+
 </main>
 
-<?php require_once __DIR__ . '/../../layout/footer.php'; ?>
+    <script>
+        let timer;
+        function filtrarLancamentos() {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                const termo = document.getElementById('pesquisa').value;
+                window.location.href = '<?= BASE_URL ?>/financeiro/lancamento?busca=' + encodeURIComponent(termo);
+            }, 500); // aguarda 500ms após parar de digitar
+        }
+</script>
+
+<?php require_once __DIR__ . '/../../layout/footer.php'; ?>                        

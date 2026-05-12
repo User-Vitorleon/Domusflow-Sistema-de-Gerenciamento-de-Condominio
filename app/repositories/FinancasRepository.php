@@ -28,6 +28,14 @@ class FinancasRepository
         ]);
     }
 
+    public function excluirTaxa(int $id): bool{
+    
+        $stmt = $this->pdo->prepare(
+            "UPDATE taxas_padrao SET status = 'I' WHERE id_taxa = :id"
+        );
+        return $stmt->execute([':id' => $id]);
+    }
+
     public function taxasPorModulo(string $modulo): array
     {
         $stmt = $this->pdo->prepare("SELECT * FROM taxas_padrao WHERE status = 'A' AND modulo = :modulo");
@@ -41,36 +49,49 @@ class FinancasRepository
         return $stmt->fetchAll();
     }
 
-    public function lancamento(int $id, int $previlegio, int $offset = 0, int $limite = 10): array
-    {
-        if ($previlegio == 2 || $previlegio == 4) {
-            $stmt = $this->pdo->prepare("
-                SELECT l.*, m.nome 
-                FROM lancamentos l 
-                INNER JOIN morador m ON l.id_user = m.id_user 
-                ORDER BY l.data_vencimento DESC
-                LIMIT :limite OFFSET :offset
-            ");
-            $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
-            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-            $stmt->execute();
-            return $stmt->fetchAll();
-        } else if ($previlegio == 1) {
-            $stmt = $this->pdo->prepare("
-                SELECT * FROM lancamentos 
-                WHERE id_user = :id 
-                ORDER BY data_vencimento DESC
-                LIMIT :limite OFFSET :offset
-            ");
-            $stmt->bindValue(':id',     $id,     PDO::PARAM_INT);
-            $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
-            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-            $stmt->execute();
-            return $stmt->fetchAll();
-        } else {
-            return [];
+    public function lancamento(int $id, int $previlegio, int $offset = 0, int $limite = 10, string $busca = ''): array{
+    if ($previlegio == 2 || $previlegio == 4) {
+        $where = $busca ? "AND (m.nome LIKE :busca OR l.descricao LIKE :busca2 OR l.modelo LIKE :busca3)" : '';
+        $stmt = $this->pdo->prepare("
+            SELECT l.*, m.nome as nome_morador
+            FROM lancamentos l 
+            INNER JOIN morador m ON l.id_user = m.id_user
+            WHERE 1=1 $where
+            ORDER BY l.data_vencimento DESC
+            LIMIT :limite OFFSET :offset
+        ");
+        if ($busca) {
+            $stmt->bindValue(':busca',  "%$busca%");
+            $stmt->bindValue(':busca2', "%$busca%");
+            $stmt->bindValue(':busca3', "%$busca%");
         }
+        $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+
+    } else if ($previlegio == 1) {
+        $where = $busca ? "AND (l.descricao LIKE :busca OR l.modelo LIKE :busca2)" : '';
+        $stmt = $this->pdo->prepare("
+            SELECT * FROM lancamentos l
+            WHERE id_user = :id $where
+            ORDER BY data_vencimento DESC
+            LIMIT :limite OFFSET :offset
+        ");
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        if ($busca) {
+            $stmt->bindValue(':busca',  "%$busca%");
+            $stmt->bindValue(':busca2', "%$busca%");
+        }
+        $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+
+    } else {
+        return [];
     }
+}
 
 public function countLancamentos(int $id, int $previlegio): int
 {

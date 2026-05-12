@@ -166,6 +166,8 @@ CREATE TABLE IF NOT EXISTS ocorrencia_notificacoes (
     FOREIGN KEY (id_ocorrencia) REFERENCES ocorrencias(id_ocorrencia)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+/*TABELA: AVISOS*/
+
 CREATE TABLE `avisos` (
   `id_aviso`    INT(11)      NOT NULL AUTO_INCREMENT,
   `titulo`      VARCHAR(100) NOT NULL,
@@ -175,4 +177,31 @@ CREATE TABLE `avisos` (
   `created_at`  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id_aviso`),
   CONSTRAINT `fk_aviso_user` FOREIGN KEY (`id_user_cad`) REFERENCES `morador` (`id_user`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+/*TABELA: ASSEMBLEIAS*/
+
+CREATE TABLE `assembleias` (
+  `id_assembleia` INT(11)      NOT NULL AUTO_INCREMENT,
+  `titulo`        VARCHAR(100) NOT NULL,
+  `data`          DATE         NOT NULL,
+  `hora`          TIME         NOT NULL,
+  `local`         VARCHAR(100) NOT NULL,
+  `pauta`         TEXT         NOT NULL,
+  `id_user_cad`   INT(11)      NOT NULL,
+  `status`        VARCHAR(1)   NOT NULL DEFAULT 'A',
+  `created_at`    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_assembleia`),
+  CONSTRAINT `fk_assembleia_user` FOREIGN KEY (`id_user_cad`) REFERENCES `morador` (`id_user`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `assembleias_presencas` (
+  `id_presenca`   INT(11)    NOT NULL AUTO_INCREMENT,
+  `id_assembleia` INT(11)    NOT NULL,
+  `id_user`       INT(11)    NOT NULL,
+  `presenca`      VARCHAR(1) NOT NULL,
+  `created_at`    DATETIME   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_presenca`),
+  CONSTRAINT `fk_presenca_assembleia` FOREIGN KEY (`id_assembleia`) REFERENCES `assembleias` (`id_assembleia`),
+  CONSTRAINT `fk_presenca_user`       FOREIGN KEY (`id_user`)       REFERENCES `morador` (`id_user`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

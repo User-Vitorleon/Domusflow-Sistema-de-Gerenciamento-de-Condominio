@@ -4,10 +4,9 @@ require_once __DIR__ . '/../repositories/FinancasRepository.php';
 require_once __DIR__ . '/../repositories/MoradorRepository.php';
 
 class FinancasController{
-
     private FinancasRepository $repo;
-
     private function requireSindico(): void{
+        
         if (!isset($_SESSION['usuario_id']) || ($_SESSION['usuario_previlegio'] ?? 0) != 2) {
             header('Location: ' . BASE_URL . '/');
             exit();
@@ -31,7 +30,6 @@ class FinancasController{
     }
 
     public function salvarTaxas():void {
-
         if ($_SESSION['usuario_previlegio'] == 2 AND $_SERVER['REQUEST_METHOD'] == 'POST'){ // validamos se esta logado / se é sindico / e foi via post
             
             $resultado = $this->repo->salvarTaxas([ // enviamos os paramentos para a repository
@@ -52,35 +50,39 @@ class FinancasController{
             exit();
     }
 
-    public function lancamento():void{
-        if (!isset($_SESSION['usuario_id'])) { // validamos se esta logado
+    public function excluirTaxa(): void{
+        $this->requireSindico();
+        $this->repo->excluirTaxa((int)$_POST['id_taxa']);
+        header('Location: ' . BASE_URL . '/financeiro/taxas?excluido=1');
+        exit();
+    }
+
+    public function lancamento(): void{
+        if (!isset($_SESSION['usuario_id'])) {
             header('Location: ' . BASE_URL . '/');
             exit();
         }
-        $id_user    = (int)$_SESSION['usuario_id']; // resgatamos os id e o previlegio
-        $previlegio = (int)$_SESSION['usuario_previlegio'];
 
-        $lancamentos = $this->repo->lancamento($id_user, $previlegio); // enviamos para a repository
-        $todasTaxas = $this->repo->listarTodasTaxasAtivas();
-        
+        $id_user    = (int)$_SESSION['usuario_id'];
+        $previlegio = (int)$_SESSION['usuario_previlegio'];
+        $busca      = $_GET['busca'] ?? '';
+        $pagina     = (int)($_GET['pagina'] ?? 1);
+        $porPagina  = 10;
+        $total        = $this->repo->countLancamentos($id_user, $previlegio);
+        $totalPaginas = (int)ceil($total / $porPagina);
+        $offset       = ($pagina - 1) * $porPagina;
+
+        $lancamentos = $this->repo->lancamento($id_user, $previlegio, $offset, $porPagina, $busca);
+        $todasTaxas  = $this->repo->listarTodasTaxasAtivas();
+
         $repo      = new MoradorRepository();
         $usuario   = $repo->findById((int)$_SESSION['usuario_id']);
         $moradores = $repo->findAtivos();
 
-
-        $pagina      = (int)($_GET['pagina'] ?? 1);
-        $porPagina   = 10;
-        $total        = $this->repo->countLancamentos($id_user, $previlegio);
-        $totalPaginas = (int)ceil($total / $porPagina);
-        $offset       = ($pagina - 1) * $porPagina;
-        $lancamentos  = $this->repo->lancamento($id_user, $previlegio, $offset, $porPagina);
-        
-
         require_once __DIR__ . '/../../resources/views/financas/lancamento/index.php';
     }
 
-public function salvarLancamento(): void
-{
+public function salvarLancamento(): void{
     if ($_SESSION['usuario_previlegio'] != 2 || $_SERVER['REQUEST_METHOD'] !== 'POST') {
         header('Location: ' . BASE_URL . '/');
         exit();
@@ -95,7 +97,6 @@ public function salvarLancamento(): void
     ];
 
     if (isset($_POST['todos_moradores'])) {
-        // lança para todos os moradores ativos
         $moradorRepo = new MoradorRepository();
         $moradores   = $moradorRepo->findAtivos();
 
@@ -106,7 +107,6 @@ public function salvarLancamento(): void
             );
         }
     } else {
-        // lança só para o morador selecionado
         $this->repo->salvarLancamento(
             array_merge($dados, ['id_user' => $_POST['id_user']]),
             (int)$_SESSION['usuario_id']

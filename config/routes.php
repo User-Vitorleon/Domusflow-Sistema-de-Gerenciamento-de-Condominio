@@ -43,6 +43,7 @@ $routes = [
     // Finanças
     'financeiro/taxas'                => ['FinancasController',     'taxasCad'],
     'financeiro/taxas/salvar'         => ['FinancasController',     'salvarTaxas'],
+    'financeiro/taxas/excluir'        => ['FinancasController', 'excluirTaxa'],
     'financeiro/lancamento'           => ['FinancasController',     'lancamento'],
     'financeiro/lancamento/salvar'    => ['FinancasController',     'salvarLancamento'],
     'financeiro/historico'            => ['FinancasController',     'historico'],
@@ -59,10 +60,16 @@ $routes = [
     'ocorrencia/detalhes'           => ['OcorrenciaController', 'detalhes'],
 
     // Avisos
-
     'avisos'              => ['AvisosController', 'index'],
     'avisos/salvar'       => ['AvisosController', 'salvar'],
     'avisos/excluir'      => ['AvisosController', 'excluir'],
+
+    // Assembleia
+    'assembleia'          => ['AssembleiaController', 'index'],
+    'assembleia/salvar'   => ['AssembleiaController', 'salvar'],
+    'assembleia/presenca' => ['AssembleiaController', 'confirmarPresenca'],
+    'assembleia/excluir'  => ['AssembleiaController', 'excluir'],
+
 
 ];
 
