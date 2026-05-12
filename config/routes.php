@@ -50,14 +50,19 @@ $routes = [
     'financeiro/lancamento/verificar' => ['FinancasController',     'verificarDuplicado'],
 
     // Ocorrências
-    'ocorrencia'            => ['OcorrenciaController', 'index'],
-    'ocorrencia/abrir'      => ['OcorrenciaController', 'abrir'],
-    'ocorrencia/cancelar'   => ['OcorrenciaController', 'cancelar'],
-    'ocorrencia/tramitar-morador' => ['OcorrenciaController', 'tramitarMorador'],
-    'ocorrencia/painel'     => ['OcorrenciaController', 'painel'],
-    'ocorrencia/tramitar'   => ['OcorrenciaController', 'tramitar'],
-    'ocorrencia/detalhes'   => ['OcorrenciaController', 'detalhes'],
+    'ocorrencia'                    => ['OcorrenciaController', 'index'],
+    'ocorrencia/abrir'              => ['OcorrenciaController', 'abrir'],
+    'ocorrencia/cancelar'           => ['OcorrenciaController', 'cancelar'],
+    'ocorrencia/tramitar-morador'   => ['OcorrenciaController', 'tramitarMorador'],
+    'ocorrencia/painel'             => ['OcorrenciaController', 'painel'],
+    'ocorrencia/tramitar'           => ['OcorrenciaController', 'tramitar'],
+    'ocorrencia/detalhes'           => ['OcorrenciaController', 'detalhes'],
 
+    // Avisos
+
+    'avisos'              => ['AvisosController', 'index'],
+    'avisos/salvar'       => ['AvisosController', 'salvar'],
+    'avisos/excluir'      => ['AvisosController', 'excluir'],
 
 ];
 

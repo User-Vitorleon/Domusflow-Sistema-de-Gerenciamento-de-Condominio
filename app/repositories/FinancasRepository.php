@@ -1,4 +1,4 @@
-<?php
+'<?php
 
 class FinancasRepository
 {
@@ -155,7 +155,7 @@ public function countLancamentos(int $id, int $previlegio): int
             ]);
 
             return $id_fatura > 0;
-        }
+        }   
 
         return false;
     }

@@ -29,6 +29,11 @@ if (in_array($prev, [1, 2, 4])) {
 if (in_array($prev, [1, 2, 4])) {
     $modulos[] = ['titulo' => 'Ocorrências',       'sub' => 'Registre e acompanhe ocorrências no condomínio',  'href' => BASE_URL . '/ocorrencia',          'icon' => 'ocorrencia'];
 }
+// avisos ok
+
+if (in_array($prev, [1, 2, 4])) {
+    $modulos[] = ['titulo' => 'Avisos',       'sub' => 'Acompanhe os últimos avisos registrados',                'href' => BASE_URL . '/avisos',             'icon' => 'avisos'];
+}
 
 $modulos[] = ['titulo' => 'Atualizar Dados',   'sub' => 'Edite seu perfil e dados pessoais',               'href' => BASE_URL . '/cadastro/update',     'icon' => 'user'];
 ?>
@@ -154,6 +159,7 @@ function pn_icon(string $k): string
         'search'     => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
         'chart'      => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>',
         'financeiro' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+        'avisos'     => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
         'ocorrencia' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
     ];
     return $i[$k] ?? '';

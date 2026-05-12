@@ -165,3 +165,14 @@ CREATE TABLE IF NOT EXISTS ocorrencia_notificacoes (
     FOREIGN KEY (id_user) REFERENCES morador(id_user),
     FOREIGN KEY (id_ocorrencia) REFERENCES ocorrencias(id_ocorrencia)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `avisos` (
+  `id_aviso`    INT(11)      NOT NULL AUTO_INCREMENT,
+  `titulo`      VARCHAR(100) NOT NULL,
+  `mensagem`    TEXT         NOT NULL,
+  `id_user_cad` INT(11)      NOT NULL,
+  `status`      VARCHAR(1)   NOT NULL DEFAULT 'A',
+  `created_at`  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_aviso`),
+  CONSTRAINT `fk_aviso_user` FOREIGN KEY (`id_user_cad`) REFERENCES `morador` (`id_user`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
