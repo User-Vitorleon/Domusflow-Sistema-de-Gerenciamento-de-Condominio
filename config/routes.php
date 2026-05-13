@@ -43,12 +43,13 @@ $routes = [
     // Finanças
     'financeiro/taxas'                => ['FinancasController',     'taxasCad'],
     'financeiro/taxas/salvar'         => ['FinancasController',     'salvarTaxas'],
-    'financeiro/taxas/excluir'        => ['FinancasController', 'excluirTaxa'],
+    'financeiro/taxas/excluir'        => ['FinancasController',     'excluirTaxa'],
     'financeiro/lancamento'           => ['FinancasController',     'lancamento'],
     'financeiro/lancamento/salvar'    => ['FinancasController',     'salvarLancamento'],
     'financeiro/historico'            => ['FinancasController',     'historico'],
     'financeiro/fatura/gerar'         => ['FinancasController',     'gerarFatura'],
     'financeiro/lancamento/verificar' => ['FinancasController',     'verificarDuplicado'],
+    'financeiro/fatura/gerarTodos'    => ['FinancasController',     'gerarFaturatodos'],
 
     // Ocorrências
     'ocorrencia'                    => ['OcorrenciaController', 'index'],

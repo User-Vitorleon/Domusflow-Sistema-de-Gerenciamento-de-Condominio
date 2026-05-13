@@ -145,7 +145,7 @@ public function countLancamentos(int $id, int $previlegio): int
 
     public function historico(int $id): array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM lancamentos where id_user = :id and STATUS = 'P'");
+        $stmt = $this->pdo->prepare("SELECT * FROM lancamentos where id_user = :id AND status IN ('P', 'F')");
         $stmt->execute([
             ':id'   =>  $id,
         ]);
@@ -181,10 +181,13 @@ public function countLancamentos(int $id, int $previlegio): int
         return false;
     }
 
-    public function totalPendente(int $id_user): float
-    {
-        $stmt = $this->pdo->prepare("SELECT COALESCE(SUM(valor), 0) FROM lancamentos WHERE id_user = :id_user 
-                                        AND status = 'P' AND id_fatura IS NULL"); // COALESCE SERVE PARA CASO NAO TENHA VALORES PENDENTES, RETORNA 0 INVES DE NULL
+    public function totalPendente(int $id_user): float{
+        $stmt = $this->pdo->prepare("
+            SELECT COALESCE(SUM(valor), 0) 
+            FROM lancamentos 
+            WHERE id_user = :id_user 
+            AND status = 'P'
+        ");
         $stmt->execute([':id_user' => $id_user]);
         return (float)$stmt->fetchColumn();
     }
