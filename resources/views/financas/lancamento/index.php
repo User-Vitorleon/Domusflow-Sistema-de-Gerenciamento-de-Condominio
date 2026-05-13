@@ -199,6 +199,16 @@ document.querySelector('form[action*="lancamento/salvar"]').addEventListener('su
             </div>
             <div class="morador-list">
 
+            <?php if ($prev == 2): ?>
+    <form action="<?= BASE_URL ?>/financeiro/fatura/gerarTodos" method="POST"
+          onsubmit="return confirm('Gerar fatura para TODOS os moradores com pendências?')"
+          style="margin-bottom: 16px;">
+        <button type="submit" class="btn-primary">
+            <i class='bx bx-file'></i> Gerar Fatura para Todos
+        </button>
+    </form>
+<?php endif; ?>
+
         <?php if (empty($lancamentos)): ?>
             <div class="empty-state">
                 <i class='bx bx-receipt'></i>

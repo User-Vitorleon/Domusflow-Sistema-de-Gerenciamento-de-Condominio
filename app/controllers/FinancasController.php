@@ -201,7 +201,38 @@ $usuario = $repo->findById((int)$_SESSION['usuario_id']);
         exit();
     }
 
+    public function gerarFaturaTodos(): void{
+        $this->requireSindico();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . BASE_URL . '/financeiro/lancamento');
+            exit();
+        }
+
+        $moradorRepo = new MoradorRepository();
+        $moradores   = $moradorRepo->findAtivos();
+        $gerados     = 0;
+
+        foreach ($moradores as $m) {
+            $valor_total = $this->repo->totalPendente($m['id_user']);
+            if ($valor_total > 0) {
+                $this->repo->gerarFatura(
+                    (int)$_SESSION['usuario_id'],
+                    [
+                        'id_user'   => $m['id_user'],
+                        'data'      => date('Y-m-d'),
+                        'valor'     => $valor_total,
+                        'descricao' => 'Fatura gerada automaticamente',
+                    ]
+                );
+                $gerados++;
+            }
+        }
+
+        $_SESSION['sucesso_fatura'] = "Faturas geradas para {$gerados} morador(es)!";
+        header('Location: ' . BASE_URL . '/financeiro/lancamento');
+        exit();
+    }
+
 }
-
-
 ?>
