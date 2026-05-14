@@ -6,7 +6,10 @@ require_once __DIR__ . '/../layout/header.php';
 $prev = $usuario['previlegio'] ?? 1;
 ?>
 
+
 <main class="main-content">
+<div class="df-container">
+
     <div class="page-header">
         <h2><?= $prev == 2 ? 'Cadastrar Local' : 'Nova Reserva' ?></h2>
     </div>
@@ -173,6 +176,7 @@ $prev = $usuario['previlegio'] ?? 1;
             <?php endif; ?>
         <?php endif; ?>
     <?php endif; ?>
+                        </div>
 </main>
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>

@@ -82,27 +82,26 @@ require_once __DIR__ . '/../../layout/header.php';
     </form>
 
     <hr class="divider">
-
-    <div class="danger-zone">
-      <h6><i class='bx bx-shield-x me-1'></i>Apagar Conta</h6>
-      <div class="danger-btns">
-
-        <form action="<?= BASE_URL ?>/moradores/inativar" method="POST" class="perfil-danger-form"
-          onsubmit="return confirm('Deseja inativar sua conta? Você não conseguirá mais acessar o sistema.')">
-          <button type="submit" class="btn-inativar w-100">
-            <i class='bx bx-pause-circle me-1'></i> Inativar conta
-          </button>
-        </form>
-
-        <form action="<?= BASE_URL ?>/moradores/deletar" method="POST" class="perfil-danger-form"
-          onsubmit="return confirm('Atenção! Esta ação é irreversível. Seus dados serão apagados permanentemente.')">
-          <button type="submit" class="btn-deletar w-100">
-            <i class='bx bx-trash me-1'></i> Apagar conta
-          </button>
-        </form>
-
+    <?php if (($usuario['previlegio'] ?? 1) != 4): ?>
+      <hr class="divider">
+      <div class="danger-zone">
+          <h6><i class='bx bx-shield-x me-1'></i>Apagar Conta</h6>
+          <div class="danger-btns">
+              <form action="<?= BASE_URL ?>/moradores/inativar" method="POST" class="perfil-danger-form"
+                  onsubmit="return confirm('Deseja inativar sua conta? Você não conseguirá mais acessar o sistema.')">
+                  <button type="submit" class="btn-inativar w-100">
+                      <i class='bx bx-pause-circle me-1'></i> Inativar conta
+                  </button>
+              </form>
+              <form action="<?= BASE_URL ?>/moradores/deletar" method="POST" class="perfil-danger-form"
+                  onsubmit="return confirm('Atenção! Esta ação é irreversível. Seus dados serão apagados permanentemente.')">
+                  <button type="submit" class="btn-deletar w-100">
+                      <i class='bx bx-trash me-1'></i> Apagar conta
+                  </button>
+              </form>
+          </div>
       </div>
-    </div>
+    <?php endif; ?>
 
   </div>
 </div>

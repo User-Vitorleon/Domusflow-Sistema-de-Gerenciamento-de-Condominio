@@ -35,5 +35,14 @@
     
     }
 
+    public function contarNovos(string $desde): int{
+    $stmt = $this->pdo->prepare("
+        SELECT COUNT(*) FROM avisos 
+        WHERE status = 'A' AND created_at > :desde
+    ");
+    $stmt->execute([':desde' => $desde]);
+    return (int)$stmt->fetchColumn();
+}
+
 }
 ?>

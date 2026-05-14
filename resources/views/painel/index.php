@@ -16,10 +16,10 @@ if (in_array($prev, [1, 2, 4])) {
     $modulos[] = ['titulo' => 'Reservas',         'sub' => 'Solicite e gerencie reservas de espaços comuns',  'href' => BASE_URL . '/reserva',             'icon' => 'calendar'];
 }
 if (in_array($prev, [3, 4])) {
-    $modulos[] = ['titulo' => 'Consultar Placa',  'sub' => 'Pesquisar veículos pela placa',            'href' => BASE_URL . '/veiculo/consultar',   'icon' => 'search'];
+    $modulos[] = ['titulo' => 'Consultar Placa',  'sub' => 'Pesquisar veículos pela placa',                   'href' => BASE_URL . '/veiculo/consultar',   'icon' => 'search'];
 }
 if (in_array($prev, [2, 4])) {
-    $modulos[] = ['titulo' => 'Novos Usuários',   'sub' => 'Controle de novos moradores', 'href' => BASE_URL . '/moradores/pendentes', 'icon' => 'user-check'];
+    $modulos[] = ['titulo' => 'Novos Usuários',   'sub' => 'Controle de novos moradores',                    'href' => BASE_URL . '/moradores/pendentes', 'icon' => 'user-check'];
 }
 if (in_array($prev, [1, 2, 4])) {
     $modulos[] = ['titulo' => 'Veículos',          'sub' => 'Cadastre e gerencie seus veículos',               'href' => BASE_URL . '/veiculo',             'icon' => 'car'];
@@ -40,7 +40,7 @@ if (in_array($prev, [1, 2, 4])) {
 }
 
 if ($prev == 4) {
-    $modulos[] = ['titulo' => 'Gestão de Moradores', 'sub' => 'Gerencie privilégios dos moradores', 'href' => BASE_URL . '/moradores/gestao', 'icon' => 'gestao'];
+    $modulos[] = ['titulo' => 'Gestão de Moradores', 'sub' => 'Gerencie privilégios dos moradores',             'href' => BASE_URL . '/moradores/gestao', 'icon' => 'gestao'];
 }
 
 $modulos[] = ['titulo' => 'Atualizar Dados',   'sub' => 'Edite seu perfil e dados pessoais',               'href' => BASE_URL . '/cadastro/update',     'icon' => 'user'];
