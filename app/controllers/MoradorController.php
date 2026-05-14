@@ -191,4 +191,43 @@ class MoradorController
         header('Location: ' . BASE_URL . '/');
         exit();
     }
+
+public function gestao(): void
+{
+    if (($_SESSION['usuario_previlegio'] ?? 0) != 4) {
+        header('Location: ' . BASE_URL . '/');
+        exit();
+    }
+    $repo      = new MoradorRepository();
+    $usuario   = $repo->findById((int)$_SESSION['usuario_id']);
+    $moradores = $repo->findTodos();
+    require_once __DIR__ . '/../../resources/views/moradores/gestao/index.php';
+}
+
+public function gestaoSalvar(): void
+{
+    if (($_SESSION['usuario_previlegio'] ?? 0) != 4) {
+        header('Location: ' . BASE_URL . '/');
+        exit();
+    }
+
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header('Location: ' . BASE_URL . '/moradores/gestao');
+        exit();
+    }
+
+    $resultado = $this->service->atualizarPrivilegio(
+        (int)$_POST['id_morador'],
+        (int)$_POST['previlegio']
+    );
+
+    if ($resultado) {
+        header('Location: ' . BASE_URL . '/moradores/gestao?sucesso=1');
+    } else {
+        header('Location: ' . BASE_URL . '/moradores/gestao?erro=1');
+    }
+    exit();
+}
+
+   
 }

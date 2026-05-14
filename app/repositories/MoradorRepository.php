@@ -24,6 +24,11 @@ class MoradorRepository
         return $stmt->fetchAll();
     }
 
+    public function findTodos(): array{
+        $stmt = $this->pdo->query("SELECT * FROM morador WHERE status != 'B' ORDER BY nome ASC");
+        return $stmt->fetchAll();
+}
+
     public function findByCpf(string $cpf): ?array
     {
         $stmt = $this->pdo->prepare("SELECT * FROM morador WHERE cpf = :cpf LIMIT 1");
@@ -291,4 +296,14 @@ class MoradorRepository
 
         return $map;
     }
+
+    public function atualizarPrivilegio(int $id, int $previlegio): bool{
+    $stmt = $this->pdo->prepare(
+        "UPDATE morador SET previlegio = :previlegio WHERE id_user = :id"
+    );
+    return $stmt->execute([
+        ':previlegio' => $previlegio,
+        ':id'         => $id,
+    ]);
+}
 }

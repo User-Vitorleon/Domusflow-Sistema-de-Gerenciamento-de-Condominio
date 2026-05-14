@@ -20,6 +20,9 @@ $routes = [
     'moradores/liberar'      => ['MoradorController',   'liberar'],
     'moradores/inativar'     => ['MoradorController',   'inativar'],
     'moradores/deletar'      => ['MoradorController',   'deletar'],
+    'moradores/gestao'       => ['MoradorController',   'gestao'],
+    'moradores/gestao/salvar'=> ['MoradorController',   'gestaoSalvar'],
+
 
     // Dashboard
     'dashboard'           => ['DashboardController', 'index'],
@@ -46,6 +49,7 @@ $routes = [
     'financeiro/taxas/excluir'        => ['FinancasController',     'excluirTaxa'],
     'financeiro/lancamento'           => ['FinancasController',     'lancamento'],
     'financeiro/lancamento/salvar'    => ['FinancasController',     'salvarLancamento'],
+    'financeiro/lancamento/excluir'   => ['FinancasController' ,    'excluirLancamento'],
     'financeiro/historico'            => ['FinancasController',     'historico'],
     'financeiro/fatura/gerar'         => ['FinancasController',     'gerarFatura'],
     'financeiro/lancamento/verificar' => ['FinancasController',     'verificarDuplicado'],

@@ -12,7 +12,7 @@ class FinancasRepository
 
     public function taxasCad(): array
     {
-        $stmt = $this->pdo->query("SELECT * FROM taxas_padrao where status = 'A' ");
+        $stmt = $this->pdo->query("SELECT * FROM taxas_padrao where status = 'A' ORDER BY descricao ASC");
         return $stmt->fetchAll();
     }
 
@@ -53,11 +53,11 @@ class FinancasRepository
     if ($previlegio == 2 || $previlegio == 4) {
         $where = $busca ? "AND (m.nome LIKE :busca OR l.descricao LIKE :busca2 OR l.modelo LIKE :busca3)" : '';
         $stmt = $this->pdo->prepare("
-            SELECT l.*, m.nome as nome_morador
+            SELECT l.*, m.nome as nome_morador, m.bloco, m.apto
             FROM lancamentos l 
             INNER JOIN morador m ON l.id_user = m.id_user
             WHERE 1=1 $where
-            ORDER BY l.data_vencimento DESC
+            ORDER BY l.data_lancamento DESC
             LIMIT :limite OFFSET :offset
         ");
         if ($busca) {
@@ -91,6 +91,12 @@ class FinancasRepository
     } else {
         return [];
     }
+}
+
+public function excluirLancamento(int $id): bool{
+    $stmt = $this->pdo->prepare("DELETE FROM lancamentos WHERE id_lancamento = :id");
+
+    return $stmt->execute([':id' => $id]);
 }
 
 public function countLancamentos(int $id, int $previlegio): int

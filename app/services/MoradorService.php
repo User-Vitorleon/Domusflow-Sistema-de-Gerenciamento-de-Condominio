@@ -118,4 +118,8 @@ class MoradorService
         $this->repo->deletarDados($dados['id']);
         return ['sucesso' => true];
     }
+
+    public function atualizarPrivilegio(int $id, int $previlegio): bool{
+        return $this->repo->atualizarPrivilegio($id, $previlegio);
+}
 }
