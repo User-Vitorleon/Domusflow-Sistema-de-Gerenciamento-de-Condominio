@@ -18,9 +18,10 @@ if (isset($usuario) && is_array($usuario)) {
 // ── Sino: conta notificações não lidas ──────────────────────────
 $sino_count = 0;
 if (!$semTopo && isset($_SESSION['usuario_id'])) {
-    require_once __DIR__ . '/../../../app/repositories/OcorrenciaRepository.php';
-    $sinoRepo   = new OcorrenciaRepository();
-    $sino_count = $sinoRepo->contarNaoLidas((int)$_SESSION['usuario_id']);
+    require_once __DIR__ . '/../../../app/repositories/AvisosRepository.php';
+    $sinoRepo   = new AvisosRepository();
+    $desde      = $_SESSION['avisos_visto_em'] ?? '2000-01-01 00:00:00';
+    $sino_count = $sinoRepo->contarNovos($desde);
 }
 ?>
 <!DOCTYPE html>
@@ -67,7 +68,7 @@ if (!$semTopo && isset($_SESSION['usuario_id'])) {
                 <div class="df-topbar-user">
 
                     <!-- ── Sino de Ocorrências ── -->
-                    <a href="<?= BASE_URL ?>/ocorrencia" class="oc-sino" title="Minhas Ocorrências" aria-label="Ocorrências">
+                    <a href="<?= BASE_URL ?>/avisos" class="oc-sino" title="Avisos" aria-label="Avisos">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
                             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />

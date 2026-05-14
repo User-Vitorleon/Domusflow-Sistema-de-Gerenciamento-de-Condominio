@@ -30,6 +30,7 @@ class AvisosController{
         $repo    = new MoradorRepository();
         $usuario = $repo->findById((int)$_SESSION['usuario_id']);
         $avisos  = $this->repo->listar();
+        $_SESSION['avisos_visto_em'] = date('Y-m-d H:i:s');
 
         require_once __DIR__ . '/../../resources/views/avisos/index.php';
     }

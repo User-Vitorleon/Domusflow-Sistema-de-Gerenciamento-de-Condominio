@@ -396,3 +396,77 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+/* ── Wrapper centralizado telas internas ── */
+.df-container {
+    width: 100%;
+    max-width: 860px;
+    margin: 0 auto;
+}
+
+/* ── Aviso card ── */
+.aviso-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: 20px 24px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--primary);
+    margin-bottom: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.aviso-card h4 {
+    margin: 0 0 6px 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.aviso-card p {
+    margin: 0 0 10px 0;
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.aviso-card small {
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+.aviso-card-icon {
+    color: var(--primary);
+    margin-right: 6px;
+}
+
+/* ── Textarea padrão ── */
+.df-field textarea {
+    padding: 9px 13px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-family: var(--font);
+    font-size: 14px;
+    color: var(--text);
+    background: var(--white);
+    outline: none;
+    resize: vertical;
+    transition: border-color var(--transition), box-shadow var(--transition);
+    width: 100%;
+}
+
+.df-field textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(15, 128, 182, .12);
+}
+
+/* ── Section title ── */
+.section-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 18px;
+    color: var(--text);
+}
