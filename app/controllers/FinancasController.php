@@ -116,6 +116,13 @@ public function salvarLancamento(): void{
     header('Location: ' . BASE_URL . '/financeiro/lancamento');
     exit();
 }
+
+public function excluirLancamento(): void{
+    $this->requireSindico();
+    $this->repo->excluirLancamento((int)$_POST['id_lancamento']);
+    header('Location: ' . BASE_URL . '/financeiro/lancamento?excluido=1');
+    exit();
+}
     
 
     public function historico():void{
@@ -135,25 +142,29 @@ $usuario = $repo->findById((int)$_SESSION['usuario_id']);
 
     }
 
-    public function gerarFatura():void{
-
-        $this->requireSindico(); // validamos se é sindico atraves da function private no topo do arquivo
-
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') { // validamos se os dados foram enviados via post
-        header('Location: ' . BASE_URL . '/financeiro/lancamento'); // caso nao seja, redirecionamos 
+public function gerarFatura(): void{
+    // tanto morador quanto síndico podem gerar fatura
+    if (!isset($_SESSION['usuario_id'])) {
+        header('Location: ' . BASE_URL . '/');
         exit();
     }
 
-    $id_user_alvo = (int)$_POST['id_user']; // resgatamos os dados do usuario
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header('Location: ' . BASE_URL . '/financeiro/historico');
+        exit();
+    }
+
+    $id_user_alvo = (int)$_POST['id_user'];
     $valor_total  = $this->repo->totalPendente($id_user_alvo);
 
-    if ($valor_total <= 0) { // em caso do morador nao tiver valores pendentes, apenas exibimos msg informando que nao a debitos pendentes
-        $_SESSION['erro_fatura'] = 'Morador não possui lançamentos pendentes.';
-        header('Location: ' . BASE_URL . '/financeiro/lancamento');
+    if ($valor_total <= 0) {
+        $_SESSION['erro_fatura'] = 'Nenhuma pendência encontrada.';
+        $destino = ($_SESSION['usuario_previlegio'] == 2) ? '/financeiro/lancamento' : '/financeiro/historico';
+        header('Location: ' . BASE_URL . $destino);
         exit();
     }
 
-    $resultado = $this->repo->gerarFatura( // passamos os dados para a repository realizar a query no sql
+    $resultado = $this->repo->gerarFatura(
         (int)$_SESSION['usuario_id'],
         [
             'id_user'   => $id_user_alvo,
@@ -163,15 +174,17 @@ $usuario = $repo->findById((int)$_SESSION['usuario_id']);
         ]
     );
 
-    if ($resultado) { // redirecionamos em caso de sucesso ou erro
+    if ($resultado) {
         $_SESSION['sucesso_fatura'] = 'Fatura gerada com sucesso! Valor: R$ ' . number_format($valor_total, 2, ',', '.');
     } else {
         $_SESSION['erro_fatura'] = 'Erro ao gerar fatura.';
     }
 
-    header('Location: ' . BASE_URL . '/financeiro/lancamento');
+    $destino = ($_SESSION['usuario_previlegio'] == 2) ? '/financeiro/lancamento' : '/financeiro/historico';
+    header('Location: ' . BASE_URL . $destino);
     exit();
-    }
+}
+
 
     public function verificarDuplicado(): void {
         header ('Content-Type: application/json');

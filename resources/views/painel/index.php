@@ -16,10 +16,10 @@ if (in_array($prev, [1, 2, 4])) {
     $modulos[] = ['titulo' => 'Reservas',         'sub' => 'Solicite e gerencie reservas de espaços comuns',  'href' => BASE_URL . '/reserva',             'icon' => 'calendar'];
 }
 if (in_array($prev, [3, 4])) {
-    $modulos[] = ['titulo' => 'Consultar Placa',  'sub' => 'Pesquise qualquer veículo pela placa',            'href' => BASE_URL . '/veiculo/consultar',   'icon' => 'search'];
+    $modulos[] = ['titulo' => 'Consultar Placa',  'sub' => 'Pesquisar veículos pela placa',            'href' => BASE_URL . '/veiculo/consultar',   'icon' => 'search'];
 }
 if (in_array($prev, [2, 4])) {
-    $modulos[] = ['titulo' => 'Novos Usuários',   'sub' => 'Aprove ou recuse solicitações de novos moradores', 'href' => BASE_URL . '/moradores/pendentes', 'icon' => 'user-check'];
+    $modulos[] = ['titulo' => 'Novos Usuários',   'sub' => 'Controle de novos moradores', 'href' => BASE_URL . '/moradores/pendentes', 'icon' => 'user-check'];
 }
 if (in_array($prev, [1, 2, 4])) {
     $modulos[] = ['titulo' => 'Veículos',          'sub' => 'Cadastre e gerencie seus veículos',               'href' => BASE_URL . '/veiculo',             'icon' => 'car'];
@@ -39,8 +39,14 @@ if (in_array($prev, [1, 2, 4])) {
     $modulos[] = ['titulo' => 'Assembleia',       'sub' => 'Proximas Assembleias agendadas',                    'href' => BASE_URL . '/assembleia',             'icon' => 'assembleia'];
 }
 
+if ($prev == 4) {
+    $modulos[] = ['titulo' => 'Gestão de Moradores', 'sub' => 'Gerencie privilégios dos moradores', 'href' => BASE_URL . '/moradores/gestao', 'icon' => 'gestao'];
+}
+
 $modulos[] = ['titulo' => 'Atualizar Dados',   'sub' => 'Edite seu perfil e dados pessoais',               'href' => BASE_URL . '/cadastro/update',     'icon' => 'user'];
 ?>
+
+
 
 <main class="pn-page">
 
@@ -52,8 +58,8 @@ $modulos[] = ['titulo' => 'Atualizar Dados',   'sub' => 'Edite seu perfil e dado
 
     <!-- Cards -->
     <div class="pn-grid">
-
-        <?php if (in_array($prev, [1, 2, 4])): ?>
+        <?php if (in_array($prev, [2, 4])): ?>
+            <!-- Síndico/Admin — dropdown -->
             <div class="dropdown pn-card" style="cursor:pointer;">
                 <button type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside"
                     aria-expanded="false"
@@ -62,25 +68,33 @@ $modulos[] = ['titulo' => 'Atualizar Dados',   'sub' => 'Edite seu perfil e dado
                 <div class="pn-card-icon"><?= pn_icon('financeiro') ?></div>
                 <div class="pn-card-body">
                     <span class="pn-card-title">Financeiro</span>
-                    <span class="pn-card-sub">Confira: Taxas, multas e faturas</span>
+                    <span class="pn-card-sub">Taxas, multas e faturas</span>
                 </div>
                 <svg class="pn-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                     stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="9 18 15 12 9 6" />
                 </svg>
                 <ul class="dropdown-menu" onclick="event.stopPropagation()">
-                    <?php if (in_array($prev, [2, 4])): ?>
-                        <li><a class="dropdown-item" href="<?= BASE_URL ?>/financeiro/taxas" 
-                            onclick="window.location='<?= BASE_URL ?>/financeiro/taxas'">Taxas Condominiais</a></li>
-                        <li><a class="dropdown-item" href="<?= BASE_URL ?>/financeiro/lancamento"
-                            onclick="window.location='<?= BASE_URL ?>/financeiro/lancamento'">Lançamentos</a></li>
-                    <?php endif; ?>
-                    <?php if ($prev == 1): ?> 
-                        <li><a class="dropdown-item" href="<?= BASE_URL ?>/financeiro/historico"
-                            onclick="window.location='<?= BASE_URL ?>/financeiro/historico'">Meu Histórico</a></li>
-                    <?php endif; ?>
+                    <li><a class="dropdown-item" href="<?= BASE_URL ?>/financeiro/taxas"
+                        onclick="window.location='<?= BASE_URL ?>/financeiro/taxas'">Cadastrar Taxas</a></li>
+                    <li><a class="dropdown-item" href="<?= BASE_URL ?>/financeiro/lancamento"
+                        onclick="window.location='<?= BASE_URL ?>/financeiro/lancamento'">Lançamentos</a></li>
                 </ul>
             </div>
+
+        <?php elseif ($prev == 1): ?>
+            <!-- Morador — vai direto para o histórico -->
+            <a href="<?= BASE_URL ?>/financeiro/historico" class="pn-card">
+                <div class="pn-card-icon"><?= pn_icon('financeiro') ?></div>
+                <div class="pn-card-body">
+                    <span class="pn-card-title">Financeiro</span>
+                    <span class="pn-card-sub">Suas pendências e faturas</span>
+                </div>
+                <svg class="pn-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6" />
+                </svg>
+            </a>
         <?php endif; ?>
 
         <?php if (in_array($prev, [2, 4])): ?>
@@ -165,6 +179,7 @@ function pn_icon(string $k): string
         'financeiro' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
         'avisos'     => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
         'assembleia' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+        'gestao' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>',
         'ocorrencia' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
     ];
     return $i[$k] ?? '';
