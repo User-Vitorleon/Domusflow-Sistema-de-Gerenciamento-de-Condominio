@@ -23,7 +23,6 @@ $routes = [
     'moradores/gestao'       => ['MoradorController',   'gestao'],
     'moradores/gestao/salvar'=> ['MoradorController',   'gestaoSalvar'],
 
-
     // Dashboard
     'dashboard'           => ['DashboardController', 'index'],
     'painel'              => ['PainelController',    'index'],
@@ -74,6 +73,7 @@ $routes = [
     'assembleia/salvar'   => ['AssembleiaController', 'salvar'],
     'assembleia/presenca' => ['AssembleiaController', 'confirmarPresenca'],
     'assembleia/excluir'  => ['AssembleiaController', 'excluir'],
+    'assembleia/presenca' => ['AssembleiaController', 'listarPresencas'],
 
 
 ];

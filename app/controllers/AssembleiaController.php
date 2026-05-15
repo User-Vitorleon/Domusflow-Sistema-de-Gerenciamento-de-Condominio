@@ -74,24 +74,34 @@ class AssembleiaController{
         exit();
     }
 
-public function confirmarPresenca(): void
-{
-    $this->requireAuth();
+    public function confirmarPresenca(): void{
+        $this->requireAuth();
 
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        header('Location: ' . BASE_URL . '/assembleia');
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . BASE_URL . '/assembleia');
+            exit();
+        }
+
+        $this->repo->confirmarPresenca(
+            (int)$_POST['id_assembleia'],
+            (int)$_SESSION['usuario_id'],
+            $_POST['presenca']
+        );
+
+        header('Location: ' . BASE_URL . '/assembleia?presenca=' . $_POST['presenca']); // ← passa o valor real
         exit();
     }
 
-    $this->repo->confirmarPresenca(
-        (int)$_POST['id_assembleia'],
-        (int)$_SESSION['usuario_id'],
-        $_POST['presenca']
-    );
+    public function listarPresencas():void{
+        $this->RequireSindico();
 
-    header('Location: ' . BASE_URL . '/assembleia?presenca=' . $_POST['presenca']); // ← passa o valor real
-    exit();
-}
+        $repo = new MoradorRepository();
+        $usuario = $repo->findById((int)$_SESSION['usuario_id']);
+        $presencas = $this->repo->listarPresencas();
+        $assembleias = $this->repo->listar();
+
+        require_once __DIR__ . '/../../resources/views/assembleia/presencas.php';
+    }
 
 
 

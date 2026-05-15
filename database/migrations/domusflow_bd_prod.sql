@@ -202,6 +202,7 @@ CREATE TABLE `assembleias_presencas` (
   `presenca`      VARCHAR(1) NOT NULL,
   `created_at`    DATETIME   NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id_presenca`),
+  UNIQUE KEY `uk_presenca` (`id_assembleia`, `id_user`),
   CONSTRAINT `fk_presenca_assembleia` FOREIGN KEY (`id_assembleia`) REFERENCES `assembleias` (`id_assembleia`),
   CONSTRAINT `fk_presenca_user`       FOREIGN KEY (`id_user`)       REFERENCES `morador` (`id_user`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

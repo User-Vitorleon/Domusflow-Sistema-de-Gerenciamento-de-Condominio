@@ -45,6 +45,23 @@ class AssembleiaRepository{
         ]);
     }
 
+    public function listarPresencas():array{
+        $stmt = $this->pdo->query("SELECT 
+            ap.presenca,
+            ap.created_at,
+            m.nome,
+            m.apto,
+            m.bloco,
+            a.titulo,
+            a.data as data_assembleia
+        FROM assembleias_presencas ap
+        INNER JOIN morador m ON ap.id_user = m.id_user
+        INNER JOIN assembleias a ON ap.id_assembleia = a.id_assembleia
+        ORDER BY a.data DESC, m.nome ASC");
+
+        return $stmt->fetchAll();
+    }
+
     public function excluir(int $id):bool{
         $stmt = $this->pdo->prepare("UPDATE assembleias SET status = 'I' WHERE id_assembleia = :id");
         return $stmt->execute([':id' => $id]);
