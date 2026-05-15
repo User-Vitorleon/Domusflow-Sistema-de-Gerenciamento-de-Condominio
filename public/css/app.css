@@ -548,6 +548,13 @@ body {
     }
 }
 
+    .offcanvas-header {
+    display: flex;
+    margin-top: 15%;
+    align-items: center;
+    padding: var(--bs-offcanvas-padding-y) var(--bs-offcanvas-padding-x);
+}
+
 /* ── Presença resumo ── */
 .presenca-resumo {
     display: flex !important;

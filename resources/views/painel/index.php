@@ -61,9 +61,7 @@ $modulos[] = ['titulo' => 'Atualizar Dados',   'sub' => 'Edite seu perfil e dado
         <?php if (in_array($prev, [2, 4])): ?>
             <!-- Síndico/Admin — dropdown -->
             <div class="dropdown pn-card" style="cursor:pointer;">
-                <button type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside"
-                    aria-expanded="false"
-                    style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:none;background:none;">
+                <button type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" class="pn-dropdown-trigger">
                 </button>
                 <div class="pn-card-icon"><?= pn_icon('financeiro') ?></div>
                 <div class="pn-card-body">
@@ -99,9 +97,7 @@ $modulos[] = ['titulo' => 'Atualizar Dados',   'sub' => 'Edite seu perfil e dado
 
         <?php if (in_array($prev, [2, 4])): ?>
             <div class="dropdown pn-card" style="cursor:pointer;">
-                <button type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside"
-                    aria-expanded="false"
-                    style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:none;background:none;">
+                <button type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" class="pn-dropdown-trigger">
                 </button>
                 <div class="pn-card-icon"><?= pn_icon('ocorrencia') ?></div>
                 <div class="pn-card-body">
@@ -129,6 +125,30 @@ $modulos[] = ['titulo' => 'Atualizar Dados',   'sub' => 'Edite seu perfil e dado
                     <li><a class="dropdown-item" href="<?= BASE_URL ?>/ocorrencia/painel?status=R">Resolvidas</a></li>
                 </ul>
             </div>
+
+        <?php endif; ?>
+                <?php if (in_array($prev, [2, 4])): ?>
+            <div class="dropdown pn-card" style="cursor:pointer;">
+                <button type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside"
+    aria-expanded="false"
+    class="pn-dropdown-trigger">
+</button>
+                <div class="pn-card-icon"><?= pn_icon('assembleia') ?></div>
+                <div class="pn-card-body">
+                    <span class="pn-card-title">Assembleia</span>
+                    <span class="pn-card-sub">Próximas assembleias agendadas</span>
+                </div>
+                <svg class="pn-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6" />
+                </svg>
+                <ul class="dropdown-menu" onclick="event.stopPropagation()">
+                    <li><a class="dropdown-item" href="<?= BASE_URL ?>/assembleia"
+                        onclick="window.location='<?= BASE_URL ?>/assembleia'">Assembleias</a></li>
+                    <li><a class="dropdown-item" href="<?= BASE_URL ?>/assembleia/presenca"
+                        onclick="window.location='<?= BASE_URL ?>/assembleia/presenca'">Presenças</a></li>
+                </ul>
+            </div>
         <?php endif; ?>
 
         <?php foreach ($modulos as $m):
@@ -152,17 +172,29 @@ $modulos[] = ['titulo' => 'Atualizar Dados',   'sub' => 'Edite seu perfil e dado
     </div>
 
     <!-- Ajuda -->
-    <div class="pn-help">
-        <p class="pn-help-title">Precisa de ajuda?</p>
-        <ul class="pn-help-list">
-            <li><a href="#">Como realizar uma <strong>reserva de espaço</strong>?</a></li>
-            <li><a href="#">Como <strong>cadastrar ou editar</strong> um veículo?</a></li>
-            <li><a href="#">Como <strong>atualizar</strong> meus dados cadastrais?</a></li>
-            <li><a href="#">Dúvidas sobre <strong>aprovação de moradores</strong>.</a></li>
-            <li><a href="#">Como <strong>abrir ou acompanhar</strong> uma ocorrência?</a></li>
-            <li><a href="#">Relatos de <strong>erros no sistema</strong>.</a></li>
-        </ul>
+    <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">Precisa de Ajuda ?</button>
+
+    <div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions" aria-labelledby="offcanvasWithBothOptionsLabel">
+    <div class="offcanvas-header">
+        <h2 class="offcanvas-title" id="offcanvasWithBothOptionsLabel">Help Flow</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
+    <div class="offcanvas-body">
+        <p>Confira nossas funcionalidades para te auxiliar !</p>
+        <hr>
+            <div class="pn-help">
+                <ul class="pn-help-list">
+                    <li><a href="<?= BASE_URL ?>/reserva">Como realizar uma <strong>reserva de espaço</strong>?</a></li>
+                    <li><a href="<?= BASE_URL ?>/veiculo">Como <strong>cadastrar ou editar</strong> um veículo?</a></li>
+                    <li><a href="<?= BASE_URL ?>/cadastro/update">Como <strong>atualizar</strong> meus dados cadastrais?</a></li>
+                    <li><a href="<?= BASE_URL ?>/ocorrencia">Como <strong>abrir ou acompanhar</strong> uma ocorrência?</a></li>
+                    <li><a href="<?= BASE_URL ?>/dashboard">Como <strong>acompanhar</strong> uma reserva realizada?</a></li>
+                    <li><a href="<?= BASE_URL ?>/avisos">Como visualizar novos <strong>Avisos</strong> realizados?</a></li>
+                </ul>
+            </div>
+    </div>
+    </div>
+
 
 </main>
 

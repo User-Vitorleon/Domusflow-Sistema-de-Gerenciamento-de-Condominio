@@ -81,11 +81,26 @@ body::before {
     transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 
+.dropdown.pn-card {
+    cursor: pointer;
+}
+
 
 .pn-card:hover {
     border-color: var(--primary);
     box-shadow: 0 2px 12px rgba(15, 128, 182, 0.13);
     color: var(--text) !important;
+}
+
+.pn-dropdown-trigger {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    border: none;
+    background: none;
 }
 
 
@@ -300,4 +315,6 @@ body::before {
     .pn-help-list a {
         font-size: 13px;
     }
+
+
 }
