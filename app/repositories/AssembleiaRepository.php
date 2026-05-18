@@ -45,6 +45,21 @@ class AssembleiaRepository{
         ]);
     }
 
+    public function registrarPresencasPendentes (int $id_assembleia, array $moradores): void{
+        $stmt = $this->pdo->prepare("INSERT IGNORE INTO assembleias_presencas (id_assembleia, id_user, presenca)
+        VALUES (:id_assembleia, :id_user, 'P') where status = 'L' "); 
+            foreach ($moradores as $m) {
+            $stmt->execute([
+                ':id_assembleia' => $id_assembleia,
+                ':id_user'       => $m['id_user'],
+            ]);
+        }
+    }
+
+    public function ultimoId(): int{
+        return (int)$this->pdo->lastInsertId();
+    }
+
     public function listarPresencas():array{
         $stmt = $this->pdo->query("SELECT 
             ap.presenca,

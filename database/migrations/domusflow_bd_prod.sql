@@ -199,7 +199,7 @@ CREATE TABLE `assembleias_presencas` (
   `id_presenca`   INT(11)    NOT NULL AUTO_INCREMENT,
   `id_assembleia` INT(11)    NOT NULL,
   `id_user`       INT(11)    NOT NULL,
-  `presenca`      VARCHAR(1) NOT NULL,
+  `presenca`      VARCHAR(1) NOT NULL DEFAULT 'P',
   `created_at`    DATETIME   NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id_presenca`),
   UNIQUE KEY `uk_presenca` (`id_assembleia`, `id_user`),

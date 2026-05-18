@@ -72,6 +72,18 @@
     font-weight: 500;
 }
 
+.kpi-card-link {
+    text-decoration: none;
+    color: inherit;
+    transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.kpi-card-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(15, 128, 182, 0.15);
+    color: inherit;
+}
+
 /* Feriado Card */
 .kpi-card-feriado {
     border-color: #fecaca;

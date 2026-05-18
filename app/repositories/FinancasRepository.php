@@ -49,9 +49,34 @@ class FinancasRepository
         return $stmt->fetchAll();
     }
 
-    public function lancamento(int $id, int $previlegio, int $offset = 0, int $limite = 10, string $busca = ''): array{
+public function lancamento(int $id, int $previlegio, int $offset = 0, int $limite = 10, string $busca = '', string $status = '', string $dt_lanc = '', string $dt_venc = '', string $atraso = ''): array
+{
+    $where = '';
+    $params = [];
+
+    if ($busca) {
+        $where .= " AND (m.nome LIKE :busca OR l.descricao LIKE :busca2 OR l.modelo LIKE :busca3)";
+        $params[':busca']  = "%$busca%";
+        $params[':busca2'] = "%$busca%";
+        $params[':busca3'] = "%$busca%";
+    }
+    if ($status && $status !== 'atraso') {
+        $where .= " AND l.status = :status";
+        $params[':status'] = $status;
+    }
+    if ($atraso === '1' || $status === 'atraso') {
+        $where .= " AND l.data_vencimento < CURDATE() AND l.status = 'P'";
+    }
+    if ($dt_lanc) {
+        $where .= " AND DATE(l.data_lancamento) = :dt_lanc";
+        $params[':dt_lanc'] = $dt_lanc;
+    }
+    if ($dt_venc) {
+        $where .= " AND DATE(l.data_vencimento) = :dt_venc";
+        $params[':dt_venc'] = $dt_venc;
+    }
+
     if ($previlegio == 2 || $previlegio == 4) {
-        $where = $busca ? "AND (m.nome LIKE :busca OR l.descricao LIKE :busca2 OR l.modelo LIKE :busca3)" : '';
         $stmt = $this->pdo->prepare("
             SELECT l.*, m.nome as nome_morador, m.bloco, m.apto
             FROM lancamentos l 
@@ -60,37 +85,24 @@ class FinancasRepository
             ORDER BY l.data_lancamento DESC
             LIMIT :limite OFFSET :offset
         ");
-        if ($busca) {
-            $stmt->bindValue(':busca',  "%$busca%");
-            $stmt->bindValue(':busca2', "%$busca%");
-            $stmt->bindValue(':busca3', "%$busca%");
-        }
-        $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll();
-
-    } else if ($previlegio == 1) {
-        $where = $busca ? "AND (l.descricao LIKE :busca OR l.modelo LIKE :busca2)" : '';
+    } else {
+        $where .= " AND l.id_user = :id";
+        $params[':id'] = $id;
         $stmt = $this->pdo->prepare("
-            SELECT * FROM lancamentos l
-            WHERE id_user = :id $where
-            ORDER BY data_vencimento DESC
+            SELECT l.* FROM lancamentos l
+            WHERE 1=1 $where
+            ORDER BY l.data_lancamento DESC
             LIMIT :limite OFFSET :offset
         ");
-        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
-        if ($busca) {
-            $stmt->bindValue(':busca',  "%$busca%");
-            $stmt->bindValue(':busca2', "%$busca%");
-        }
-        $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll();
-
-    } else {
-        return [];
     }
+
+    foreach ($params as $k => $v) {
+        $stmt->bindValue($k, $v);
+    }
+    $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll();
 }
 
 public function excluirLancamento(int $id): bool{
@@ -99,14 +111,49 @@ public function excluirLancamento(int $id): bool{
     return $stmt->execute([':id' => $id]);
 }
 
-public function countLancamentos(int $id, int $previlegio): int
-{
+public function countLancamentos(int $id, int $previlegio, string $busca = '', string $status = '', string $dt_lanc = '', string $dt_venc = '', string $atraso = ''): int{
+    $where  = '';
+    $params = [];
+
+    if ($busca) {
+        $where .= " AND (m.nome LIKE :busca OR l.descricao LIKE :busca2 OR l.modelo LIKE :busca3)";
+        $params[':busca']  = "%$busca%";
+        $params[':busca2'] = "%$busca%";
+        $params[':busca3'] = "%$busca%";
+    }
+    if ($status && $status !== 'atraso') {
+        $where .= " AND l.status = :status";
+        $params[':status'] = $status;
+    }
+    if ($atraso === '1' || $status === 'atraso') {
+        $where .= " AND l.data_vencimento < CURDATE() AND l.status = 'P'";
+    }
+    if ($dt_lanc) {
+        $where .= " AND DATE(l.data_lancamento) = :dt_lanc";
+        $params[':dt_lanc'] = $dt_lanc;
+    }
+    if ($dt_venc) {
+        $where .= " AND DATE(l.data_vencimento) = :dt_venc";
+        $params[':dt_venc'] = $dt_venc;
+    }
+
     if ($previlegio == 2 || $previlegio == 4) {
-        $stmt = $this->pdo->query("SELECT COUNT(*) FROM lancamentos");
+        $stmt = $this->pdo->prepare("
+            SELECT COUNT(*) FROM lancamentos l
+            INNER JOIN morador m ON l.id_user = m.id_user
+            WHERE 1=1 $where
+        ");
     } else {
-        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM lancamentos WHERE id_user = :id");
-        $stmt->execute([':id' => $id]);
-        return (int)$stmt->fetchColumn();
+        $where .= " AND l.id_user = :id";
+        $params[':id'] = $id;
+        $stmt = $this->pdo->prepare("
+            SELECT COUNT(*) FROM lancamentos l
+            WHERE 1=1 $where
+        ");
+    }
+
+    foreach ($params as $k => $v) {
+        $stmt->bindValue($k, $v);
     }
     $stmt->execute();
     return (int)$stmt->fetchColumn();

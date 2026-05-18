@@ -5,13 +5,13 @@ require_once __DIR__ . '/../repositories/MoradorRepository.php';
 
 class FinancasController{
     private FinancasRepository $repo;
+
     private function requireSindico(): void{
-        
-        if (!isset($_SESSION['usuario_id']) || ($_SESSION['usuario_previlegio'] ?? 0) != 2) {
-            header('Location: ' . BASE_URL . '/');
-            exit();
-        }
+    if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['usuario_previlegio'] ?? 0, [2, 4])) {
+        header('Location: ' . BASE_URL . '/');
+        exit();
     }
+}
 
     public function __construct (){
         $this->repo = new FinancasRepository();
@@ -57,30 +57,37 @@ class FinancasController{
         exit();
     }
 
-    public function lancamento(): void{
-        if (!isset($_SESSION['usuario_id'])) {
-            header('Location: ' . BASE_URL . '/');
-            exit();
-        }
-
-        $id_user    = (int)$_SESSION['usuario_id'];
-        $previlegio = (int)$_SESSION['usuario_previlegio'];
-        $busca      = $_GET['busca'] ?? '';
-        $pagina     = (int)($_GET['pagina'] ?? 1);
-        $porPagina  = 10;
-        $total        = $this->repo->countLancamentos($id_user, $previlegio);
-        $totalPaginas = (int)ceil($total / $porPagina);
-        $offset       = ($pagina - 1) * $porPagina;
-
-        $lancamentos = $this->repo->lancamento($id_user, $previlegio, $offset, $porPagina, $busca);
-        $todasTaxas  = $this->repo->listarTodasTaxasAtivas();
-
-        $repo      = new MoradorRepository();
-        $usuario   = $repo->findById((int)$_SESSION['usuario_id']);
-        $moradores = $repo->findAtivos();
-
-        require_once __DIR__ . '/../../resources/views/financas/lancamento/index.php';
+    public function lancamento(): void
+{
+    if (!isset($_SESSION['usuario_id'])) {
+        header('Location: ' . BASE_URL . '/');
+        exit();
     }
+
+    $id_user    = (int)$_SESSION['usuario_id'];
+    $previlegio = (int)$_SESSION['usuario_previlegio'];
+
+    $busca   = $_GET['busca']   ?? '';
+    $status  = $_GET['status']  ?? '';
+    $dt_lanc = $_GET['dt_lanc'] ?? '';
+    $dt_venc = $_GET['dt_venc'] ?? '';
+    $atraso  = $_GET['atraso']  ?? '';
+    $pagina  = (int)($_GET['pagina'] ?? 1);
+    $porPagina = 10;
+
+    $total        = $this->repo->countLancamentos($id_user, $previlegio, $busca, $status, $dt_lanc, $dt_venc, $atraso);
+    $totalPaginas = (int)ceil($total / $porPagina);
+    $offset       = ($pagina - 1) * $porPagina;
+
+    $lancamentos = $this->repo->lancamento($id_user, $previlegio, $offset, $porPagina, $busca, $status, $dt_lanc, $dt_venc, $atraso);
+    $todasTaxas  = $this->repo->listarTodasTaxasAtivas();
+
+    $repo      = new MoradorRepository();
+    $usuario   = $repo->findById((int)$_SESSION['usuario_id']);
+    $moradores = $repo->findAtivos();
+
+    require_once __DIR__ . '/../../resources/views/financas/lancamento/index.php';
+}
 
 public function salvarLancamento(): void{
     if ($_SESSION['usuario_previlegio'] != 2 || $_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -96,7 +103,19 @@ public function salvarLancamento(): void{
         'data_lanc' => $_POST['data_lanc'],
     ];
 
-    if (isset($_POST['todos_moradores'])) {
+        if ($dados['data_lanc'] < date('Y-m-d')) {
+            $_SESSION['erro_lancamento'] = 'A data de lançamento não pode ser inferior ao dia de hoje.';
+            header('Location: ' . BASE_URL . '/financeiro/lancamento');
+            exit();
+        }
+
+        if ($dados['data_venc'] < date('Y-m-d')) {
+            $_SESSION['erro_lancamento'] = 'A data de vencimento não pode ser inferior ao dia de hoje.';
+            header('Location: ' . BASE_URL . '/financeiro/lancamento');
+            exit();
+        }
+
+        if (isset($_POST['todos_moradores'])) {
         $moradorRepo = new MoradorRepository();
         $moradores   = $moradorRepo->findAtivos();
 
@@ -106,11 +125,13 @@ public function salvarLancamento(): void{
                 (int)$_SESSION['usuario_id']
             );
         }
+        $_SESSION['sucesso_lancamento'] = 'Lançamento realizado para ' . count($moradores) . ' morador(es)!'; // ← adiciona
     } else {
         $this->repo->salvarLancamento(
             array_merge($dados, ['id_user' => $_POST['id_user']]),
             (int)$_SESSION['usuario_id']
         );
+        $_SESSION['sucesso_lancamento'] = 'Lançamento realizado com sucesso!'; // ← adiciona
     }
 
     header('Location: ' . BASE_URL . '/financeiro/lancamento');

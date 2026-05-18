@@ -35,7 +35,7 @@ if (in_array($prev, [1, 2, 4])) {
     $modulos[] = ['titulo' => 'Avisos',       'sub' => 'Acompanhe os últimos avisos registrados',                'href' => BASE_URL . '/avisos',             'icon' => 'avisos'];
 }
 
-if (in_array($prev, [1, 2, 4])) {
+if (in_array($prev, [1])) {
     $modulos[] = ['titulo' => 'Assembleia',       'sub' => 'Proximas Assembleias agendadas',                    'href' => BASE_URL . '/assembleia',             'icon' => 'assembleia'];
 }
 
@@ -130,9 +130,9 @@ $modulos[] = ['titulo' => 'Atualizar Dados',   'sub' => 'Edite seu perfil e dado
                 <?php if (in_array($prev, [2, 4])): ?>
             <div class="dropdown pn-card" style="cursor:pointer;">
                 <button type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside"
-    aria-expanded="false"
-    class="pn-dropdown-trigger">
-</button>
+                    aria-expanded="false"
+                    class="pn-dropdown-trigger">
+                </button>
                 <div class="pn-card-icon"><?= pn_icon('assembleia') ?></div>
                 <div class="pn-card-body">
                     <span class="pn-card-title">Assembleia</span>
@@ -145,15 +145,13 @@ $modulos[] = ['titulo' => 'Atualizar Dados',   'sub' => 'Edite seu perfil e dado
                 <ul class="dropdown-menu" onclick="event.stopPropagation()">
                     <li><a class="dropdown-item" href="<?= BASE_URL ?>/assembleia"
                         onclick="window.location='<?= BASE_URL ?>/assembleia'">Assembleias</a></li>
-                    <li><a class="dropdown-item" href="<?= BASE_URL ?>/assembleia/presenca"
-                        onclick="window.location='<?= BASE_URL ?>/assembleia/presenca'">Presenças</a></li>
+                    <li><a class="dropdown-item" href="<?= BASE_URL ?>/assembleia/presencas"
+                        onclick="window.location='<?= BASE_URL ?>/assembleia/presencas'">Ver Presenças</a></li>
                 </ul>
             </div>
         <?php endif; ?>
 
         <?php foreach ($modulos as $m):
-            // Ocorrências do morador (previlegio 1) vem pelo $modulos;
-            // para síndico/admin já aparece como dropdown acima — pula
             if ($m['icon'] === 'ocorrencia' && in_array($prev, [2, 4])) continue;
         ?>
             <a href="<?= $m['href'] ?>" class="pn-card">

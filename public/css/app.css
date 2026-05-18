@@ -17,6 +17,12 @@ html {
     scroll-behavior: smooth;
 }
 
+.presenca-badge-pendente {
+    color: #CA8A04;
+    background: #FFFBEB;
+    border: 1px solid #FDE68A;
+}
+
 img {
     display: block;
     max-width: 100%;
@@ -563,6 +569,12 @@ body {
     margin-bottom: 16px;
 }
 
+.presenca-resumo-total {
+    background: #F8FAFC;
+    border: 1px solid var(--border);
+    color: var(--text);
+}
+
 .presenca-resumo-item {
     padding: 8px 16px;
     border-radius: var(--radius);
@@ -625,11 +637,5 @@ body {
 
 .presenca-table tr:hover td {
     background: #F8FAFC;
-}
-
-.presenca-resumo-total {
-    background: #F8FAFC;
-    border: 1px solid var(--border);
-    color: var(--text);
 }
 

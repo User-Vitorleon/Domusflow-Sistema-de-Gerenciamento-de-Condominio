@@ -69,11 +69,11 @@ $routes = [
     'avisos/excluir'      => ['AvisosController', 'excluir'],
 
     // Assembleia
-    'assembleia'          => ['AssembleiaController', 'index'],
-    'assembleia/salvar'   => ['AssembleiaController', 'salvar'],
-    'assembleia/presenca' => ['AssembleiaController', 'confirmarPresenca'],
-    'assembleia/excluir'  => ['AssembleiaController', 'excluir'],
-    'assembleia/presenca' => ['AssembleiaController', 'listarPresencas'],
+    'assembleia'           => ['AssembleiaController', 'index'],
+    'assembleia/salvar'    => ['AssembleiaController', 'salvar'],
+    'assembleia/presenca'  => ['AssembleiaController', 'confirmarPresenca'],
+    'assembleia/excluir'   => ['AssembleiaController', 'excluir'],
+    'assembleia/presencas' => ['AssembleiaController', 'listarPresencas'],
 
 
 ];

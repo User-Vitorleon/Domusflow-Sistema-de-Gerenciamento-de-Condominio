@@ -15,7 +15,7 @@ $jsExtra      = 'dashboard.js';
     <!-- 1. KPIs -->
     <section class="dashboard-section">
         <div class="kpi-grid">
-            <div class="kpi-card">
+            <a href="<?= BASE_URL ?>/moradores/pendentes" class="kpi-card kpi-card-link">
                 <div class="kpi-icon" style="background:#eff8ff;color:#0f80b6">
                     <i class="bx bx-group"></i>
                 </div>
@@ -23,8 +23,8 @@ $jsExtra      = 'dashboard.js';
                     <p class="kpi-label">Total Moradores</p>
                     <h3 class="kpi-value"><?= (int) (($moradoresStatus['P'] ?? 0) + ($moradoresStatus['L'] ?? 0) + ($moradoresStatus['I'] ?? 0) + ($moradoresStatus['B'] ?? 0)) ?></h3>
                 </div>
-            </div>
-            <div class="kpi-card">
+            </a>
+            <a href="<?= BASE_URL ?>/moradores/pendentes" class="kpi-card kpi-card-link">
                 <div class="kpi-icon" style="background:#fef9c3;color:#ca8a04">
                     <i class="bx bx-time"></i>
                 </div>
@@ -32,8 +32,8 @@ $jsExtra      = 'dashboard.js';
                     <p class="kpi-label">Pendentes Aprovação</p>
                     <h3 class="kpi-value"><?= (int) ($moradoresPendentes ?? 0) ?></h3>
                 </div>
-            </div>
-            <div class="kpi-card">
+            </a>
+            <a href="<?= BASE_URL ?>/financeiro/lancamento" class="kpi-card kpi-card-link">
                 <div class="kpi-icon" style="background:#fdf4ff;color:#9333ea">
                     <i class="bx bx-money"></i>
                 </div>
@@ -41,8 +41,8 @@ $jsExtra      = 'dashboard.js';
                     <p class="kpi-label">Inadimplentes</p>
                     <h3 class="kpi-value"><?= (int) ($countInadimplentes ?? 0) ?></h3>
                 </div>
-            </div>
-            <div class="kpi-card">
+            </a>
+            <a href="<?= BASE_URL ?>/veiculo" class="kpi-card kpi-card-link">
                 <div class="kpi-icon" style="background:#f0fdf4;color:#16a34a">
                     <i class="bx bx-car"></i>
                 </div>
@@ -50,7 +50,7 @@ $jsExtra      = 'dashboard.js';
                     <p class="kpi-label">Veículos</p>
                     <h3 class="kpi-value"><?= (int) ($totalVeiculos ?? 0) ?></h3>
                 </div>
-            </div>
+            </a>
         </div>
     </section>
 

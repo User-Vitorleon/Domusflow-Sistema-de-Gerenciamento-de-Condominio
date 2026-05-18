@@ -17,7 +17,7 @@ $prev = $usuario['previlegio'] ?? 1;
         <div class="df-alert df-alert-success">Aviso publicado com sucesso!</div>
     <?php endif; ?>
     <?php if (isset($_GET['excluido'])): ?>
-        <div class="df-alert df-alert-success">Aviso removido com sucesso!</div>
+        <div class="df-alert df-alert-error">Aviso removido com sucesso!</div>
     <?php endif; ?>
     <?php if (isset($_SESSION['erro_aviso'])): ?>
         <div class="df-alert df-alert-error"><?= htmlspecialchars($_SESSION['erro_aviso']) ?><?php unset($_SESSION['erro_aviso']); ?></div>
@@ -70,7 +70,7 @@ $prev = $usuario['previlegio'] ?? 1;
                               onsubmit="return confirm('Deseja remover este aviso?')">
                             <input type="hidden" name="id_aviso" value="<?= $aviso['id_aviso'] ?>">
                             <button type="submit" class="btn-danger-sm">
-                                <i class='bx bx-trash'></i>
+                                <i class='bx bx-trash'> Remover.</i>
                             </button>
                         </form>
                     <?php endif; ?>

@@ -25,6 +25,12 @@ $prev = $usuario['previlegio'] ?? 1;
     <?php if (isset($_GET['excluido'])): ?>
         <div class="df-alert df-alert-success">Lançamento excluído com sucesso!</div>
     <?php endif; ?>
+    <?php if (isset($_SESSION['sucesso_lancamento'])): ?>
+        <div class="df-alert df-alert-success">
+            <?= htmlspecialchars($_SESSION['sucesso_lancamento']) ?>
+            <?php unset($_SESSION['sucesso_lancamento']); ?>
+        </div>
+    <?php endif; ?>
 
     <?php if ($prev == 2): ?>
     <!-- Formulário de lançamento -->
@@ -317,45 +323,32 @@ function toggleMorador() {
 }
 
 // Filtros client-side
-function aplicarFiltros() {
-    const status = document.getElementById('filtroStatus')?.value ?? '';
-    const dtLanc = document.getElementById('filtroDtLanc')?.value ?? '';
-    const dtVenc = document.getElementById('filtroDtVenc')?.value ?? '';
-    const busca  = document.getElementById('pesquisa')?.value.toLowerCase() ?? '';
-
-    document.querySelectorAll('#tabelaLancamentos tr').forEach(row => {
-        const rowStatus  = row.dataset.status ?? '';
-        const rowVencido = row.dataset.vencido ?? '0';
-        const rowDtLanc  = row.dataset.dtLanc ?? '';
-        const rowDtVenc  = row.dataset.dtVenc ?? '';
-        const rowNome    = row.dataset.nome ?? '';
-        const rowTipo    = row.dataset.tipo ?? '';
-        const rowDesc    = row.dataset.desc ?? '';
-
-        let ok = true;
-        if (status === 'atraso') { if (rowVencido !== '1') ok = false; }
-        else if (status && rowStatus !== status) ok = false;
-        if (dtLanc && rowDtLanc !== dtLanc) ok = false;
-        if (dtVenc && rowDtVenc !== dtVenc) ok = false;
-        if (busca && !rowNome.includes(busca) && !rowTipo.includes(busca) && !rowDesc.includes(busca)) ok = false;
-
-        row.style.display = ok ? '' : 'none';
-    });
-}
-
-function limparFiltros() {
-    document.getElementById('filtroStatus').value = '';
-    document.getElementById('filtroDtLanc').value = '';
-    document.getElementById('filtroDtVenc').value = '';
-    document.getElementById('pesquisa').value = '';
-    aplicarFiltros();
-}
-
 let timer;
 function filtrarLancamentos() {
     clearTimeout(timer);
-    timer = setTimeout(() => aplicarFiltros(), 300);
+    timer = setTimeout(() => aplicarFiltros(), 400);
 }
+
+function aplicarFiltros() {
+    const busca   = document.getElementById('pesquisa')?.value ?? '';
+    const status  = document.getElementById('filtroStatus')?.value ?? '';
+    const dtLanc  = document.getElementById('filtroDtLanc')?.value ?? '';
+    const dtVenc  = document.getElementById('filtroDtVenc')?.value ?? '';
+
+    const params = new URLSearchParams();
+    if (busca)   params.set('busca',   busca);
+    if (status)  params.set('status',  status);
+    if (dtLanc)  params.set('dt_lanc', dtLanc);
+    if (dtVenc)  params.set('dt_venc', dtVenc);
+    params.set('pagina', '1');
+
+    window.location.href = '<?= BASE_URL ?>/financeiro/lancamento?' + params.toString();
+}
+
+function limparFiltros() {
+    window.location.href = '<?= BASE_URL ?>/financeiro/lancamento';
+}
+
 
 // Validação duplicado
 <?php if ($prev == 2): ?>

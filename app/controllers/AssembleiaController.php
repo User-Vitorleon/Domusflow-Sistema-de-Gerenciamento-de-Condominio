@@ -43,6 +43,12 @@ class AssembleiaController{
             exit();
         }
 
+        if ($_POST['data'] < date('Y-m-d')) {
+            $_SESSION['erro_assembleia'] = 'A data da assembleia não pode ser no passado.';
+            header('Location: ' . BASE_URL . '/assembleia');
+            exit();
+        }
+
         $resultado = $this->repo->salvarAssembleia([
             'titulo'       => $_POST['titulo']            ?? '',
             'data'         => $_POST['data']              ?? '',
@@ -53,6 +59,11 @@ class AssembleiaController{
         ]);
 
         if ($resultado) {
+            $id_assembleia = $this->repo->ultimoId(); 
+            $moradorRepo   = new MoradorRepository();
+            $moradores     = $moradorRepo->findAtivos();
+            $this->repo->registrarPresencasPendentes($id_assembleia, $moradores);
+
             header('Location: ' . BASE_URL . '/assembleia?sucesso=1');
         } else {
             $_SESSION['erro_aviso'] = 'Erro ao publicar aviso.';

@@ -3,8 +3,9 @@ $paginaTitulo = 'Presenças nas Assembleias';
 $paginaAtiva  = 'assembleia';
 require_once __DIR__ . '/../layout/header.php';
 
-$totalConfirmadas = count(array_filter($presencas, fn($p) => $p['presenca'] === 'S'));
-$totalNegadas     = count(array_filter($presencas, fn($p) => $p['presenca'] === 'N'));
+$totalConfirmadas   = count(array_filter($presencas, fn($p) => $p['presenca'] === 'S'));
+$totalNegadas       = count(array_filter($presencas, fn($p) => $p['presenca'] === 'N'));
+$totalPendentes     = count(array_filter($presencas, fn($p) => $p['presenca'] === 'P'));
 ?>
 
 <main class="main-content">
@@ -41,6 +42,7 @@ $totalNegadas     = count(array_filter($presencas, fn($p) => $p['presenca'] === 
                     <option value="">Todas</option>
                     <option value="S">Confirmadas</option>
                     <option value="N">Negadas</option>
+                    <option value="P">Pendentes</option>
                 </select>
             </div>
         </div>
@@ -69,8 +71,11 @@ $totalNegadas     = count(array_filter($presencas, fn($p) => $p['presenca'] === 
             <div class="presenca-resumo-item presenca-resumo-negada">
                 <strong>✗ <span id="totalNegadas"><?= $totalNegadas ?></span></strong> negadas
             </div>
-            <div class="presenca-resumo-item" style="background: #F8FAFC; border: 1px solid var(--border); color: var(--text);">
+            <div class="presenca-resumo-item presenca-resumo-total">
                 <strong><span id="totalGeral"><?= count($presencas) ?></span></strong> total
+            </div>
+            <div class="presenca-resumo-item presenca-resumo-total">
+                <strong><span id="totalPendentes"><?= $totalPendentes ?></span></strong> pendentes
             </div>
         </div>
 
@@ -102,9 +107,21 @@ $totalNegadas     = count(array_filter($presencas, fn($p) => $p['presenca'] === 
                                 <td><?= htmlspecialchars($p['titulo']) ?></td>
                                 <td><?= date('d/m/Y', strtotime($p['data_assembleia'])) ?></td>
                                 <td>
-                                    <span class="presenca-badge <?= $confirmada ? 'presenca-badge-confirmada' : 'presenca-badge-negada' ?>">
-                                        <?= $confirmada ? '✓ Confirmada' : '✗ Negada' ?>
-                                    </span>
+                                    <?php
+                                        $badgeClass = match($p['presenca']) {
+                                            'S' => 'presenca-badge-confirmada',
+                                            'N' => 'presenca-badge-negada',
+                                            default => 'presenca-badge-pendente'
+                                        };
+                                        $badgeTexto = match($p['presenca']) {
+                                            'S' => '✓ Confirmada',
+                                            'N' => '✗ Negada',
+                                            default => '⏳ Pendente'
+                                        };
+                                        ?>
+                                        <span class="presenca-badge <?= $badgeClass ?>">
+                                            <?= $badgeTexto ?>
+                                        </span>
                                 </td>
                                 <td><?= date('d/m/Y H:i', strtotime($p['created_at'])) ?></td>
                             </tr>
@@ -124,9 +141,7 @@ function filtrarPresencas() {
     const assembleia = document.getElementById('filtroAssembleia').value;
     const presenca   = document.getElementById('filtroPresenca').value;
 
-    let confirmadas = 0;
-    let negadas     = 0;
-    let total       = 0;
+    let confirmadas = 0, negadas = 0, total = 0, pendentes = 0; 
 
     document.querySelectorAll('#tabelaPresencas tr').forEach(row => {
         const rowNome       = row.dataset.nome       ?? '';
@@ -146,6 +161,7 @@ function filtrarPresencas() {
             total++;
             if (rowPresenca === 'S') confirmadas++;
             if (rowPresenca === 'N') negadas++;
+            if (rowPresenca === 'P') pendentes++; // ← adiciona
         }
     });
 
@@ -153,6 +169,7 @@ function filtrarPresencas() {
     document.getElementById('totalConfirmadas').textContent = confirmadas;
     document.getElementById('totalNegadas').textContent     = negadas;
     document.getElementById('totalGeral').textContent       = total;
+    document.getElementById('totalPendentes').textContent   = pendentes; 
 }
 </script>
 

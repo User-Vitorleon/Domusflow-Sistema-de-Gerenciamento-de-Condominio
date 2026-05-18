@@ -14,7 +14,7 @@ $jsExtra      = 'dashboard.js';
     <!-- 1. KPIs -->
     <section class="dashboard-section">
         <div class="kpi-grid">
-            <div class="kpi-card">
+            <a href="<?= BASE_URL ?>/moradores/pendentes" class="kpi-card kpi-card-link">
                 <div class="kpi-icon" style="background:#eff8ff;color:#0f80b6">
                     <i class="bx bx-group"></i>
                 </div>
@@ -22,8 +22,8 @@ $jsExtra      = 'dashboard.js';
                     <p class="kpi-label">Moradores Ativos</p>
                     <h3 class="kpi-value"><?= (int) ($moradoresAtivos ?? 0) ?></h3>
                 </div>
-            </div>
-            <div class="kpi-card">
+            </a>
+            <a href="<?= BASE_URL ?>/reserva" class="kpi-card kpi-card-link">
                 <div class="kpi-icon" style="background:#fef9c3;color:#ca8a04">
                     <i class="bx bx-calendar-check"></i>
                 </div>
@@ -31,8 +31,8 @@ $jsExtra      = 'dashboard.js';
                     <p class="kpi-label">Reservas Pendentes</p>
                     <h3 class="kpi-value"><?= (int) ($reservasPendentes ?? 0) ?></h3>
                 </div>
-            </div>
-            <div class="kpi-card">
+            </a>
+            <a href="<?= BASE_URL ?>/ocorrencia/painel" class="kpi-card kpi-card-link">
                 <div class="kpi-icon" style="background:#fee2e2;color:#dc2626">
                     <i class="bx bx-error-circle"></i>
                 </div>
@@ -40,8 +40,8 @@ $jsExtra      = 'dashboard.js';
                     <p class="kpi-label">Ocorrências Abertas</p>
                     <h3 class="kpi-value"><?= (int) ($ocorrenciasGeral['aberto'] ?? 0) ?></h3>
                 </div>
-            </div>
-            <div class="kpi-card">
+            </a>
+            <a href="<?= BASE_URL ?>/reserva" class="kpi-card kpi-card-link">
                 <div class="kpi-icon" style="background:#f0fdf4;color:#16a34a">
                     <i class="bx bx-building-house"></i>
                 </div>
@@ -49,7 +49,7 @@ $jsExtra      = 'dashboard.js';
                     <p class="kpi-label">Locais Disponíveis</p>
                     <h3 class="kpi-value"><?= (int) ($locaisTotal ?? 0) ?></h3>
                 </div>
-            </div>
+            </a>
         </div>
     </section>
 
