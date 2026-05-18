@@ -9,14 +9,14 @@ class Morador {
     public string $telefone;
     public ?string $telefone_recado;
     public string $status;    // P=Pendente, L=Liberado, B=Bloqueado
-    public int    $previlegio; // 1=Morador, 2=Síndico
+    public int    $privilegio; // 1=Morador, 2=Síndico
 
     public function getPrimeiroNome(): string {
         return explode(' ', $this->nome)[0];
     }
 
     public function isSindico(): bool {
-        return $this->previlegio === 2;
+        return $this->privilegio === 2;
     }
 
     public function isAtivo(): bool {
@@ -34,7 +34,7 @@ class Morador {
         $m->telefone        = $data['telefone']          ?? '';
         $m->telefone_recado = $data['tell_recado']       ?? null;
         $m->status          = $data['status']            ?? 'P';
-        $m->previlegio      = (int)($data['previlegio'] ?? 1);
+        $m->privilegio      = (int)($data['privilegio'] ?? 1);
         return $m;
     }
 }

@@ -49,7 +49,7 @@ class FinancasRepository
         return $stmt->fetchAll();
     }
 
-public function lancamento(int $id, int $previlegio, int $offset = 0, int $limite = 10, string $busca = '', string $status = '', string $dt_lanc = '', string $dt_venc = '', string $atraso = ''): array
+public function lancamento(int $id, int $privilegio, int $offset = 0, int $limite = 10, string $busca = '', string $status = '', string $dt_lanc = '', string $dt_venc = '', string $atraso = ''): array
 {
     $where = '';
     $params = [];
@@ -76,7 +76,7 @@ public function lancamento(int $id, int $previlegio, int $offset = 0, int $limit
         $params[':dt_venc'] = $dt_venc;
     }
 
-    if ($previlegio == 2 || $previlegio == 4) {
+    if ($privilegio == 2 || $privilegio == 4) {
         $stmt = $this->pdo->prepare("
             SELECT l.*, m.nome as nome_morador, m.bloco, m.apto
             FROM lancamentos l 
@@ -111,7 +111,7 @@ public function excluirLancamento(int $id): bool{
     return $stmt->execute([':id' => $id]);
 }
 
-public function countLancamentos(int $id, int $previlegio, string $busca = '', string $status = '', string $dt_lanc = '', string $dt_venc = '', string $atraso = ''): int{
+public function countLancamentos(int $id, int $privilegio, string $busca = '', string $status = '', string $dt_lanc = '', string $dt_venc = '', string $atraso = ''): int{
     $where  = '';
     $params = [];
 
@@ -137,7 +137,7 @@ public function countLancamentos(int $id, int $previlegio, string $busca = '', s
         $params[':dt_venc'] = $dt_venc;
     }
 
-    if ($previlegio == 2 || $previlegio == 4) {
+    if ($privilegio == 2 || $privilegio == 4) {
         $stmt = $this->pdo->prepare("
             SELECT COUNT(*) FROM lancamentos l
             INNER JOIN morador m ON l.id_user = m.id_user

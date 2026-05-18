@@ -2,7 +2,7 @@
 $paginaTitulo = 'Assembleias';
 $paginaAtiva  = 'assembleia';
 require_once __DIR__ . '/../layout/header.php';
-$prev = $usuario['previlegio'] ?? 1;
+$prev = $usuario['privilegio'] ?? 1;
 ?>
 
 <main class="main-content">

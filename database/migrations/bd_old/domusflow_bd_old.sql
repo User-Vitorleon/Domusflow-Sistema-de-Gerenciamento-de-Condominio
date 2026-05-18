@@ -17,7 +17,7 @@ USE `domusflow_bd`;
 
 -- ── Tabela: morador ─────────────────────────────────────────
 -- status:     P=Pendente, L=Liberado, B=Bloqueado
--- previlegio: 1=Morador,  2=Síndico
+-- privilegio: 1=Morador,  2=Síndico
 -- sexo:       M=Masculino, F=Feminino
 CREATE TABLE IF NOT EXISTS `morador` (
   `id_user`       INT(11)      NOT NULL AUTO_INCREMENT,
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `morador` (
   `sexo`          CHAR(1)      NOT NULL DEFAULT 'M',
   `senha`         VARCHAR(255) NOT NULL,
   `status`        CHAR(1)      NOT NULL DEFAULT 'P',
-  `previlegio`    TINYINT(1)   NOT NULL DEFAULT 1,
+  `privilegio`    TINYINT(1)   NOT NULL DEFAULT 1,
   `created_at`    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id_user`),
   UNIQUE KEY `uk_cpf` (`cpf`),

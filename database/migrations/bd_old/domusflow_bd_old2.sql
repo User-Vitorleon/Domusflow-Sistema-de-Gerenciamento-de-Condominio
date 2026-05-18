@@ -229,7 +229,7 @@ CREATE TABLE `morador` (
   `sexo` char(1) NOT NULL DEFAULT 'M',
   `senha` varchar(255) NOT NULL,
   `status` char(1) NOT NULL DEFAULT 'P',
-  `previlegio` tinyint(1) NOT NULL DEFAULT 1,
+  `privilegio` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -237,7 +237,7 @@ CREATE TABLE `morador` (
 -- Extraindo dados da tabela `morador`
 --
 
-INSERT INTO `morador` (`id_user`, `identificador`, `nome`, `apto`, `bloco`, `cpf`, `email`, `telefone`, `tell_recado`, `sexo`, `senha`, `status`, `previlegio`, `created_at`) VALUES
+INSERT INTO `morador` (`id_user`, `identificador`, `nome`, `apto`, `bloco`, `cpf`, `email`, `telefone`, `tell_recado`, `sexo`, `senha`, `status`, `privilegio`, `created_at`) VALUES
 (1, 1, 'Admin Root', '00', '0', '00000000000', 'admin@domusflow.com', '(11) 00000-0000', NULL, 'M', '$2y$10$OxGG./OPCNycEDy2WZ3MoOv.FZ2N1u2G6YPjtzmbadiKogGulnvxu', 'L', 4, '2026-04-09 18:34:39'),
 (2, 1, 'Vitor Leon', '10', '1', '43209957835', 'sindico@domusflow.com.br', '(11) 98522-9900', '(11) 959073260', 'M', '$2y$10$OxGG./OPCNycEDy2WZ3MoOv.FZ2N1u2G6YPjtzmbadiKogGulnvxu', 'L', 2, '2026-04-09 18:34:39'),
 (3, 1, 'Porteiro Padrão', '00', '0', '11111111111', 'porteiro@domusflow.com', '(11) 00000-0001', NULL, 'M', '$2y$10$OxGG./OPCNycEDy2WZ3MoOv.FZ2N1u2G6YPjtzmbadiKogGulnvxu', 'L', 3, '2026-04-09 18:34:39'),

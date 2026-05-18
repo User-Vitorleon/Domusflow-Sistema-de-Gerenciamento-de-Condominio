@@ -31,7 +31,7 @@ class VeiculoService
         // Morador (prev 1) só pode ter até 2 veículos
         $moradorRepo = new MoradorRepository();
         $dono        = $moradorRepo->findById($id_dono);
-        if (($dono['previlegio'] ?? 1) == 1) {
+        if (($dono['privilegio'] ?? 1) == 1) {
             $total = $this->repo->countByUser($id_dono);
             if ($total >= 2) {
                 return ['sucesso' => false, 'mensagem' => 'Limite de 2 veículos por morador atingido.'];
@@ -91,9 +91,9 @@ class VeiculoService
     }
 
     // Edita um veículo
-    public function editar(int $id, array $dados, int $previlegio): array
+    public function editar(int $id, array $dados, int $privilegio): array
     {
-        if (!in_array($previlegio, [2, 3, 4])) {
+        if (!in_array($privilegio, [2, 3, 4])) {
             return ['sucesso' => false, 'mensagem' => 'Você não tem permissão para editar veículos.'];
         }
 
@@ -121,16 +121,16 @@ class VeiculoService
     }
 
     // Exclui um veículo
-    public function excluir(int $id, int $previlegio, int $id_user_logado): array
+    public function excluir(int $id, int $privilegio, int $id_user_logado): array
     {
         // Síndico/admin excluem qualquer um
-        if (in_array($previlegio, [2, 4])) {
+        if (in_array($privilegio, [2, 4])) {
             $this->repo->delete($id);
             return ['sucesso' => true];
         }
 
         // Morador só pode excluir o próprio veículo
-        if ($previlegio == 1) {
+        if ($privilegio == 1) {
             $veiculo = $this->repo->findById($id);
             if (!$veiculo) {
                 return ['sucesso' => false, 'mensagem' => 'Veículo não encontrado.'];

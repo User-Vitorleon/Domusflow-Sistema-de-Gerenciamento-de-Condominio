@@ -85,7 +85,7 @@ if (!$semTopo && isset($_SESSION['usuario_id'])) {
                         <div class="df-topbar-name-row">
                             <?php
                             $perfis = [1 => 'Morador(a)', 2 => 'Síndico(a)', 3 => 'Funcionário(a)', 4 => 'Admin'];
-                            $prev   = $usuario['previlegio'] ?? 1;
+                            $prev   = $usuario['privilegio'] ?? 1;
                             $label  = $perfis[$prev] ?? 'Morador';
                             ?>
                             <span class="df-topbar-role df-topbar-role--<?= $prev ?>"><?= $label ?></span>

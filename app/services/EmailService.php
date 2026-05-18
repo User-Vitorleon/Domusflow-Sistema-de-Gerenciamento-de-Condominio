@@ -28,7 +28,7 @@ class EmailService
 
     public function enviar(string $destinatario, string $nome, string $assunto, string $corpo): bool{
         try{
-            $mail                 = $this->configurar();
+            $mail = $this->configurar();
             $mail->addAddress($destinatario, $nome);
             $mail->isHTML(true);
             $mail->Subject = $assunto;
@@ -37,7 +37,6 @@ class EmailService
             return true; 
         }catch (Exception $e) {
             error_log('EmailService erro: ' . $e->getMessage());
-            var_dump($e->getMessage());
             return false;
         }
     }

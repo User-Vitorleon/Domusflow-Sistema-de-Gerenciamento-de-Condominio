@@ -28,7 +28,7 @@ CREATE TABLE `morador` (
   `sexo`         char(1)      NOT NULL DEFAULT 'M',
   `senha`        varchar(255) NOT NULL,
   `status`       char(1)      NOT NULL DEFAULT 'P',
-  `previlegio`   tinyint(1)   NOT NULL DEFAULT 1,
+  `privilegio`   tinyint(1)   NOT NULL DEFAULT 1,
   `created_at`   datetime     NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id_user`),
   UNIQUE KEY `uk_cpf`   (`cpf`),

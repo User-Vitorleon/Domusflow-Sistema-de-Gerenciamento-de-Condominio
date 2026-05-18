@@ -40,7 +40,7 @@ class AuthService
         }
 
         // Se chegou aqui, está Liberado (L)
-        $_SESSION['usuario_previlegio'] = $usuario['previlegio'];
+        $_SESSION['usuario_privilegio'] = $usuario['privilegio'];
         return ['sucesso' => true, 'redirecionar' => BASE_URL . '/painel'];
     }
 

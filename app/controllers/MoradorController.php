@@ -98,7 +98,7 @@ class MoradorController
 
     private function requireSindico(): void
     {
-        if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['usuario_previlegio'] ?? 0, [2, 4])) {
+        if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['usuario_privilegio'] ?? 0, [2, 4])) {
             header('Location: ' . BASE_URL . '/painel');
             exit();
         }
@@ -194,7 +194,7 @@ class MoradorController
 
 public function gestao(): void
 {
-    if (($_SESSION['usuario_previlegio'] ?? 0) != 4) {
+    if (($_SESSION['usuario_privilegio'] ?? 0) != 4) {
         header('Location: ' . BASE_URL . '/');
         exit();
     }
@@ -206,7 +206,7 @@ public function gestao(): void
 
 public function gestaoSalvar(): void
 {
-    if (($_SESSION['usuario_previlegio'] ?? 0) != 4) {
+    if (($_SESSION['usuario_privilegio'] ?? 0) != 4) {
         header('Location: ' . BASE_URL . '/');
         exit();
     }
@@ -218,7 +218,7 @@ public function gestaoSalvar(): void
 
     $resultado = $this->service->atualizarPrivilegio(
         (int)$_POST['id_morador'],
-        (int)$_POST['previlegio']
+        (int)$_POST['privilegio']
     );
 
     if ($resultado) {

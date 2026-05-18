@@ -15,7 +15,7 @@
         {
             $this->requireAuth();
 
-            $prev = (int)($_SESSION['usuario_previlegio'] ?? 1);
+            $prev = (int)($_SESSION['usuario_privilegio'] ?? 1);
 
             // Porteiro não tem acesso ao cadastro
             if ($prev == 3) {
@@ -75,7 +75,7 @@
             $resultado = $this->veiculoService->cadastrar(
                 $_POST,
                 (int)$_SESSION['usuario_id'],
-                (int)($_SESSION['usuario_previlegio'] ?? 1)
+                (int)($_SESSION['usuario_privilegio'] ?? 1)
             );
 
             if ($resultado['sucesso']) {
@@ -97,7 +97,7 @@
                 exit();
             }
 
-            $prev      = (int)($_SESSION['usuario_previlegio'] ?? 1);
+            $prev      = (int)($_SESSION['usuario_privilegio'] ?? 1);
             $resultado = $this->veiculoService->editar(
                 (int)$_POST['id_veiculo'],
                 $_POST,
@@ -123,7 +123,7 @@
                 exit();
             }
 
-            $prev       = (int)($_SESSION['usuario_previlegio'] ?? 1);
+            $prev       = (int)($_SESSION['usuario_privilegio'] ?? 1);
             $id_veiculo = (int)$_POST['id_veiculo'];
             $id_user    = (int)$_SESSION['usuario_id'];
 

@@ -96,4 +96,4 @@ Sistema de gerenciamento de condomínio desenvolvido com **PHP puro**, **PDO** e
 | `reservas` | Reservas de espaços |
 | `locais_festivos` | Espaços disponíveis para reserva |
 
-Campo `previlegio`: `1` Morador · `2` Síndico · `3` Funcionário · `4` Admin
+Campo `privilegio`: `1` Morador · `2` Síndico · `3` Funcionário · `4` Admin

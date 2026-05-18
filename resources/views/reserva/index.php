@@ -3,7 +3,7 @@ $paginaTitulo = 'Reservas';
 $paginaAtiva  = 'reserva';
 $jsExtra      = 'reserva.js';
 require_once __DIR__ . '/../layout/header.php';
-$prev = $usuario['previlegio'] ?? 1;
+$prev = $usuario['privilegio'] ?? 1;
 ?>
 
 
@@ -103,7 +103,7 @@ $prev = $usuario['previlegio'] ?? 1;
     <br>
     <hr>
 
-    <?php if (($usuario['previlegio'] ?? 0) == 2): ?>
+    <?php if (($usuario['privilegio'] ?? 0) == 2): ?>
         <h3 class="section-title">Solicitações de Reserva Pendentes</h3>
 
         <?php if (empty($reservasParaAprovar)): ?>

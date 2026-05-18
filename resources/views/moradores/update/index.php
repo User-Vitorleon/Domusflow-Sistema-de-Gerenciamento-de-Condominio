@@ -18,7 +18,7 @@ require_once __DIR__ . '/../../layout/header.php';
           <span class="perfil-badge">
             <?php
             $labels = [1 => 'Morador', 2 => 'Síndico', 3 => 'Porteiro', 4 => 'Admin'];
-            echo $labels[$usuario['previlegio']] ?? 'Usuário';
+            echo $labels[$usuario['privilegio']] ?? 'Usuário';
             ?>
           </span>
         </div>
@@ -82,7 +82,7 @@ require_once __DIR__ . '/../../layout/header.php';
     </form>
 
     <hr class="divider">
-    <?php if (($usuario['previlegio'] ?? 1) != 4): ?>
+    <?php if (($usuario['privilegio'] ?? 1) != 4): ?>
       <hr class="divider">
       <div class="danger-zone">
           <h6><i class='bx bx-shield-x me-1'></i>Apagar Conta</h6>

@@ -4,7 +4,7 @@ $paginaAtiva  = 'veiculo';
 $cssExtra     = 'veiculo.css';
 $jsExtra      = 'veiculo.js';
 require_once __DIR__ . '/../layout/header.php';
-$prev = $usuario['previlegio'] ?? 1;
+$prev = $usuario['privilegio'] ?? 1;
 
 $cores = [
     'Amarelo',
@@ -98,7 +98,7 @@ $cores = [
                             <select name="id_user" required>
                                 <option value="">Selecione...</option>
                                 <?php foreach ($moradores as $m): ?>
-                                    <?php if (in_array($m['previlegio'], [1, 2])): ?>
+                                    <?php if (in_array($m['privilegio'], [1, 2])): ?>
                                         <option value="<?= $m['id_user'] ?>">
                                             <?= htmlspecialchars($m['nome']) ?> — Ap <?= $m['apto'] ?> · Bloco <?= $m['bloco'] ?>
                                         </option>

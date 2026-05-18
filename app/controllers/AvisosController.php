@@ -18,7 +18,7 @@ class AvisosController{
     }
 
     private function RequireSindico(): void{
-        if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['usuario_previlegio'] ?? 0, [2, 4])) {
+        if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['usuario_privilegio'] ?? 0, [2, 4])) {
             header('Location: ' . BASE_URL . '/');
             exit();
         }

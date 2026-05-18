@@ -6,19 +6,19 @@
 USE `domusflow_bd`;
 
 -- ── Admin Root — CPF: 000.000.000-00 | Senha: 123456 | Privilégio: 4
-INSERT INTO `morador` (`identificador`,`nome`,`apto`,`bloco`,`cpf`,`email`,`telefone`,`tell_recado`,`senha`,`status`,`previlegio`) VALUES
+INSERT INTO `morador` (`identificador`,`nome`,`apto`,`bloco`,`cpf`,`email`,`telefone`,`tell_recado`,`senha`,`status`,`privilegio`) VALUES
   (1, 'Admin Root', '00', '0', '00000000000', 'admin@domusflow.com', '(11) 00000-0000', NULL, '$2y$10$TFYflMyWCmgpm/KFokJ3yO.zlffHUjH3hRufEziUGOT2rOCmA.KK2', 'L', 4);
 
 -- ── Síndico — CPF: 432.099.578-35 | Senha: 123456 | Privilégio: 2
-INSERT INTO `morador` (`identificador`,`nome`,`apto`,`bloco`,`cpf`,`email`,`telefone`,`tell_recado`,`senha`,`status`,`previlegio`) VALUES
+INSERT INTO `morador` (`identificador`,`nome`,`apto`,`bloco`,`cpf`,`email`,`telefone`,`tell_recado`,`senha`,`status`,`privilegio`) VALUES
   (1, 'Vitor Leon', '20', '2', '43209957835', 'sindico@domusflow.com', '(11) 98522-9900', '(11) 98544-5780', '$2y$10$TFYflMyWCmgpm/KFokJ3yO.zlffHUjH3hRufEziUGOT2rOCmA.KK2', 'L', 2);
 
 -- ── Porteiro — CPF: 111.111.111-11 | Senha: 123456 | Privilégio: 3
-INSERT INTO `morador` (`identificador`,`nome`,`apto`,`bloco`,`cpf`,`email`,`telefone`,`tell_recado`,`senha`,`status`,`previlegio`) VALUES
+INSERT INTO `morador` (`identificador`,`nome`,`apto`,`bloco`,`cpf`,`email`,`telefone`,`tell_recado`,`senha`,`status`,`privilegio`) VALUES
   (1, 'Porteiro Padrão', '00', '0', '11111111111', 'porteiro@domusflow.com', '(11) 00000-0001', NULL, '$2y$10$TFYflMyWCmgpm/KFokJ3yO.zlffHUjH3hRufEziUGOT2rOCmA.KK2', 'L', 3);
 
 -- ── Morador teste — CPF: 117.604.018-97 | Senha: 123456 | Privilégio: 1
-INSERT INTO `morador` (`identificador`,`nome`,`apto`,`bloco`,`cpf`,`email`,`telefone`,`tell_recado`,`senha`,`status`,`previlegio`) VALUES
+INSERT INTO `morador` (`identificador`,`nome`,`apto`,`bloco`,`cpf`,`email`,`telefone`,`tell_recado`,`senha`,`status`,`privilegio`) VALUES
   (1, 'Dona Zefinha', '20', '1A', '11760401897', 'zefinha@domusflow.com', '(11) 98475-5600', '(11) 54878-7870', '$2y$10$TFYflMyWCmgpm/KFokJ3yO.zlffHUjH3hRufEziUGOT2rOCmA.KK2', 'L', 1);
 
 -- ── Locais festivos
@@ -45,19 +45,19 @@ INSERT INTO `veiculos` (`placa`,`marca`,`modelo`,`cor`,`id_user`,`id_user_cad`) 
 USE `domusflow_bd`;
 
 -- ── Moradores ──────────────────────────────────────────────
-INSERT INTO `morador` (`id_user`,`identificador`,`nome`,`apto`,`bloco`,`cpf`,`email`,`telefone`,`senha`,`status`,`previlegio`) VALUES
+INSERT INTO `morador` (`id_user`,`identificador`,`nome`,`apto`,`bloco`,`cpf`,`email`,`telefone`,`senha`,`status`,`privilegio`) VALUES
   (5, 1, 'Carlos Silva', '2', 'A', '10433218196', 'carlossilva5@email.com', '(11) 94582-4811', '$2y$10$TFYflMyWCmgpm/KFokJ3yO.zlffHUjH3hRufEziUGOT2rOCmA.KK2', 'L', 1);
-INSERT INTO `morador` (`id_user`,`identificador`,`nome`,`apto`,`bloco`,`cpf`,`email`,`telefone`,`senha`,`status`,`previlegio`) VALUES
+INSERT INTO `morador` (`id_user`,`identificador`,`nome`,`apto`,`bloco`,`cpf`,`email`,`telefone`,`senha`,`status`,`privilegio`) VALUES
   (6, 1, 'João Oliveira', '1', 'D', '89083863794', 'joaooliveira6@email.com', '(11) 96574-5552', '$2y$10$TFYflMyWCmgpm/KFokJ3yO.zlffHUjH3hRufEziUGOT2rOCmA.KK2', 'L', 1);
-INSERT INTO `morador` (`id_user`,`identificador`,`nome`,`apto`,`bloco`,`cpf`,`email`,`telefone`,`senha`,`status`,`previlegio`) VALUES
+INSERT INTO `morador` (`id_user`,`identificador`,`nome`,`apto`,`bloco`,`cpf`,`email`,`telefone`,`senha`,`status`,`privilegio`) VALUES
   (7, 1, 'Pedro Santos', '2B', 'D', '23511615594', 'pedrosantos7@email.com', '(11) 99785-3045', '$2y$10$TFYflMyWCmgpm/KFokJ3yO.zlffHUjH3hRufEziUGOT2rOCmA.KK2', 'L', 1);
-INSERT INTO `morador` (`id_user`,`identificador`,`nome`,`apto`,`bloco`,`cpf`,`email`,`telefone`,`senha`,`status`,`previlegio`) VALUES
+INSERT INTO `morador` (`id_user`,`identificador`,`nome`,`apto`,`bloco`,`cpf`,`email`,`telefone`,`senha`,`status`,`privilegio`) VALUES
   (8, 1, 'Lucas Ferreira', '10', 'B', '61849593103', 'lucasferreira8@email.com', '(11) 92654-7227', '$2y$10$TFYflMyWCmgpm/KFokJ3yO.zlffHUjH3hRufEziUGOT2rOCmA.KK2', 'L', 1);
-INSERT INTO `morador` (`id_user`,`identificador`,`nome`,`apto`,`bloco`,`cpf`,`email`,`telefone`,`senha`,`status`,`previlegio`) VALUES
+INSERT INTO `morador` (`id_user`,`identificador`,`nome`,`apto`,`bloco`,`cpf`,`email`,`telefone`,`senha`,`status`,`privilegio`) VALUES
   (9, 1, 'Marcos Costa', '18B', 'B', '47525534192', 'marcoscosta9@email.com', '(11) 93677-8573', '$2y$10$TFYflMyWCmgpm/KFokJ3yO.zlffHUjH3hRufEziUGOT2rOCmA.KK2', 'L', 1);
-INSERT INTO `morador` (`id_user`,`identificador`,`nome`,`apto`,`bloco`,`cpf`,`email`,`telefone`,`senha`,`status`,`previlegio`) VALUES
+INSERT INTO `morador` (`id_user`,`identificador`,`nome`,`apto`,`bloco`,`cpf`,`email`,`telefone`,`senha`,`status`,`privilegio`) VALUES
   (10, 1, 'Rafael Souza', '3', 'E', '64835030564', 'rafaelsouza10@email.com', '(11) 96155-4483', '$2y$10$TFYflMyWCmgpm/KFokJ3yO.zlffHUjH3hRufEziUGOT2rOCmA.KK2', 'L', 1);
-INSERT INTO `morador` (`id_user`,`identificador`,`nome`,`apto`,`bloco`,`cpf`,`email`,`telefone`,`senha`,`status`,`previlegio`) VALUES
+INSERT INTO `morador` (`id_user`,`identificador`,`nome`,`apto`,`bloco`,`cpf`,`email`,`telefone`,`senha`,`status`,`privilegio`) VALUES
   (11, 1, 'Bruno Lima', '14B', 'D', '76724238849', 'brunolima11@email.com', '(11) 96930-4593', '$2y$10$TFYflMyWCmgpm/KFokJ3yO.zlffHUjH3hRufEziUGOT2rOCmA.KK2', 'L', 1);
 INSERT INTO `morador` (`id_user`,`identificador`,`nome`,`apto`,`bloco`,`cpf`,`email`,`telefone`,`senha`,`status`,`previlegio`) VALUES
   (12, 1, 'Felipe Pereira', '13A', 'E', '28710122691', 'felipepereira12@email.com', '(11) 98668-9669', '$2y$10$TFYflMyWCmgpm/KFokJ3yO.zlffHUjH3hRufEziUGOT2rOCmA.KK2', 'L', 1);

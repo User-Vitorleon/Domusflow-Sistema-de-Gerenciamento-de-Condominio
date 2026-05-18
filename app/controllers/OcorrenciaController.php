@@ -55,7 +55,7 @@ class OcorrenciaController
             exit();
         }
 
-        $priv = (int)($_SESSION['usuario_previlegio'] ?? 1);
+        $priv = (int)($_SESSION['usuario_privilegio'] ?? 1);
         $isGestor = in_array($priv, [2, 4], true);
 
         if (!$isGestor && (int)$detalhe['id_user'] !== (int)$_SESSION['usuario_id']) {
@@ -243,7 +243,7 @@ class OcorrenciaController
 
     private function requireSindico(): void
     {
-        $priv = (int)($_SESSION['usuario_previlegio'] ?? 1);
+        $priv = (int)($_SESSION['usuario_privilegio'] ?? 1);
         if (!in_array($priv, [2, 4], true)) {
             header('Location: ' . BASE_URL . '/ocorrencia');
             exit();

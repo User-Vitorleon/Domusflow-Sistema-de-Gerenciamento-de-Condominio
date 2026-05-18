@@ -20,8 +20,7 @@ $routes = [
     'moradores/liberar'      => ['MoradorController',   'liberar'],
     'moradores/inativar'     => ['MoradorController',   'inativar'],
     'moradores/deletar'      => ['MoradorController',   'deletar'],
-    'moradores/gestao'       => ['MoradorController',   'gestao'],
-    'moradores/gestao/salvar'=> ['MoradorController',   'gestaoSalvar'],
+    
 
     // Dashboard
     'dashboard'           => ['DashboardController', 'index'],
@@ -52,7 +51,7 @@ $routes = [
     'financeiro/historico'            => ['FinancasController',     'historico'],
     'financeiro/fatura/gerar'         => ['FinancasController',     'gerarFatura'],
     'financeiro/lancamento/verificar' => ['FinancasController',     'verificarDuplicado'],
-    'financeiro/fatura/gerarTodos'    => ['FinancasController',     'gerarFaturatodos'],
+    'financeiro/fatura/gerarTodos'    => ['FinancasController',     'gerarFaturaTodos'],
 
     // Ocorrências
     'ocorrencia'                    => ['OcorrenciaController', 'index'],
@@ -74,6 +73,12 @@ $routes = [
     'assembleia/presenca'  => ['AssembleiaController', 'confirmarPresenca'],
     'assembleia/excluir'   => ['AssembleiaController', 'excluir'],
     'assembleia/presencas' => ['AssembleiaController', 'listarPresencas'],
+
+
+    // testaaaar 
+    
+    'cadastro/admin'        => ['MoradorController', 'cadastrarAdmin'],
+    'cadastro/admin/salvar' => ['MoradorController', 'cadastrarAdminSalvar'],
 
 
 ];

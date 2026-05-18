@@ -61,7 +61,6 @@ class DashboardController
         }
 
         if ($usuario['status'] === 'B') {
-            var_dump($usuario['status']);
             exit();
         }
 
@@ -103,14 +102,14 @@ class DashboardController
 
         // Variável opcional para o Síndico (Privilégio 2)
         $reservasParaAprovar = [];
-        if (!in_array($usuario['previlegio'] ?? 0, [2, 4])) {
+        if (!in_array($usuario['privilegio'] ?? 0, [2, 4])) {
             $reservasParaAprovar = $this->reservaRepo->buscarReservasPendentesGeral();
         }
 
         // Determina a view baseada no privilégio
-        $previlegio = (int) $usuario['previlegio'];
+        $privilegio = (int) $usuario['privilegio'];
 
-        switch ($previlegio) {
+        switch ($privilegio) {
             case 1:
                 $viewFile = 'dashboard/morador.php';
                 break;

@@ -7,7 +7,7 @@ class FinancasController{
     private FinancasRepository $repo;
 
     private function requireSindico(): void{
-    if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['usuario_previlegio'] ?? 0, [2, 4])) {
+    if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['usuario_privilegio'] ?? 0, [2, 4])) {
         header('Location: ' . BASE_URL . '/');
         exit();
     }
@@ -30,7 +30,7 @@ class FinancasController{
     }
 
     public function salvarTaxas():void {
-        if ($_SESSION['usuario_previlegio'] == 2 AND $_SERVER['REQUEST_METHOD'] == 'POST'){ // validamos se esta logado / se é sindico / e foi via post
+        if ($_SESSION['usuario_privilegio'] == 2 AND $_SERVER['REQUEST_METHOD'] == 'POST'){ // validamos se esta logado / se é sindico / e foi via post
             
             $resultado = $this->repo->salvarTaxas([ // enviamos os paramentos para a repository
             'descricao'         => $_POST['descricao']        ?? '',
@@ -65,7 +65,7 @@ class FinancasController{
     }
 
     $id_user    = (int)$_SESSION['usuario_id'];
-    $previlegio = (int)$_SESSION['usuario_previlegio'];
+    $privilegio = (int)$_SESSION['usuario_privilegio'];
 
     $busca   = $_GET['busca']   ?? '';
     $status  = $_GET['status']  ?? '';
@@ -75,11 +75,11 @@ class FinancasController{
     $pagina  = (int)($_GET['pagina'] ?? 1);
     $porPagina = 10;
 
-    $total        = $this->repo->countLancamentos($id_user, $previlegio, $busca, $status, $dt_lanc, $dt_venc, $atraso);
+    $total        = $this->repo->countLancamentos($id_user, $privilegio, $busca, $status, $dt_lanc, $dt_venc, $atraso);
     $totalPaginas = (int)ceil($total / $porPagina);
     $offset       = ($pagina - 1) * $porPagina;
 
-    $lancamentos = $this->repo->lancamento($id_user, $previlegio, $offset, $porPagina, $busca, $status, $dt_lanc, $dt_venc, $atraso);
+    $lancamentos = $this->repo->lancamento($id_user, $privilegio, $offset, $porPagina, $busca, $status, $dt_lanc, $dt_venc, $atraso);
     $todasTaxas  = $this->repo->listarTodasTaxasAtivas();
 
     $repo      = new MoradorRepository();
@@ -90,7 +90,7 @@ class FinancasController{
 }
 
 public function salvarLancamento(): void{
-    if ($_SESSION['usuario_previlegio'] != 2 || $_SERVER['REQUEST_METHOD'] !== 'POST') {
+    if ($_SESSION['usuario_privilegio'] != 2 || $_SERVER['REQUEST_METHOD'] !== 'POST') {
         header('Location: ' . BASE_URL . '/');
         exit();
     }
@@ -180,7 +180,7 @@ public function gerarFatura(): void{
 
     if ($valor_total <= 0) {
         $_SESSION['erro_fatura'] = 'Nenhuma pendência encontrada.';
-        $destino = ($_SESSION['usuario_previlegio'] == 2) ? '/financeiro/lancamento' : '/financeiro/historico';
+        $destino = ($_SESSION['usuario_privilegio'] == 2) ? '/financeiro/lancamento' : '/financeiro/historico';
         header('Location: ' . BASE_URL . $destino);
         exit();
     }
@@ -201,7 +201,7 @@ public function gerarFatura(): void{
         $_SESSION['erro_fatura'] = 'Erro ao gerar fatura.';
     }
 
-    $destino = ($_SESSION['usuario_previlegio'] == 2) ? '/financeiro/lancamento' : '/financeiro/historico';
+    $destino = ($_SESSION['usuario_privilegio'] == 2) ? '/financeiro/lancamento' : '/financeiro/historico';
     header('Location: ' . BASE_URL . $destino);
     exit();
 }

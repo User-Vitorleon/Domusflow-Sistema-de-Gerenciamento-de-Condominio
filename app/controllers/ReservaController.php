@@ -27,7 +27,7 @@ class ReservaController
         $locais  = $this->reservaService->listarLocaisDisponiveis();
 
         $reservasParaAprovar = [];
-        if (in_array($usuario['previlegio'] ?? 0, [2, 4])) {
+        if (in_array($usuario['privilegio'] ?? 0, [2, 4])) {
             $pagina       = (int)($_GET['pagina'] ?? 1);
             $porPagina    = 10;
             $total        = $this->reservaService->contarPendentesGeral();
@@ -47,7 +47,7 @@ class ReservaController
             exit();
         }
 
-        if (in_array($_SESSION['usuario_previlegio'] ?? 1, [2, 4])) {
+        if (in_array($_SESSION['usuario_privilegio'] ?? 1, [2, 4])) {
             $resultado = $this->localService->cadastrar($_POST, (int)$_SESSION['usuario_id']);
         } else {
             $resultado = $this->reservaService->salvar($_POST, (int)$_SESSION['usuario_id']);

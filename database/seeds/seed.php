@@ -35,7 +35,7 @@ try {
 
     $stmt = $pdo->prepare("
         INSERT INTO morador
-          (id_user, identificador, nome, apto, bloco, cpf, email, telefone, tell_recado, sexo, senha, status, previlegio)
+          (id_user, identificador, nome, apto, bloco, cpf, email, telefone, tell_recado, sexo, senha, status, privilegio)
         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
     ");
     foreach ($sistema as $u) {
@@ -178,7 +178,7 @@ try {
 
     $stmt_m = $pdo->prepare("
         INSERT INTO morador
-          (identificador, nome, apto, bloco, cpf, email, telefone, tell_recado, sexo, senha, status, previlegio)
+          (identificador, nome, apto, bloco, cpf, email, telefone, tell_recado, sexo, senha, status, privilegio)
         VALUES (1,?,?,?,?,?,?,?,?,?,?,1)
     ");
 
@@ -241,7 +241,7 @@ try {
     echo "✔ Moradores inseridos: {$inseridos}\n";
 
     // busca os ids dos moradores (excluindo sistema)
-    $ids_moradores = $pdo->query("SELECT id_user FROM morador WHERE previlegio = 1 ORDER BY id_user")->fetchAll(PDO::FETCH_COLUMN);
+    $ids_moradores = $pdo->query("SELECT id_user FROM morador WHERE privilegio = 1 ORDER BY id_user")->fetchAll(PDO::FETCH_COLUMN);
 
     // ── 3. LOCAIS FESTIVOS (6 locais) ───────────────────────────────────────
     $locais = [

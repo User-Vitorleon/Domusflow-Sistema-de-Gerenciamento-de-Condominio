@@ -16,7 +16,7 @@ class LocalService
     public function cadastrar(array $dados, int $id_logado): array
     {
         $solicitante = $this->moradorRepo->findById($id_logado);
-        if (!$solicitante || !in_array($solicitante['previlegio'] ?? 0, [2, 4])) {
+        if (!$solicitante || !in_array($solicitante['privilegio'] ?? 0, [2, 4])) {
             return ['sucesso' => false, 'mensagem' => 'Sem permissão.'];
         }
 

@@ -4,7 +4,7 @@ $paginaAtiva  = 'painel';
 $cssExtra     = 'painel.css';
 require_once __DIR__ . '/../layout/header.php';
 
-$prev          = $usuario['previlegio'] ?? 1;
+$prev          = $usuario['privilegio'] ?? 1;
 $primeiro_nome = explode(' ', $usuario['nome'])[0];
 
 $modulos = [];

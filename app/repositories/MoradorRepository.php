@@ -19,7 +19,7 @@ class MoradorRepository
     public function findAtivos(): array
     {
         $stmt = $this->pdo->query(
-            "SELECT * FROM morador WHERE status = 'L' AND previlegio = 1"
+            "SELECT * FROM morador WHERE status = 'L' AND privilegio = 1"
         );
         return $stmt->fetchAll();
     }
@@ -297,12 +297,12 @@ class MoradorRepository
         return $map;
     }
 
-    public function atualizarPrivilegio(int $id, int $previlegio): bool{
+    public function atualizarPrivilegio(int $id, int $privilegio): bool{
     $stmt = $this->pdo->prepare(
-        "UPDATE morador SET previlegio = :previlegio WHERE id_user = :id"
+        "UPDATE morador SET privilegio = :privilegio WHERE id_user = :id"
     );
     return $stmt->execute([
-        ':previlegio' => $previlegio,
+        ':privilegio' => $privilegio,
         ':id'         => $id,
     ]);
 }

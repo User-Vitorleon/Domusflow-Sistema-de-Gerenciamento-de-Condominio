@@ -58,7 +58,7 @@ require_once __DIR__ . '/../layout/header.php';
 
     <br>
 
-    <?php if (($usuario['previlegio'] ?? 0) == 2): ?>
+    <?php if (($usuario['privilegio'] ?? 0) == 2): ?>
         <h3 class="section-title">Visão Geral do Condomínio</h3>
         <div class="kpi-grid">
             <div class="kpi-card">

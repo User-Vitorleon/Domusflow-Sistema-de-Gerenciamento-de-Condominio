@@ -46,9 +46,9 @@
     const form = document.querySelector('form[action*="veiculo/salvar"]');
     if (form) {
         const total = parseInt(form.dataset.total ?? '0', 10);
-        const previlegio = parseInt(form.dataset.prev ?? '4', 10);
+        const privilegio = parseInt(form.dataset.prev ?? '4', 10);
 
-        if (previlegio === 1 && total >= 2) {
+        if (privilegio === 1 && total >= 2) {
             // desabilita o formulário visualmente
             form.querySelectorAll('input, select, button[type="submit"]')
                 .forEach(el => el.disabled = true);

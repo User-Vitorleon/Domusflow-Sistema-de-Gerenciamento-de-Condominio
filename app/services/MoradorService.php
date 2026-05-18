@@ -60,7 +60,7 @@ class MoradorService
     public function liberarOuBloquear(int $id, string $acao, int $id_logado): array
     {
         $solicitante = $this->repo->findById($id_logado);
-        if (!$solicitante || !in_array($solicitante['previlegio'] ?? 0, [2, 4])) {
+        if (!$solicitante || !in_array($solicitante['privilegio'] ?? 0, [2, 4])) {
             return ['sucesso' => false, 'mensagem' => 'Você não tem permissão para realizar esta ação.'];
         }
 
@@ -119,7 +119,7 @@ class MoradorService
         return ['sucesso' => true];
     }
 
-    public function atualizarPrivilegio(int $id, int $previlegio): bool{
-        return $this->repo->atualizarPrivilegio($id, $previlegio);
+    public function atualizarPrivilegio(int $id, int $privilegio): bool{
+        return $this->repo->atualizarPrivilegio($id, $privilegio);
 }
 }
