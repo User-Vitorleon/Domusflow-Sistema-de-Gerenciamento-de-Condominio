@@ -4,58 +4,8 @@ $paginaAtiva  = 'painel';
 $cssExtra     = 'painel.css';
 require_once __DIR__ . '/../layout/header.php';
 
-<<<<<<< HEAD
-$prev          = $usuario['privilegio'] ?? 1;
-$primeiro_nome = explode(' ', $usuario['nome'])[0];
-
-$modulos = [];
-
-if (in_array($prev, [1, 2, 3, 4])) {
-    $modulos[] = ['titulo' => 'Dashboard',       'sub' => 'Visão geral e gráficos do condomínio',            'href' => BASE_URL . '/dashboard',           'icon' => 'chart'];
-}
-if (in_array($prev, [1, 2, 4])) {
-    $modulos[] = ['titulo' => 'Reservas',         'sub' => 'Solicite e gerencie reservas de espaços comuns',  'href' => BASE_URL . '/reserva',             'icon' => 'calendar'];
-}
-if (in_array($prev, [3, 4])) {
-    $modulos[] = ['titulo' => 'Consultar Placa',  'sub' => 'Pesquisar veículos pela placa',                   'href' => BASE_URL . '/veiculo/consultar',   'icon' => 'search'];
-}
-if (in_array($prev, [2, 4])) {
-    $modulos[] = ['titulo' => 'Novos Usuários',   'sub' => 'Controle de novos moradores',                    'href' => BASE_URL . '/moradores/pendentes', 'icon' => 'user-check'];
-}
-if (in_array($prev, [1, 2, 4])) {
-    $modulos[] = ['titulo' => 'Veículos',          'sub' => 'Cadastre e gerencie seus veículos',               'href' => BASE_URL . '/veiculo',             'icon' => 'car'];
-}
-
-// ── Ocorrências ───────────────────────────────────────────────────────────
-if (in_array($prev, [1, 2, 4])) {
-    $modulos[] = ['titulo' => 'Ocorrências',       'sub' => 'Registre e acompanhe ocorrências no condomínio',  'href' => BASE_URL . '/ocorrencia',          'icon' => 'ocorrencia'];
-}
-// avisos ok
-
-if (in_array($prev, [1, 2, 4])) {
-    $modulos[] = ['titulo' => 'Avisos',       'sub' => 'Acompanhe os últimos avisos registrados',                'href' => BASE_URL . '/avisos',             'icon' => 'avisos'];
-}
-
-if (in_array($prev, [1])) {
-    $modulos[] = ['titulo' => 'Assembleia',       'sub' => 'Proximas Assembleias agendadas',                    'href' => BASE_URL . '/assembleia',             'icon' => 'assembleia'];
-}
-
-if ($prev == 4) {
-    $modulos[] = ['titulo' => 'Gestão de Moradores', 'sub' => 'Gerencie privilégios dos moradores',             'href' => BASE_URL . '/moradores/gestao', 'icon' => 'gestao'];
-}
-
-$modulos[] = ['titulo' => 'Atualizar Dados',   'sub' => 'Edite seu perfil e dados pessoais',               'href' => BASE_URL . '/cadastro/update',     'icon' => 'user'];
-?>
-
-
-
-=======
 $privilegio = (int) ($usuario['privilegio'] ?? 1);
 
-/**
- * Catálogo de módulos disponíveis no painel.
- * Cada entrada define quais privilégios podem ver o card.
- */
 $catalogoModulos = [
     ['titulo' => 'Dashboard',           'sub' => 'Visão geral e gráficos do condomínio',          'href' => '/dashboard',           'icon' => 'chart',      'privilegios' => [1, 2, 3, 4]],
     ['titulo' => 'Reservas',            'sub' => 'Solicite e gerencie reservas de espaços comuns','href' => '/reserva',             'icon' => 'calendar',   'privilegios' => [1, 2, 4]],
@@ -73,9 +23,6 @@ $modulos = array_values(array_filter($catalogoModulos, static function ($modulo)
     return in_array($privilegio, $modulo['privilegios'], true);
 }));
 
-/**
- * Devolve o SVG inline correspondente ao ícone do módulo.
- */
 function pn_icon(string $nome): string
 {
     static $icones = [
@@ -95,23 +42,17 @@ function pn_icon(string $nome): string
 }
 ?>
 
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
 <main class="pn-page">
 
-    <!-- Logo centralizado, sem texto -->
+
     <div class="pn-brand">
         <img src="<?= BASE_URL ?>/public/assets/img/logo_icon.png"
             alt="DomusFlow" class="pn-brand-icon">
     </div>
 
-    <!-- Cards -->
     <div class="pn-grid">
-<<<<<<< HEAD
-        <?php if (in_array($prev, [2, 4])): ?>
-=======
         <?php if (in_array($privilegio, [2, 4])): ?>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
-            <!-- Síndico/Admin — dropdown -->
+
             <div class="dropdown pn-card" style="cursor:pointer;">
                 <button type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" class="pn-dropdown-trigger">
                 </button>
@@ -132,12 +73,8 @@ function pn_icon(string $nome): string
                 </ul>
             </div>
 
-<<<<<<< HEAD
-        <?php elseif ($prev == 1): ?>
-=======
         <?php elseif ($privilegio == 1): ?>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
-            <!-- Morador — vai direto para o histórico -->
+
             <a href="<?= BASE_URL ?>/financeiro/historico" class="pn-card">
                 <div class="pn-card-icon"><?= pn_icon('financeiro') ?></div>
                 <div class="pn-card-body">
@@ -151,11 +88,7 @@ function pn_icon(string $nome): string
             </a>
         <?php endif; ?>
 
-<<<<<<< HEAD
-        <?php if (in_array($prev, [2, 4])): ?>
-=======
         <?php if (in_array($privilegio, [2, 4])): ?>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
             <div class="dropdown pn-card" style="cursor:pointer;">
                 <button type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" class="pn-dropdown-trigger">
                 </button>
@@ -187,11 +120,7 @@ function pn_icon(string $nome): string
             </div>
 
         <?php endif; ?>
-<<<<<<< HEAD
-                <?php if (in_array($prev, [2, 4])): ?>
-=======
                 <?php if (in_array($privilegio, [2, 4])): ?>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
             <div class="dropdown pn-card" style="cursor:pointer;">
                 <button type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside"
                     aria-expanded="false"
@@ -215,19 +144,9 @@ function pn_icon(string $nome): string
             </div>
         <?php endif; ?>
 
-<<<<<<< HEAD
-        <?php foreach ($modulos as $m):
-            if ($m['icon'] === 'ocorrencia' && in_array($prev, [2, 4])) continue;
-        ?>
-            <a href="<?= $m['href'] ?>" class="pn-card">
-                <div class="pn-card-icon"><?= pn_icon($m['icon']) ?></div>
-                <div class="pn-card-body">
-                    <span class="pn-card-title"><?= htmlspecialchars($m['titulo']) ?></span>
-                    <span class="pn-card-sub"><?= htmlspecialchars($m['sub']) ?></span>
-=======
         <?php foreach ($modulos as $modulo): ?>
             <?php
-            // Síndico/Admin já têm dropdown próprio de Ocorrências acima
+
             if ($modulo['icon'] === 'ocorrencia' && in_array($privilegio, [2, 4], true)) {
                 continue;
             }
@@ -237,7 +156,6 @@ function pn_icon(string $nome): string
                 <div class="pn-card-body">
                     <span class="pn-card-title"><?= htmlspecialchars($modulo['titulo']) ?></span>
                     <span class="pn-card-sub"><?= htmlspecialchars($modulo['sub']) ?></span>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
                 </div>
                 <svg class="pn-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                     stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -248,7 +166,6 @@ function pn_icon(string $nome): string
 
     </div>
 
-    <!-- Ajuda -->
     <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">Precisa de Ajuda ?</button>
 
     <div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions" aria-labelledby="offcanvasWithBothOptionsLabel">
@@ -272,32 +189,6 @@ function pn_icon(string $nome): string
     </div>
     </div>
 
-<<<<<<< HEAD
-
-</main>
-
-<?php
-function pn_icon(string $k): string
-{
-    $i = [
-        'calendar'   => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
-        'user-check' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>',
-        'car'        => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3v-5l2-5h14l2 5v5h-2"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="16.5" cy="17.5" r="1.5"/><path d="M5 12h14"/></svg>',
-        'user'       => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>',
-        'search'     => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
-        'chart'      => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>',
-        'financeiro' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
-        'avisos'     => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
-        'assembleia' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
-        'gestao' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>',
-        'ocorrencia' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
-    ];
-    return $i[$k] ?? '';
-}
-?>
-<?php require_once __DIR__ . '/../layout/footer.php'; ?>
-=======
 </main>
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)

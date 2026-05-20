@@ -1,8 +1,5 @@
 <?php
-<<<<<<< HEAD
-=======
 
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
 class LocalRepository
 {
     private PDO $pdo;
@@ -47,13 +44,8 @@ class LocalRepository
     public function findById(int $id): ?array
     {
         $stmt = $this->pdo->prepare("
-<<<<<<< HEAD
-        SELECT * FROM locais_festivos WHERE id_local = :id
-    ");
-=======
             SELECT * FROM locais_festivos WHERE id_local = :id
         ");
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
         $stmt->execute([':id' => $id]);
         $result = $stmt->fetch();
         return $result ?: null;

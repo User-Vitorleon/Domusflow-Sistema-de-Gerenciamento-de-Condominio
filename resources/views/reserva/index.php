@@ -3,25 +3,14 @@ $paginaTitulo = 'Reservas';
 $paginaAtiva  = 'reserva';
 $jsExtra      = 'reserva.js';
 require_once __DIR__ . '/../layout/header.php';
-<<<<<<< HEAD
-$prev = $usuario['privilegio'] ?? 1;
-?>
-
-
-=======
 $privilegio = $usuario['privilegio'] ?? 1;
 ?>
 
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
 <main class="main-content">
 <div class="df-container">
 
     <div class="page-header">
-<<<<<<< HEAD
-        <h2><?= $prev == 2 ? 'Cadastrar Local' : 'Nova Reserva' ?></h2>
-=======
         <h2><?= $privilegio == 2 ? 'Cadastrar Local' : 'Nova Reserva' ?></h2>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
     </div>
 
     <?php if (isset($_GET['sucesso'])): ?>
@@ -34,11 +23,7 @@ $privilegio = $usuario['privilegio'] ?? 1;
     <?php endif; ?>
 
     <div class="df-card">
-<<<<<<< HEAD
-        <?php if ($prev == 1): ?>
-=======
         <?php if ($privilegio == 1): ?>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
             <form action="<?= BASE_URL ?>/reserva/salvar" method="POST" id="formReserva">
                 <div class="df-grid-2">
                     <div class="df-field">
@@ -128,7 +113,6 @@ $privilegio = $usuario['privilegio'] ?? 1;
             </div>
         <?php else: ?>
             <?php foreach ($reservasParaAprovar as $res):
-                // Corrigido para usar $res que vem do foreach
                 $sexoMorador = $res['sexo'] ?? 'M';
                 $avatar = 'https://static.vecteezy.com/ti/vetor-gratis/p1/21548095-padrao-perfil-cenario-avatar-do-utilizador-avatar-icone-pessoa-icone-cabeca-icone-perfil-cenario-icones-padrao-anonimo-do-utilizador-masculino-e-femea-homem-de-negocios-foto-espaco-reservado-social-rede-avatar-retrato-gratis-vetor.jpg';
             ?>
@@ -161,7 +145,7 @@ $privilegio = $usuario['privilegio'] ?? 1;
                             <a class="page-link" href="?pagina=<?= $pagina - 1 ?>">Anterior</a>
                         </li>
                         <?php
-                        $range = 2; // quantas páginas ao redor da atual
+                        $range = 2; 
                         for ($i = 1; $i <= $totalPaginas; $i++):
                             $mostrar = (
                                 $i == 1 ||
@@ -193,8 +177,4 @@ $privilegio = $usuario['privilegio'] ?? 1;
                         </div>
 </main>
 
-<<<<<<< HEAD
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>
-=======
-<?php require_once __DIR__ . '/../layout/footer.php'; ?>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)

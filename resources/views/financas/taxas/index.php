@@ -6,11 +6,7 @@ require_once __DIR__ . '/../../layout/header.php';
 
 <main class="main-content">
     <div style="max-width: 720px; margin: 0 auto;">
-<<<<<<< HEAD
-        
-=======
 
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
         <div class="page-header">
             <h2>Cadastro de Taxas</h2>
             <p class="text-muted">Gerencie as taxas padrão do condomínio</p>
@@ -73,7 +69,7 @@ require_once __DIR__ . '/../../layout/header.php';
             <div class="morador-list">
                 <?php foreach ($taxas as $taxa): ?>
                     <div class="morador-card">
-                        <!-- Ícone -->
+
                         <div style="
                             width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
                             background: <?= $taxa['modulo'] === 'TAXA' ? '#EFF6FF' : '#FEF2F2' ?>;
@@ -82,7 +78,6 @@ require_once __DIR__ . '/../../layout/header.php';
                                style="font-size: 20px; color: <?= $taxa['modulo'] === 'TAXA' ? '#2563EB' : '#DC2626' ?>"></i>
                         </div>
 
-                        <!-- Info -->
                         <div class="morador-info">
                             <strong><?= htmlspecialchars($taxa['descricao']) ?></strong>
                             <span>
@@ -94,8 +89,6 @@ require_once __DIR__ . '/../../layout/header.php';
                                 · <?= date('d/m/Y', strtotime($taxa['data_cad'])) ?>
                             </span>
                         </div>
-
-                        <!-- Status + Excluir -->
                         <div style="display: flex; align-items: center; gap: 12px; flex-shrink: 0;">
                             <span style="
                                 padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;
@@ -119,8 +112,4 @@ require_once __DIR__ . '/../../layout/header.php';
     </div>
 </main>
 
-<<<<<<< HEAD
 <?php require_once __DIR__ . '/../../layout/footer.php'; ?>
-=======
-<?php require_once __DIR__ . '/../../layout/footer.php'; ?>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)

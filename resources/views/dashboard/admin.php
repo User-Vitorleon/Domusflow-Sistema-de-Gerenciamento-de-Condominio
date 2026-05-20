@@ -5,17 +5,13 @@ $jsExtra      = 'dashboard.js';
 ?>
 <?php require_once __DIR__ . '/../layout/header.php'; ?>
 
-<<<<<<< HEAD
-
-=======
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
 <main class="main-content" id="app">
     <div class="page-header">
         <h2>Dashboard</h2>
         <p class="text-muted">Visão sistêmica do condomínio</p>
     </div>
 
-    <!-- 1. KPIs -->
+
     <section class="dashboard-section">
         <div class="kpi-grid">
             <a href="<?= BASE_URL ?>/moradores/pendentes" class="kpi-card kpi-card-link">
@@ -57,7 +53,6 @@ $jsExtra      = 'dashboard.js';
         </div>
     </section>
 
-    <!-- 2. Moradores por status + Ocorrências -->
     <section class="dashboard-section">
         <div class="row g-3">
             <div class="col-12 col-lg-7">
@@ -128,7 +123,6 @@ $jsExtra      = 'dashboard.js';
         </div>
     </section>
 
-    <!-- 3. Financeiro -->
     <section class="dashboard-section">
         <h3 class="section-title">Financeiro</h3>
         <div class="kpi-grid">
@@ -173,7 +167,6 @@ $jsExtra      = 'dashboard.js';
         </div>
     </section>
 
-    <!-- 4. Top Marcas Veículos -->
     <section class="dashboard-section">
         <div class="row g-3">
             <div class="col-12 col-md-6">
@@ -204,7 +197,6 @@ $jsExtra      = 'dashboard.js';
                 </div>
             </div>
 
-            <!-- 5. Últimos moradores cadastrados -->
             <div class="col-12 col-md-6">
                 <div class="chart-card h-100">
                     <h5 class="chart-title">Últimos Moradores Cadastrados</h5>
@@ -261,8 +253,4 @@ $jsExtra      = 'dashboard.js';
                             ]) ?>;
 </script>
 
-<<<<<<< HEAD
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>
-=======
-<?php require_once __DIR__ . '/../layout/footer.php'; ?>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)

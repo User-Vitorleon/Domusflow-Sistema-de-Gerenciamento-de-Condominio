@@ -3,7 +3,6 @@ $paginaTitulo = 'Meu Histórico';
 $paginaAtiva  = 'financeiro';
 require_once __DIR__ . '/../../layout/header.php';
 
-// Separar pendentes e faturas geradas
 $pendentes = array_filter($historico, fn($h) => $h['status'] === 'P');
 $geradas   = array_filter($historico, fn($h) => $h['status'] === 'F');
 $totalPendente = array_sum(array_column(iterator_to_array($pendentes ?? new ArrayIterator([])), 'valor'));
@@ -24,7 +23,6 @@ $totalPendente = array_sum(array_column(iterator_to_array($pendentes ?? new Arra
         <div class="df-alert df-alert-error"><?= htmlspecialchars($_SESSION['erro_fatura']) ?><?php unset($_SESSION['erro_fatura']); ?></div>
     <?php endif; ?>
 
-    <!-- ── PENDÊNCIAS ── -->
     <div class="df-card" style="margin-bottom: 24px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
             <h3 class="section-title" style="margin: 0;">Pendências</h3>
@@ -39,7 +37,6 @@ $totalPendente = array_sum(array_column(iterator_to_array($pendentes ?? new Arra
             <?php endif; ?>
         </div>
 
-        <!-- Filtros pendências -->
         <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; margin-bottom: 14px; padding: 12px; background: #F8FAFC; border-radius: var(--radius); border: 1px solid var(--border);">
             <div class="df-field" style="margin: 0;">
                 <label style="font-size: 11px;">Buscar</label>
@@ -114,7 +111,6 @@ $totalPendente = array_sum(array_column(iterator_to_array($pendentes ?? new Arra
                 </table>
             </div>
 
-            <!-- Total pendente -->
             <div style="margin-top: 14px; padding: 12px 16px; background: #FFFBEB; border-radius: var(--radius); border: 1px solid #FDE68A; display: flex; justify-content: space-between; align-items: center;">
                 <strong>Total Pendente</strong>
                 <strong style="color: #CA8A04; font-size: 16px;">
@@ -124,11 +120,9 @@ $totalPendente = array_sum(array_column(iterator_to_array($pendentes ?? new Arra
         <?php endif; ?>
     </div>
 
-    <!-- ── FATURAS GERADAS ── -->
     <div class="df-card">
         <h3 class="section-title" style="margin-bottom: 16px;">Faturas Geradas</h3>
 
-        <!-- Filtros faturas -->
         <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; margin-bottom: 14px; padding: 12px; background: #F8FAFC; border-radius: var(--radius); border: 1px solid var(--border);">
             <div class="df-field" style="margin: 0;">
                 <label style="font-size: 11px;">Buscar</label>
@@ -229,8 +223,4 @@ function limparFiltro(inputId, dtId, tabelaId) {
 }
 </script>
 
-<<<<<<< HEAD
 <?php require_once __DIR__ . '/../../layout/footer.php'; ?>
-=======
-<?php require_once __DIR__ . '/../../layout/footer.php'; ?>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)

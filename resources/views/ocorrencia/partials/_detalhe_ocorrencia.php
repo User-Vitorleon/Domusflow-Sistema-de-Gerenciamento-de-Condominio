@@ -1,10 +1,8 @@
 <?php
-// resources/views/ocorrencia/partials/_detalhe_ocorrencia.php
-// $detalhe vem do OcorrenciaController->painel()
+
 ?>
 <div class="oc-detalhe">
 
-    <!-- Cabeçalho do chamado -->
     <div class="oc-detalhe-meta">
         <div>
             <span class="oc-cat-pill"><?= htmlspecialchars($detalhe['categoria']) ?></span>
@@ -36,7 +34,6 @@
 
     <hr class="df-divider">
 
-    <!-- Timeline de tramitações -->
     <h6 class="oc-timeline-title">
         <i class="fa-solid fa-timeline" style="margin-right:6px"></i>Histórico de Tramitações
     </h6>
@@ -61,7 +58,6 @@
     <p style="color:var(--text-muted);font-size:13px">Nenhuma tramitação registrada ainda.</p>
     <?php endif; ?>
 
-    <!-- Formulário de nova tramitação (só se não estiver resolvido/cancelado) -->
     <?php if (!in_array($detalhe['status'], ['R', 'C'])): ?>
     <hr class="df-divider">
     <h6 class="oc-timeline-title">

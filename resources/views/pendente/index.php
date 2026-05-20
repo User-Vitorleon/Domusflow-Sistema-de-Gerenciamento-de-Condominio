@@ -9,7 +9,6 @@ $nome = htmlspecialchars($_SESSION['usuario_nome'] ?? 'Morador');
 <div class="page-centered">
     <div class="df-card df-card-pendente">
 
-        <!-- Brand -->
         <div class="pendente-brand">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round">
@@ -19,7 +18,6 @@ $nome = htmlspecialchars($_SESSION['usuario_nome'] ?? 'Morador');
             <span>DomusFlow</span>
         </div>
 
-        <!-- Ícone animado -->
         <div class="pendente-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -27,15 +25,12 @@ $nome = htmlspecialchars($_SESSION['usuario_nome'] ?? 'Morador');
                 <polyline points="12 6 12 12 16 14" />
             </svg>
         </div>
-
         <h2 class="pendente-title">Cadastro em análise</h2>
         <p class="pendente-sub">
             Olá, <strong><?= $nome ?></strong>!<br>
             Seu cadastro foi recebido com sucesso.<br>
             Aguarde a aprovação do síndico para acessar o sistema.
         </p>
-
-        <!-- Alerta Bootstrap estilizado -->
         <div class="alert alert-warning d-flex align-items-start gap-3 text-start mb-4" role="alert">
             <i class='bx bxs-info-circle fs-5 mt-1 flex-shrink-0'></i>
             <div>
@@ -46,8 +41,6 @@ $nome = htmlspecialchars($_SESSION['usuario_nome'] ?? 'Morador');
                 </span>
             </div>
         </div>
-
-        <!-- Steps -->
         <div class="steps">
             <div class="step done">
                 <div class="step-dot">
@@ -81,8 +74,4 @@ $nome = htmlspecialchars($_SESSION['usuario_nome'] ?? 'Morador');
     window.APP_BASE_URL = '<?= BASE_URL ?>';
 </script>
 
-<<<<<<< HEAD
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>
-=======
-<?php require_once __DIR__ . '/../layout/footer.php'; ?>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)

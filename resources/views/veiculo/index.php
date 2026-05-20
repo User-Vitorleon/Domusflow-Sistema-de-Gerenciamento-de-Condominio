@@ -4,11 +4,7 @@ $paginaAtiva  = 'veiculo';
 $cssExtra     = 'veiculo.css';
 $jsExtra      = 'veiculo.js';
 require_once __DIR__ . '/../layout/header.php';
-<<<<<<< HEAD
-$prev = $usuario['privilegio'] ?? 1;
-=======
 $privilegio = $usuario['privilegio'] ?? 1;
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
 
 $cores = [
     'Amarelo',
@@ -45,22 +41,12 @@ $cores = [
             <?php unset($_SESSION['erro_veiculo']); ?>
         <?php endif; ?>
 
-        <!-- Formulário: síndico/morador/admin cadastram por qualquer morador -->
-        <!-- Morador cadastra o próprio veículo (máx 2) -->
-<<<<<<< HEAD
-        <?php if (in_array($prev, [1, 2, 4])): ?>
-=======
         <?php if (in_array($privilegio, [1, 2, 4])): ?>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
             <div class="df-card" style="margin-bottom: 24px;">
                 <h3 class="section-title">Cadastrar Veículo</h3>
 
-                <!-- Contador de vagas (só para morador) -->
-<<<<<<< HEAD
-                <?php if ($prev == 1): ?>
-=======
+
                 <?php if ($privilegio == 1): ?>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
                     <div class="veiculo-counter">
                         <div class="veiculo-counter-bar">
                             <div class="veiculo-counter-dot <?= count($veiculos) >= 1 ? 'usado' : '' ?>"></div>
@@ -72,11 +58,7 @@ $cores = [
 
                 <form action="<?= BASE_URL ?>/veiculo/salvar" method="POST"
                     data-total="<?= count($veiculos) ?>"
-<<<<<<< HEAD
-                    data-prev="<?= $prev ?>">
-=======
                     data-prev="<?= $privilegio ?>">
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
 
                     <div class="df-grid-2">
                         <div class="df-field">
@@ -107,12 +89,7 @@ $cores = [
                         </div>
                     </div>
 
-                    <!-- Síndico/admin escolhem o morador dono -->
-<<<<<<< HEAD
-                    <?php if (in_array($prev, [2, 3, 4])): ?>
-=======
                     <?php if (in_array($privilegio, [2, 3, 4])): ?>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
                         <div class="df-field">
                             <label>Morador (dono do veículo)</label>
                             <select name="id_user" required>
@@ -127,11 +104,10 @@ $cores = [
                             </select>
                         </div>
                     <?php else: ?>
-                        <!-- Morador: id_user é o próprio -->
+
                         <input type="hidden" name="id_user" value="<?= $usuario['id_user'] ?>">
                     <?php endif; ?>
 
-                    <!-- Checkbox principal -->
                     <div class="df-field df-field-check">
                         <input type="checkbox" name="principal" id="principal" value="1">
                         <label for="principal">Definir como veículo principal</label>
@@ -145,14 +121,9 @@ $cores = [
             </div>
         <?php endif; ?>
 
-        <!-- Tabela de veículos -->
         <div class="df-card">
             <h3 class="section-title">
-<<<<<<< HEAD
-                <?= in_array($prev, [2, 3, 4]) ? 'Todos os Veículos' : 'Meus Veículos' ?>
-=======
                 <?= in_array($privilegio, [2, 3, 4]) ? 'Todos os Veículos' : 'Meus Veículos' ?>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
             </h3>
 
             <?php if (empty($veiculos)): ?>
@@ -170,15 +141,11 @@ $cores = [
                                 <th>Marca</th>
                                 <th>Modelo</th>
                                 <th>Cor</th>
-<<<<<<< HEAD
-                                <?php if (in_array($prev, [2, 3, 4])): ?>
-=======
                                 <?php if (in_array($privilegio, [2, 3, 4])): ?>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
                                     <th>Morador</th>
                                     <th>Cadastrado por</th>
                                 <?php endif; ?>
-                                <th></th> <!-- ações -->
+                                <th></th> 
                             </tr>
                         </thead>
                         <tbody>
@@ -190,25 +157,15 @@ $cores = [
                                     <td><?= htmlspecialchars($v['marca']) ?></td>
                                     <td><?= htmlspecialchars($v['modelo']) ?></td>
                                     <td><?= htmlspecialchars($v['cor']) ?></td>
-<<<<<<< HEAD
-                                    <?php if (in_array($prev, [2, 3, 4])): ?>
-=======
                                     <?php if (in_array($privilegio, [2, 3, 4])): ?>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
                                         <td><?= htmlspecialchars($v['nome_morador']) ?></td>
                                         <td><?= htmlspecialchars($v['cadastrado_por']) ?></td>
                                     <?php endif; ?>
                                     <td>
                                         <?php
-                                        // Síndico/admin podem excluir qualquer um
-                                        // Morador só pode excluir o próprio
-<<<<<<< HEAD
-                                        $podeExcluir = in_array($prev, [2, 4]) ||
-                                            ($prev == 1 && $v['id_user'] == $usuario['id_user']);
-=======
+
                                         $podeExcluir = in_array($privilegio, [2, 4]) ||
                                             ($privilegio == 1 && $v['id_user'] == $usuario['id_user']);
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
                                         ?>
                                         <?php if ($podeExcluir): ?>
                                             <form action="<?= BASE_URL ?>/veiculo/excluir" method="POST"
@@ -254,8 +211,4 @@ $cores = [
     </div>
 </main>
 
-<<<<<<< HEAD
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>
-=======
-<?php require_once __DIR__ . '/../layout/footer.php'; ?>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)

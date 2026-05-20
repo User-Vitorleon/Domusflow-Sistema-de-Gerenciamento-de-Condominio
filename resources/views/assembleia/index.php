@@ -2,11 +2,7 @@
 $paginaTitulo = 'Assembleias';
 $paginaAtiva  = 'assembleia';
 require_once __DIR__ . '/../layout/header.php';
-<<<<<<< HEAD
-$prev = $usuario['privilegio'] ?? 1;
-=======
 $privilegio = $usuario['privilegio'] ?? 1;
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
 ?>
 
 <main class="main-content">
@@ -37,11 +33,7 @@ $privilegio = $usuario['privilegio'] ?? 1;
         </div>
     <?php endif; ?>
 
-<<<<<<< HEAD
-    <?php if (in_array($prev, [2, 4])): ?>
-=======
     <?php if (in_array($privilegio, [2, 4])): ?>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
     <div class="df-card" style="margin-bottom: 24px;">
         <h3 class="section-title">Convocar Assembleia</h3>
         <form action="<?= BASE_URL ?>/assembleia/salvar" method="POST">
@@ -87,11 +79,7 @@ $privilegio = $usuario['privilegio'] ?? 1;
         <?php else: ?>
             <?php foreach ($avisos as $a):
                 $presenca = null;
-<<<<<<< HEAD
-                if ($prev == 1) {
-=======
                 if ($privilegio == 1) {
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
                     $presenca = $assembleiaRepo->verificarPresenca($a['id_assembleia'], (int)$_SESSION['usuario_id']);
                 }
             ?>
@@ -125,11 +113,7 @@ $privilegio = $usuario['privilegio'] ?? 1;
                     </div>
 
                     <div class="assembleia-card-actions">
-<<<<<<< HEAD
-                        <?php if ($prev == 1): ?>
-=======
                         <?php if ($privilegio == 1): ?>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
                             <?php if ($presenca === 'S'): ?>
                                 <span class="assembleia-presenca-confirmada">
                                     <i class='bx bx-check-circle'></i> Presença Confirmada
@@ -163,11 +147,7 @@ $privilegio = $usuario['privilegio'] ?? 1;
                             <?php endif; ?>
                         <?php endif; ?>
 
-<<<<<<< HEAD
-                        <?php if (in_array($prev, [2, 4])): ?>
-=======
                         <?php if (in_array($privilegio, [2, 4])): ?>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
                             <form action="<?= BASE_URL ?>/assembleia/excluir" method="POST"
                                   onsubmit="return confirm('Deseja remover esta assembleia?')">
                                 <input type="hidden" name="id_assembleia" value="<?= $a['id_assembleia'] ?>">
@@ -185,8 +165,4 @@ $privilegio = $usuario['privilegio'] ?? 1;
 </div>
 </main>
 
-<<<<<<< HEAD
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>
-=======
-<?php require_once __DIR__ . '/../layout/footer.php'; ?>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)

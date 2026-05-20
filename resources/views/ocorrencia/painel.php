@@ -32,7 +32,6 @@ function statusBadgeP(string $s): string
             <p>Gerencie e responda os chamados dos moradores.</p>
         </div>
 
-        <!-- Contadores -->
         <?php
         $statusMap = [
             'total'     => ['label' => 'Total',       'key' => null, 'mod' => 'total'],
@@ -58,7 +57,6 @@ function statusBadgeP(string $s): string
             <?php endforeach; ?>
         </div>
 
-        <!-- Filtros -->
         <div class="oc-filtros-card">
             <div class="oc-filtros-header" onclick="toggleFiltros()">
                 <div style="display:flex;align-items:center;gap:8px">
@@ -170,7 +168,6 @@ function statusBadgeP(string $s): string
             </form>
         </div>
 
-        <!-- Tabela -->
         <div class="df-card" style="padding:0;overflow:hidden">
 
             <?php if (empty($ocorrencias)): ?>
@@ -184,7 +181,6 @@ function statusBadgeP(string $s): string
                     <?= $total ?> ocorrência(s) encontrada(s)
                 </div>
 
-                <!-- Desktop -->
                 <div class="oc-table-wrap">
                     <table class="oc-table">
                         <thead>
@@ -225,7 +221,6 @@ function statusBadgeP(string $s): string
                     </table>
                 </div>
 
-                <!-- Mobile -->
                 <div class="oc-mobile-cards">
                     <?php foreach ($ocorrencias as $oc): ?>
                         <div class="oc-mobile-card">
@@ -253,7 +248,6 @@ function statusBadgeP(string $s): string
                     <?php endforeach; ?>
                 </div>
 
-                <!-- Paginação -->
                 <?php if ($totalPaginas > 1):
                     $range     = 2;
                     $queryBase = http_build_query(array_filter([
@@ -292,20 +286,10 @@ function statusBadgeP(string $s): string
                 <?php endif; ?>
 
             <?php endif; ?>
-        </div><!-- fecha df-card -->
+        </div>
 
-    </div><!-- fecha df-page -->
-
-<<<<<<< HEAD
-
-    <script src="<?= BASE_URL ?>/public/js/ocorrencia.js"></script>
-</main>
-
-
-<?php require_once __DIR__ . '/../layout/footer.php'; ?>
-=======
+    </div>
     <script src="<?= BASE_URL ?>/public/js/ocorrencia.js"></script>
 </main>
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)

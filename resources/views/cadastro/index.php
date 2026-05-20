@@ -86,11 +86,7 @@ unset($_SESSION['erro_cadastro']);
                     <input type="checkbox" name="termos" id="termos" required
                         style="width: 16px; height: 16px; margin-top: 2px; accent-color: var(--primary); flex-shrink: 0;">
                     <span>
-<<<<<<< HEAD
-                        Li e aceito os 
-=======
                         Li e aceito os
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
                         <a href="#" onclick="abrirTermos(); return false;" style="color: var(--primary); font-weight: 600;">
                             Termos de Uso e Política de Privacidade
                         </a>
@@ -155,19 +151,12 @@ unset($_SESSION['erro_cadastro']);
 
 </main>
 
-<!-- Modal Termos de Uso -->
 <div id="modalTermos" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
     <div style="background:#fff; border-radius:16px; padding:32px; max-width:560px; width:90%; max-height:80vh; overflow-y:auto; position:relative;">
         <button onclick="fecharTermos()" style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:22px; cursor:pointer; color:#6B7280;">✕</button>
-<<<<<<< HEAD
-        
-        <h3 style="margin-bottom:16px; font-size:18px; font-weight:700;">Termos de Uso — DomusFlow</h3>
-        
-=======
 
         <h3 style="margin-bottom:16px; font-size:18px; font-weight:700;">Termos de Uso — DomusFlow</h3>
 
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
         <div style="font-size:13px; color:#374151; line-height:1.7;">
             <p style="margin-bottom:12px;"><strong>1. Aceitação dos Termos</strong><br>
             Ao se cadastrar no DomusFlow, você concorda com os presentes termos de uso e política de privacidade.</p>
@@ -206,14 +195,10 @@ function aceitarTermos() {
     document.getElementById('termos').checked = true;
     fecharTermos();
 }
-// fecha ao clicar fora
+
 document.getElementById('modalTermos').addEventListener('click', function(e) {
     if (e.target === this) fecharTermos();
 });
 </script>
 
-<<<<<<< HEAD
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>
-=======
-<?php require_once __DIR__ . '/../layout/footer.php'; ?>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)

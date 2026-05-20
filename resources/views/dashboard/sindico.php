@@ -11,7 +11,6 @@ $jsExtra      = 'dashboard.js';
         <p class="text-muted">Bem-vindo, <?= htmlspecialchars(explode(' ', $usuario['nome'])[0]) ?>!</p>
     </div>
 
-    <!-- 1. KPIs -->
     <section class="dashboard-section">
         <div class="kpi-grid">
             <a href="<?= BASE_URL ?>/moradores/pendentes" class="kpi-card kpi-card-link">
@@ -53,7 +52,6 @@ $jsExtra      = 'dashboard.js';
         </div>
     </section>
 
-    <!-- 2. Gráfico Reservas + Ocorrências -->
     <section class="dashboard-section">
         <div class="row g-3">
             <div class="col-12 col-lg-7">
@@ -97,7 +95,6 @@ $jsExtra      = 'dashboard.js';
         </div>
     </section>
 
-    <!-- 3. Reservas da semana -->
     <section class="dashboard-section">
         <h3 class="section-title">Reservas dos Próximos 7 Dias</h3>
         <?php if (empty($reservasSemana)): ?>
@@ -145,7 +142,6 @@ $jsExtra      = 'dashboard.js';
         <?php endif; ?>
     </section>
 
-    <!-- 4. Feriados -->
     <section class="dashboard-section">
         <h3 class="section-title">Próximos Feriados</h3>
         <?php if (!empty($proximosFeriados)): ?>
@@ -191,8 +187,4 @@ $jsExtra      = 'dashboard.js';
                             ]) ?>;
 </script>
 
-<<<<<<< HEAD
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>
-=======
-<?php require_once __DIR__ . '/../layout/footer.php'; ?>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)

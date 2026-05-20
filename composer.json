@@ -1,8 +1,6 @@
 {
     "require": {
         "phpmailer/phpmailer": "^7.0"
-<<<<<<< HEAD
-=======
     },
     "require-dev": {
         "phpunit/phpunit": "^10.0"
@@ -18,6 +16,5 @@
         "psr-4": {
             "Tests\\": "tests/"
         }
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
     }
 }

@@ -16,7 +16,6 @@ $totalPendentes     = count(array_filter($presencas, fn($p) => $p['presenca'] ==
         <p class="text-muted">Confirme quem irá participar das reuniões</p>
     </div>
 
-    <!-- Filtros -->
     <div class="df-card" style="margin-bottom: 24px;">
         <h3 class="section-title">Filtros</h3>
         <div class="df-grid-3">
@@ -51,7 +50,7 @@ $totalPendentes     = count(array_filter($presencas, fn($p) => $p['presenca'] ==
         </div>
     </div>
 
-    <!-- Grid -->
+
     <div class="df-card">
         <h3 class="section-title">Registros de Presença</h3>
 
@@ -63,7 +62,7 @@ $totalPendentes     = count(array_filter($presencas, fn($p) => $p['presenca'] ==
             </div>
         <?php else: ?>
 
-            <!-- Resumo no topo -->
+
              <div class="presenca-resumo d-flex">
             <div class="presenca-resumo-item presenca-resumo-confirmada">
                 <strong>✓ <span id="totalConfirmadas"><?= $totalConfirmadas ?></span></strong> confirmadas
@@ -141,11 +140,7 @@ function filtrarPresencas() {
     const assembleia = document.getElementById('filtroAssembleia').value;
     const presenca   = document.getElementById('filtroPresenca').value;
 
-<<<<<<< HEAD
-    let confirmadas = 0, negadas = 0, total = 0, pendentes = 0; 
-=======
     let confirmadas = 0, negadas = 0, total = 0, pendentes = 0;
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
 
     document.querySelectorAll('#tabelaPresencas tr').forEach(row => {
         const rowNome       = row.dataset.nome       ?? '';
@@ -165,24 +160,16 @@ function filtrarPresencas() {
             total++;
             if (rowPresenca === 'S') confirmadas++;
             if (rowPresenca === 'N') negadas++;
-            if (rowPresenca === 'P') pendentes++; // ← adiciona
+            if (rowPresenca === 'P') pendentes++; 
         }
     });
 
-    // atualiza os contadores
+
     document.getElementById('totalConfirmadas').textContent = confirmadas;
     document.getElementById('totalNegadas').textContent     = negadas;
     document.getElementById('totalGeral').textContent       = total;
-<<<<<<< HEAD
-    document.getElementById('totalPendentes').textContent   = pendentes; 
-}
-</script>
-
-<?php require_once __DIR__ . '/../layout/footer.php'; ?>
-=======
     document.getElementById('totalPendentes').textContent   = pendentes;
 }
 </script>
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)

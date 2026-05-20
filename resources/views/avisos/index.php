@@ -2,11 +2,7 @@
 $paginaTitulo = 'Avisos';
 $paginaAtiva  = 'avisos';
 require_once __DIR__ . '/../layout/header.php';
-<<<<<<< HEAD
-$prev = $usuario['privilegio'] ?? 1;
-=======
 $privilegio = $usuario['privilegio'] ?? 1;
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
 ?>
 
 <main class="main-content">
@@ -27,11 +23,7 @@ $privilegio = $usuario['privilegio'] ?? 1;
         <div class="df-alert df-alert-error"><?= htmlspecialchars($_SESSION['erro_aviso']) ?><?php unset($_SESSION['erro_aviso']); ?></div>
     <?php endif; ?>
 
-<<<<<<< HEAD
-    <?php if (in_array($prev, [2, 4])): ?>
-=======
     <?php if (in_array($privilegio, [2, 4])): ?>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
     <div class="df-card" style="margin-bottom: 24px;">
         <h3 class="section-title">Publicar Aviso</h3>
         <form action="<?= BASE_URL ?>/avisos/salvar" method="POST">
@@ -73,11 +65,7 @@ $privilegio = $usuario['privilegio'] ?? 1;
                             em <?= date('d/m/Y \à\s H:i', strtotime($aviso['created_at'])) ?>
                         </small>
                     </div>
-<<<<<<< HEAD
-                    <?php if (in_array($prev, [2, 4])): ?>
-=======
                     <?php if (in_array($privilegio, [2, 4])): ?>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
                         <form action="<?= BASE_URL ?>/avisos/excluir" method="POST"
                               onsubmit="return confirm('Deseja remover este aviso?')">
                             <input type="hidden" name="id_aviso" value="<?= $aviso['id_aviso'] ?>">
@@ -94,8 +82,4 @@ $privilegio = $usuario['privilegio'] ?? 1;
 </div>
 </main>
 
-<<<<<<< HEAD
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>
-=======
-<?php require_once __DIR__ . '/../layout/footer.php'; ?>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)

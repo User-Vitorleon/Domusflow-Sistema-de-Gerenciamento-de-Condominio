@@ -12,7 +12,6 @@ $jsExtra = 'dashboard.js';
         <p class="text-muted">Bem-vindo, <?= htmlspecialchars(explode(' ', $usuario['nome'])[0]) ?>!</p>
     </div>
 
-    <!-- FERIADOS — 3 colunas alinhado à esquerda -->
     <section class="dashboard-section">
         <h3 class="section-title">Próximos Feriados</h3>
         <?php if (!empty($proximosFeriados)): ?>
@@ -43,7 +42,6 @@ $jsExtra = 'dashboard.js';
         <?php endif; ?>
     </section>
 
-    <!-- RESERVAS -->
     <section class="dashboard-section">
         <h3 class="section-title">Minhas Reservas</h3>
         <?php if (empty($minhasReservas)): ?>
@@ -99,7 +97,6 @@ $jsExtra = 'dashboard.js';
         <?php endif; ?>
     </section>
 
-    <!-- OCORRÊNCIAS -->
     <section class="dashboard-section">
         <h3 class="section-title">Minhas Ocorrências</h3>
         <?php
@@ -173,8 +170,4 @@ $jsExtra = 'dashboard.js';
                             ]) ?>;
 </script>
 
-<<<<<<< HEAD
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>
-=======
-<?php require_once __DIR__ . '/../layout/footer.php'; ?>
->>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
