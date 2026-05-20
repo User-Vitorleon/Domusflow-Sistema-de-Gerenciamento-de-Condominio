@@ -3,15 +3,25 @@ $paginaTitulo = 'Reservas';
 $paginaAtiva  = 'reserva';
 $jsExtra      = 'reserva.js';
 require_once __DIR__ . '/../layout/header.php';
+<<<<<<< HEAD
 $prev = $usuario['privilegio'] ?? 1;
 ?>
 
 
+=======
+$privilegio = $usuario['privilegio'] ?? 1;
+?>
+
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
 <main class="main-content">
 <div class="df-container">
 
     <div class="page-header">
+<<<<<<< HEAD
         <h2><?= $prev == 2 ? 'Cadastrar Local' : 'Nova Reserva' ?></h2>
+=======
+        <h2><?= $privilegio == 2 ? 'Cadastrar Local' : 'Nova Reserva' ?></h2>
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
     </div>
 
     <?php if (isset($_GET['sucesso'])): ?>
@@ -24,7 +34,11 @@ $prev = $usuario['privilegio'] ?? 1;
     <?php endif; ?>
 
     <div class="df-card">
+<<<<<<< HEAD
         <?php if ($prev == 1): ?>
+=======
+        <?php if ($privilegio == 1): ?>
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
             <form action="<?= BASE_URL ?>/reserva/salvar" method="POST" id="formReserva">
                 <div class="df-grid-2">
                     <div class="df-field">
@@ -179,4 +193,8 @@ $prev = $usuario['privilegio'] ?? 1;
                         </div>
 </main>
 
+<<<<<<< HEAD
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>
+=======
+<?php require_once __DIR__ . '/../layout/footer.php'; ?>
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)

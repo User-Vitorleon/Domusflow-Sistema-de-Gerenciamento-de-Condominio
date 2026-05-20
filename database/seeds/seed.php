@@ -1,5 +1,6 @@
 <?php
 
+<<<<<<< HEAD
 /**
  * DomusFlow — Seed de dados
  *
@@ -9,6 +10,8 @@
  *  APAGUE este arquivo após executar!
  */
 
+=======
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
 require_once __DIR__ . '/../../config/database.php';
 
 set_time_limit(120);
@@ -25,7 +28,10 @@ try {
     echo "Hash bcrypt gerado com sucesso.\n";
     echo "Senha padrão: <strong>{$senha_padrao}</strong>\n\n";
 
+<<<<<<< HEAD
     // ── 1. USUÁRIOS DO SISTEMA (admin, síndico, porteiros) ──────────────────
+=======
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
     $sistema = [
         [1, 1, 'Admin Root',       '00', '0', '00000000000', 'admin@domusflow.com',    '(11) 00000-0000', null,              'M', $hash, 'L', 4],
         [2, 1, 'Vitor Leon',       '10', '1', '43209957835', 'sindico@domusflow.com',  '(11) 98522-9900', '(11) 95907-3260', 'M', $hash, 'L', 2],
@@ -43,7 +49,10 @@ try {
     }
     echo "✔ Usuários do sistema inseridos: " . count($sistema) . "\n";
 
+<<<<<<< HEAD
     // ── 2. MORADORES (1000 registros únicos) ────────────────────────────────
+=======
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
     $nomes_m = [
         'Carlos',
         'João',
@@ -174,7 +183,11 @@ try {
     ];
 
     $blocos = ['A', 'B', 'C', 'D', 'E'];
+<<<<<<< HEAD
     $status_opts = ['L', 'L', 'L', 'L', 'L', 'L', 'L', 'P', 'P', 'B']; // 70% livre, 20% pendente, 10% bloqueado
+=======
+    $status_opts = ['L', 'L', 'L', 'L', 'L', 'L', 'L', 'P', 'P', 'B'];
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
 
     $stmt_m = $pdo->prepare("
         INSERT INTO morador
@@ -240,10 +253,15 @@ try {
 
     echo "✔ Moradores inseridos: {$inseridos}\n";
 
+<<<<<<< HEAD
     // busca os ids dos moradores (excluindo sistema)
     $ids_moradores = $pdo->query("SELECT id_user FROM morador WHERE privilegio = 1 ORDER BY id_user")->fetchAll(PDO::FETCH_COLUMN);
 
     // ── 3. LOCAIS FESTIVOS (6 locais) ───────────────────────────────────────
+=======
+    $ids_moradores = $pdo->query("SELECT id_user FROM morador WHERE privilegio = 1 ORDER BY id_user")->fetchAll(PDO::FETCH_COLUMN);
+
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
     $locais = [
         [1, 'Churrasqueira',           100, 'S'],
         [1, 'Salão de Festas Pequeno',  50, 'S'],
@@ -260,7 +278,10 @@ try {
     $id_locais = $pdo->query("SELECT id_local FROM locais_festivos ORDER BY id_local")->fetchAll(PDO::FETCH_COLUMN);
     echo "✔ Locais festivos inseridos: " . count($locais) . "\n";
 
+<<<<<<< HEAD
     // ── 4. VEÍCULOS (1000 registros) ────────────────────────────────────────
+=======
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
     $marcas = [
         'Fiat'       => ['Uno', 'Argo', 'Pulse', 'Strada', 'Toro', 'Cronos'],
         'Volkswagen' => ['Gol', 'Polo', 'Virtus', 'Nivus', 'T-Cross', 'Tiguan'],
@@ -290,7 +311,10 @@ try {
 
     $veiculos_inseridos = 0;
     $total_ids = count($ids_moradores);
+<<<<<<< HEAD
     // distribuir ~1 veículo por morador, alguns terão 2
+=======
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
     $i = 0;
     while ($veiculos_inseridos < 1000) {
         $id_user = $ids_moradores[$i % $total_ids];
@@ -300,7 +324,10 @@ try {
         $cor     = $cores[$veiculos_inseridos % count($cores)];
         $principal = ($veiculos_inseridos % 7 !== 0) ? 1 : 0;
 
+<<<<<<< HEAD
         // gerar placa no padrão Mercosul (ABC1D23) ou antigo (ABC1234) alternado
+=======
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
         $tentativas_placa = 0;
         do {
             if ($veiculos_inseridos % 2 === 0) {
@@ -327,7 +354,10 @@ try {
     }
     echo "✔ Veículos inseridos: {$veiculos_inseridos}\n";
 
+<<<<<<< HEAD
     // ── 5. RESERVAS (1000 registros) ────────────────────────────────────────
+=======
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
     $horas = [
         ['08:00:00', '12:00:00'],
         ['12:00:00', '17:00:00'],
@@ -336,7 +366,11 @@ try {
         ['19:00:00', '23:00:00'],
         ['20:00:00', '23:59:00'],
     ];
+<<<<<<< HEAD
     $status_res = ['A', 'A', 'A', 'P', 'P', 'N']; // 50% aprovada, 33% pendente, 17% negada
+=======
+    $status_res = ['A', 'A', 'A', 'P', 'P', 'N'];
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
 
     $stmt_r = $pdo->prepare("
         INSERT INTO reservas
@@ -380,7 +414,10 @@ try {
     }
     echo "✔ Reservas inseridas: 1000\n";
 
+<<<<<<< HEAD
     // ── 6. TAXAS PADRÃO ─────────────────────────────────────────────────────
+=======
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
     $taxas = [
         ['Taxa de Condomínio',        350.00, 'A', 'Vitor Leon', '2026-01-01', 'TAXA'],
         ['Taxa de Limpeza',            25.00, 'A', 'Vitor Leon', '2026-01-01', 'TAXA'],
@@ -403,7 +440,10 @@ try {
     $pdo->exec("SET FOREIGN_KEY_CHECKS = 1");
 
 
+<<<<<<< HEAD
     // ── 7. OCORRÊNCIAS (50 registros) ─────────────────────────────────────────
+=======
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
     $categorias_oc = [
         'MANUTENÇÃO',
         'BARULHO / PERTURBAÇÃO',
@@ -422,7 +462,11 @@ try {
         'OUTROS'                => ['CAIXA DE CORREIO DANIFICADA', 'BICICLETA ABANDONADA NO CORREDOR', 'RECLAMAÇÃO SOBRE ESTACIONAMENTO', 'PROBLEMA COM ENTREGA DE ENCOMENDA', 'OUTRO ASSUNTO DIVERSO'],
     ];
 
+<<<<<<< HEAD
     $status_oc  = ['A', 'A', 'E', 'R', 'C']; // 40% aberto, 20% andamento, 20% resolvido, 20% cancelado
+=======
+    $status_oc  = ['A', 'A', 'E', 'R', 'C'];
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
     $base_oc    = new DateTime('2026-01-15');
 
     $stmt_oc = $pdo->prepare("
@@ -444,7 +488,10 @@ try {
     }
     echo "✔ Ocorrências inseridas: " . count($oc_ids) . "\n";
 
+<<<<<<< HEAD
     // ── 8. TRAMITAÇÕES (para ocorrências E, R e C) ────────────────────────────
+=======
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
     $stmt_tr = $pdo->prepare("
     INSERT INTO ocorrencia_tramites (id_ocorrencia, id_user_cad, nome_user_cad, status_novo, descricao, created_at)
     VALUES (?,?,?,?,?,?)
@@ -460,7 +507,10 @@ try {
         $data_base  = new DateTime($oc['created_at']);
 
         if ($status_oc === 'E') {
+<<<<<<< HEAD
             // 1 tramitação: Aberto → Em Andamento
+=======
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
             $stmt_tr->execute([
                 $id_oc,
                 2,
@@ -473,7 +523,10 @@ try {
         }
 
         if ($status_oc === 'R') {
+<<<<<<< HEAD
             // 2 tramitações: Aberto → Em Andamento → Resolvido
+=======
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
             $stmt_tr->execute([
                 $id_oc,
                 2,
@@ -494,7 +547,10 @@ try {
         }
 
         if ($status_oc === 'C') {
+<<<<<<< HEAD
             // 1 tramitação: cancelamento pelo próprio morador
+=======
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
             $stmt_tr->execute([
                 $id_oc,
                 $ids_moradores[0],
@@ -508,7 +564,10 @@ try {
     }
     echo "✔ Tramitações inseridas: {$tramites_inseridos}\n";
 
+<<<<<<< HEAD
     // ── 9. NOTIFICAÇÕES (para ocorrências com tramitação) ─────────────────────
+=======
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
     $stmt_noti = $pdo->prepare("
     INSERT INTO ocorrencia_notificacoes (id_ocorrencia, id_user, lida, created_at)
     VALUES (?,?,0,?)
@@ -529,8 +588,11 @@ try {
     }
     echo "✔ Notificações inseridas: {$notis_inseridas}\n";
 
+<<<<<<< HEAD
     // ── Confirmação (SEED APLICADO) ─────────────────────────────────────────
 
+=======
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
     echo "\n<strong style='color:green'>✔ Seed concluído com sucesso!</strong>\n";
     echo "Senha padrão de todos os usuários: <strong>{$senha_padrao}</strong>\n";
     echo "<p style='color:red; font-weight:bold; margin-top:16px'>⚠️  APAGUE este arquivo agora!</p>";

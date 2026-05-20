@@ -81,4 +81,8 @@ $nome = htmlspecialchars($_SESSION['usuario_nome'] ?? 'Morador');
     window.APP_BASE_URL = '<?= BASE_URL ?>';
 </script>
 
+<<<<<<< HEAD
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>
+=======
+<?php require_once __DIR__ . '/../layout/footer.php'; ?>
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)

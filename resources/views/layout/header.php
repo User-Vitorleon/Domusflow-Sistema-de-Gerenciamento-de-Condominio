@@ -3,6 +3,7 @@ $paginaTitulo = $paginaTitulo ?? 'DomusFlow';
 $cssExtra     = $cssExtra     ?? null;
 $cssTela      = $cssTela      ?? null;
 
+<<<<<<< HEAD
 $semTopo = in_array($paginaTitulo, ['Login', 'Cadastro']);
 
 $primeiro_nome = null;
@@ -23,6 +24,37 @@ if (!$semTopo && isset($_SESSION['usuario_id'])) {
     $desde      = $_SESSION['avisos_visto_em'] ?? '2000-01-01 00:00:00';
     $sino_count = $sinoRepo->contarNovos($desde);
 }
+=======
+$telasSemTopo = ['Login', 'Cadastro'];
+$semTopo      = in_array($paginaTitulo, $telasSemTopo, true);
+
+$primeiroNome = null;
+$apartamento  = null;
+$bloco        = null;
+
+if (isset($usuario) && is_array($usuario)) {
+    $primeiroNome = explode(' ', $usuario['nome'] ?? '')[0] ?? null;
+    $apartamento  = $usuario['apto']  ?? null;
+    $bloco        = $usuario['bloco'] ?? null;
+}
+
+// Sino: conta avisos novos desde a última visita
+$sinoCount = 0;
+if (!$semTopo && isset($_SESSION['usuario_id'])) {
+    require_once __DIR__ . '/../../../app/repositories/AvisosRepository.php';
+    $sinoRepo  = new AvisosRepository();
+    $desde     = $_SESSION['avisos_visto_em'] ?? '2000-01-01 00:00:00';
+    $sinoCount = $sinoRepo->contarNovos($desde);
+}
+
+// Rótulos dos perfis (privilégios)
+$rotulosPerfil = [
+    1 => 'Morador(a)',
+    2 => 'Síndico(a)',
+    3 => 'Funcionário(a)',
+    4 => 'Admin',
+];
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -47,7 +79,11 @@ if (!$semTopo && isset($_SESSION['usuario_id'])) {
 
 <body>
 
+<<<<<<< HEAD
     <?php if (!$semTopo && $primeiro_nome): ?>
+=======
+    <?php if (!$semTopo && $primeiroNome): ?>
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
         <header class="df-topbar">
             <div class="df-topbar-inner">
 
@@ -67,15 +103,24 @@ if (!$semTopo && isset($_SESSION['usuario_id'])) {
 
                 <div class="df-topbar-user">
 
+<<<<<<< HEAD
                     <!-- ── Sino de Ocorrências ── -->
+=======
+                    <!-- Sino de avisos -->
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
                     <a href="<?= BASE_URL ?>/avisos" class="oc-sino" title="Avisos" aria-label="Avisos">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
                             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
                             <path d="M13.73 21a2 2 0 0 1-3.46 0" />
                         </svg>
+<<<<<<< HEAD
                         <?php if ($sino_count > 0): ?>
                             <span class="oc-sino-badge"><?= $sino_count > 9 ? '9+' : $sino_count ?></span>
+=======
+                        <?php if ($sinoCount > 0): ?>
+                            <span class="oc-sino-badge"><?= $sinoCount > 9 ? '9+' : $sinoCount ?></span>
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
                         <?php endif; ?>
                     </a>
 
@@ -84,6 +129,7 @@ if (!$semTopo && isset($_SESSION['usuario_id'])) {
                         <!-- Linha 1: badge + nome -->
                         <div class="df-topbar-name-row">
                             <?php
+<<<<<<< HEAD
                             $perfis = [1 => 'Morador(a)', 2 => 'Síndico(a)', 3 => 'Funcionário(a)', 4 => 'Admin'];
                             $prev   = $usuario['privilegio'] ?? 1;
                             $label  = $perfis[$prev] ?? 'Morador';
@@ -97,6 +143,20 @@ if (!$semTopo && isset($_SESSION['usuario_id'])) {
                             <span class="df-topbar-apto">
                                 <?php if ($bloco): ?>Bl. <?= htmlspecialchars($bloco) ?><?php endif; ?>
                                 <?php if ($apto): ?>&nbsp;Ap. <?= htmlspecialchars($apto) ?><?php endif; ?>
+=======
+                                $privilegio = (int) ($usuario['privilegio'] ?? 1);
+                                $rotulo     = $rotulosPerfil[$privilegio] ?? 'Morador';
+                            ?>
+                            <span class="df-topbar-role df-topbar-role--<?= $privilegio ?>"><?= $rotulo ?></span>
+                            <span class="df-topbar-name"><?= htmlspecialchars($primeiroNome) ?></span>
+                        </div>
+
+                        <!-- Linha 2: bloco + apto -->
+                        <?php if ($apartamento || $bloco): ?>
+                            <span class="df-topbar-apto">
+                                <?php if ($bloco): ?>Bl. <?= htmlspecialchars($bloco) ?><?php endif; ?>
+                                <?php if ($apartamento): ?>&nbsp;Ap. <?= htmlspecialchars($apartamento) ?><?php endif; ?>
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
                             </span>
                         <?php endif; ?>
 
@@ -115,4 +175,8 @@ if (!$semTopo && isset($_SESSION['usuario_id'])) {
 
             </div>
         </header>
+<<<<<<< HEAD
     <?php endif; ?>
+=======
+    <?php endif; ?>
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)

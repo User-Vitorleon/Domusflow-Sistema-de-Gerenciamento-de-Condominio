@@ -141,7 +141,11 @@ function filtrarPresencas() {
     const assembleia = document.getElementById('filtroAssembleia').value;
     const presenca   = document.getElementById('filtroPresenca').value;
 
+<<<<<<< HEAD
     let confirmadas = 0, negadas = 0, total = 0, pendentes = 0; 
+=======
+    let confirmadas = 0, negadas = 0, total = 0, pendentes = 0;
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
 
     document.querySelectorAll('#tabelaPresencas tr').forEach(row => {
         const rowNome       = row.dataset.nome       ?? '';
@@ -169,8 +173,16 @@ function filtrarPresencas() {
     document.getElementById('totalConfirmadas').textContent = confirmadas;
     document.getElementById('totalNegadas').textContent     = negadas;
     document.getElementById('totalGeral').textContent       = total;
+<<<<<<< HEAD
     document.getElementById('totalPendentes').textContent   = pendentes; 
 }
 </script>
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>
+=======
+    document.getElementById('totalPendentes').textContent   = pendentes;
+}
+</script>
+
+<?php require_once __DIR__ . '/../layout/footer.php'; ?>
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)

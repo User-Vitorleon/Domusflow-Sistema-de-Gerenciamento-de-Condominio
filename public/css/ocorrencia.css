@@ -1062,7 +1062,10 @@
     justify-content: center !important;
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
 /* ── Responsividade ──────────────────────────────────────────────────────────── */
 @media (max-width: 640px) {
     .oc-table-wrap {
@@ -1121,4 +1124,8 @@
     .oc-filtros-grid {
         grid-template-columns: 1fr;
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)

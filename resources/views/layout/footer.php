@@ -8,4 +8,8 @@
 <?php endif; ?>
 </body>
 
+<<<<<<< HEAD
 </html>
+=======
+</html>
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)

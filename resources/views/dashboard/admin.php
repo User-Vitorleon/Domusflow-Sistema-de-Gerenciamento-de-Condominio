@@ -5,7 +5,10 @@ $jsExtra      = 'dashboard.js';
 ?>
 <?php require_once __DIR__ . '/../layout/header.php'; ?>
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
 <main class="main-content" id="app">
     <div class="page-header">
         <h2>Dashboard</h2>
@@ -258,4 +261,8 @@ $jsExtra      = 'dashboard.js';
                             ]) ?>;
 </script>
 
+<<<<<<< HEAD
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>
+=======
+<?php require_once __DIR__ . '/../layout/footer.php'; ?>
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)

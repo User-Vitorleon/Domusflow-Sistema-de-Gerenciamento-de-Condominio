@@ -17,12 +17,15 @@ html {
     scroll-behavior: smooth;
 }
 
+<<<<<<< HEAD
 .presenca-badge-pendente {
     color: #CA8A04;
     background: #FFFBEB;
     border: 1px solid #FDE68A;
 }
 
+=======
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
 img {
     display: block;
     max-width: 100%;
@@ -57,6 +60,23 @@ a:hover {
     --error: #EF4444;
     --info: #3B82F6;
 
+<<<<<<< HEAD
+=======
+    /* Tons de fundo/borda para alerts e badges */
+    --success-bg:     #F0FDF4;
+    --success-border: #BBF7D0;
+    --success-text:   #16A34A;
+
+    --warning-bg:     #FFFBEB;
+    --warning-border: #FDE68A;
+    --warning-text:   #CA8A04;
+    --warning-text-strong: #D97706;
+
+    --error-bg:     #FEF2F2;
+    --error-border: #FECACA;
+    --error-text:   #DC2626;
+
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
     --radius: 10px;
     --radius-lg: 16px;
     --shadow: 0 1px 3px rgba(0, 0, 0, .08), 0 4px 16px rgba(0, 0, 0, .06);
@@ -248,9 +268,15 @@ body {
 
 .btn-success-sm {
     padding: 5px 12px;
+<<<<<<< HEAD
     background: #F0FDF4;
     color: #16A34A;
     border: 1px solid #BBF7D0;
+=======
+    background: var(--success-bg);
+    color: var(--success-text);
+    border: 1px solid var(--success-border);
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
     border-radius: 7px;
     font-size: 13px;
     font-weight: 600;
@@ -264,9 +290,15 @@ body {
 
 .btn-danger-sm {
     padding: 5px 12px;
+<<<<<<< HEAD
     background: #FEF2F2;
     color: #DC2626;
     border: 1px solid #FECACA;
+=======
+    background: var(--error-bg);
+    color: var(--error-text);
+    border: 1px solid var(--error-border);
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
     border-radius: 7px;
     font-size: 13px;
     font-weight: 600;
@@ -291,6 +323,7 @@ body {
 }
 
 .df-alert-error {
+<<<<<<< HEAD
     background: #FEF2F2;
     color: #DC2626;
     border: 1px solid #FECACA;
@@ -306,6 +339,30 @@ body {
     background: #FFFBEB;
     color: #D97706;
     border: 1px solid #FDE68A;
+=======
+    background: var(--error-bg);
+    color: var(--error-text);
+    border: 1px solid var(--error-border);
+}
+
+.df-alert-success {
+    background: var(--success-bg);
+    color: var(--success-text);
+    border: 1px solid var(--success-border);
+}
+
+.df-alert-warning {
+    background: var(--warning-bg);
+    color: var(--warning-text-strong);
+    border: 1px solid var(--warning-border);
+}
+
+/* ── Badges (status visual) ── */
+.presenca-badge-pendente {
+    color: var(--warning-text);
+    background: var(--warning-bg);
+    border: 1px solid var(--warning-border);
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
 }
 
 .df-alert.d-none {
@@ -638,4 +695,7 @@ body {
 .presenca-table tr:hover td {
     background: #F8FAFC;
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)

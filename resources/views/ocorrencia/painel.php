@@ -296,9 +296,16 @@ function statusBadgeP(string $s): string
 
     </div><!-- fecha df-page -->
 
+<<<<<<< HEAD
 
     <script src="<?= BASE_URL ?>/public/js/ocorrencia.js"></script>
 </main>
 
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>
+=======
+    <script src="<?= BASE_URL ?>/public/js/ocorrencia.js"></script>
+</main>
+
+<?php require_once __DIR__ . '/../layout/footer.php'; ?>
+>>>>>>> e213854 (feat: testes unitarios 30% e realizado o clean code no projeto)
