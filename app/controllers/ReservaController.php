@@ -37,6 +37,8 @@ class ReservaController
         require_once __DIR__ . '/../../resources/views/reserva/index.php';
     }
 
+    
+
     public function salvar(): void
     {
         AuthGuard::requereLogin();
@@ -54,9 +56,8 @@ class ReservaController
         $this->redirecionar('/reserva');
     }
 
-    public function decidir(): void
-    {
-        $idReserva = (int) ($_POST['id_reserva'] ?? 0);
+    public function decidir(): void{
+        $idReserva = (int)($_POST['id_reserva'] ?? 0);
         $acao      = $_POST['acao'] ?? null;
 
         if (!$idReserva || !$acao) {
@@ -68,41 +69,52 @@ class ReservaController
         if ($acao === 'aceitar') {
             $reservaRepo->aprovar(
                 $idReserva,
-                (int) $_SESSION['usuario_id'],
+                (int)$_SESSION['usuario_id'],
                 $_SESSION['usuario_nome']
             );
         } else {
             $reservaRepo->atualizarStatus($idReserva, 'N');
         }
 
+        $totalConflitos = 0;
         $reserva = $reservaRepo->findById($idReserva);
         if ($reserva) {
-            $this->notificarDecisao($reserva, $acao, $reservaRepo, $idReserva);
+            $totalConflitos = $this->notificarDecisao($reserva, $acao, $reservaRepo, $idReserva);
         }
 
+        if ($acao === 'aceitar') {
+            $msg = 'Reserva aprovada com sucesso!';
+            if ($totalConflitos > 0) {
+                $msg .= " {$totalConflitos} reserva(s) conflitante(s) foram canceladas automaticamente.";
+            }
+            $_SESSION['sucesso_reserva'] = $msg;
+        } else {
+            $_SESSION['sucesso_reserva'] = 'Reserva negada com sucesso!';
+        }
+        
         $this->redirecionar('/reserva');
-    }
+    }    
 
-    private function montarPaginacaoPendentes(): array
-    {
-        $pagina       = max(1, (int) ($_GET['pagina'] ?? 1));
+
+    private function montarPaginacaoPendentes(): array{
+        $pagina       = max(1, (int)($_GET['pagina'] ?? 1));
         $porPagina    = self::ITENS_POR_PAGINA;
         $total        = $this->reservaService->contarPendentesGeral();
-        $totalPaginas = (int) ceil($total / $porPagina);
+        $totalPaginas = (int)ceil($total / $porPagina);
         $offset       = ($pagina - 1) * $porPagina;
 
         return [
+            'pagina'              => $pagina,        // ← adiciona
             'totalPaginas'        => $totalPaginas,
             'reservasParaAprovar' => $this->reservaService->listarPendentesGeral($offset, $porPagina),
         ];
     }
-
     private function notificarDecisao(
         array $reserva,
         string $acao,
         ReservaRepository $reservaRepo,
         int $idReserva
-    ): void {
+    ): int {
         $moradorRepo  = new MoradorRepository();
         $localRepo    = new LocalRepository();
         $morador      = $moradorRepo->findById($reserva['id_user']);
@@ -133,7 +145,8 @@ class ReservaController
                     $reserva['data_reserva']
                 );
             }
-            return;
+
+            return count($conflitantes);
         }
 
         $emailService->reservaNegada(
@@ -142,6 +155,8 @@ class ReservaController
             $local['local'],
             $reserva['data_reserva']
         );
+
+        return 0;
     }
 
     private function ehSindicoOuAdmin(?array $usuario): bool

@@ -1,6 +1,7 @@
 <?php
 $paginaTitulo = 'Assembleias';
 $paginaAtiva  = 'assembleia';
+$cssTela = 'assembleia.css';
 require_once __DIR__ . '/../layout/header.php';
 $privilegio = $usuario['privilegio'] ?? 1;
 ?>

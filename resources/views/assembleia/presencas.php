@@ -1,11 +1,8 @@
 <?php
 $paginaTitulo = 'Presenças nas Assembleias';
 $paginaAtiva  = 'assembleia';
+$cssTela = 'assembleia.css';
 require_once __DIR__ . '/../layout/header.php';
-
-$totalConfirmadas   = count(array_filter($presencas, fn($p) => $p['presenca'] === 'S'));
-$totalNegadas       = count(array_filter($presencas, fn($p) => $p['presenca'] === 'N'));
-$totalPendentes     = count(array_filter($presencas, fn($p) => $p['presenca'] === 'P'));
 ?>
 
 <main class="main-content">
@@ -54,75 +51,49 @@ $totalPendentes     = count(array_filter($presencas, fn($p) => $p['presenca'] ==
     <div class="df-card">
         <h3 class="section-title">Registros de Presença</h3>
 
-        <?php if (empty($presencas)): ?>
+        <?php if (empty($presencasAgrupadas)): ?>
             <div class="empty-state">
                 <i class='bx bx-group'></i>
                 <h5>Nenhuma presença registrada</h5>
                 <p>Os moradores ainda não confirmaram presença em nenhuma assembleia.</p>
             </div>
         <?php else: ?>
-
-
-             <div class="presenca-resumo d-flex">
-            <div class="presenca-resumo-item presenca-resumo-confirmada">
-                <strong>✓ <span id="totalConfirmadas"><?= $totalConfirmadas ?></span></strong> confirmadas
-            </div>
-            <div class="presenca-resumo-item presenca-resumo-negada">
-                <strong>✗ <span id="totalNegadas"><?= $totalNegadas ?></span></strong> negadas
-            </div>
-            <div class="presenca-resumo-item presenca-resumo-total">
-                <strong><span id="totalGeral"><?= count($presencas) ?></span></strong> total
-            </div>
-            <div class="presenca-resumo-item presenca-resumo-total">
-                <strong><span id="totalPendentes"><?= $totalPendentes ?></span></strong> pendentes
-            </div>
-        </div>
-
             <div style="overflow-x: auto;">
                 <table class="presenca-table">
                     <thead>
                         <tr>
-                            <th>Morador</th>
-                            <th>Apto</th>
-                            <th>Bloco</th>
                             <th>Assembleia</th>
                             <th>Data</th>
-                            <th>Presença</th>
-                            <th>Confirmado em</th>
+                            <th>Local</th>
+                            <th style="text-align:center;">✓ Confirmados</th>
+                            <th style="text-align:center;">⏳ Pendentes</th>
+                            <th style="text-align:center;">✗ Recusados</th>
+                            <th style="text-align:center;">Total</th>
+                            <th style="text-align:center;">Detalhes</th>
                         </tr>
                     </thead>
                     <tbody id="tabelaPresencas">
-                        <?php foreach ($presencas as $p):
-                            $confirmada = $p['presenca'] === 'S';
-                        ?>
-                            <tr data-nome="<?= strtolower($p['nome']) ?>"
-                                data-apto="<?= strtolower($p['apto']) ?>"
-                                data-bloco="<?= strtolower($p['bloco']) ?>"
-                                data-assembleia="<?= htmlspecialchars($p['titulo']) ?>"
-                                data-presenca="<?= $p['presenca'] ?>">
-                                <td><strong><?= htmlspecialchars($p['nome']) ?></strong></td>
-                                <td><?= htmlspecialchars($p['apto']) ?></td>
-                                <td><?= htmlspecialchars($p['bloco']) ?></td>
-                                <td><?= htmlspecialchars($p['titulo']) ?></td>
-                                <td><?= date('d/m/Y', strtotime($p['data_assembleia'])) ?></td>
-                                <td>
-                                    <?php
-                                        $badgeClass = match($p['presenca']) {
-                                            'S' => 'presenca-badge-confirmada',
-                                            'N' => 'presenca-badge-negada',
-                                            default => 'presenca-badge-pendente'
-                                        };
-                                        $badgeTexto = match($p['presenca']) {
-                                            'S' => '✓ Confirmada',
-                                            'N' => '✗ Negada',
-                                            default => '⏳ Pendente'
-                                        };
-                                        ?>
-                                        <span class="presenca-badge <?= $badgeClass ?>">
-                                            <?= $badgeTexto ?>
-                                        </span>
+                        <?php foreach ($presencasAgrupadas as $a): ?>
+                            <tr data-assembleia="<?= htmlspecialchars($a['titulo']) ?>">
+                                <td><strong><?= htmlspecialchars($a['titulo']) ?></strong></td>
+                                <td><?= date('d/m/Y', strtotime($a['data'])) ?></td>
+                                <td><?= htmlspecialchars($a['local']) ?></td>
+                                <td style="text-align:center;">
+                                    <span class="presenca-badge presenca-badge-confirmada"><?= $a['confirmados'] ?></span>
                                 </td>
-                                <td><?= date('d/m/Y H:i', strtotime($p['created_at'])) ?></td>
+                                <td style="text-align:center;">
+                                    <span class="presenca-badge presenca-badge-pendente"><?= $a['pendentes'] ?></span>
+                                </td>
+                                <td style="text-align:center;">
+                                    <span class="presenca-badge presenca-badge-negada"><?= $a['negados'] ?></span>
+                                </td>
+                                <td style="text-align:center;"><strong><?= $a['total'] ?></strong></td>
+                                <td style="text-align:center;">
+                                    <a href="<?= BASE_URL ?>/assembleia/presencas/detalhe?id=<?= $a['id_assembleia'] ?>"
+                                    class="btn-primary" style="font-size:12px;padding:5px 12px;">
+                                        <i class='bx bx-list-ul'></i> Ver
+                                    </a>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

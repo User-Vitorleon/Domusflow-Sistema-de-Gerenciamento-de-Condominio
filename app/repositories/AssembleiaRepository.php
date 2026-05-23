@@ -71,29 +71,63 @@ class AssembleiaRepository
         return (int)$this->pdo->lastInsertId();
     }
 
-    public function listarPresencas(): array
-    {
-        $stmt = $this->pdo->query("
-            SELECT
-                ap.presenca,
-                ap.created_at,
-                m.nome,
-                m.apto,
-                m.bloco,
-                a.titulo,
-                a.data AS data_assembleia
+    public function findById(int $id): ?array{
+        $stmt = $this->pdo->prepare("
+            SELECT * FROM assembleias WHERE id_assembleia = :id LIMIT 1
+        ");
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetch() ?: null;
+    }
+
+    public function listarPresencas(int $idAssembleia = 0): array{
+        $where = $idAssembleia ? 'AND ap.id_assembleia = :id' : '';
+        $stmt  = $this->pdo->prepare("
+            SELECT ap.presenca, ap.created_at, m.nome, m.apto, m.bloco, a.titulo, a.data as data_assembleia
             FROM assembleias_presencas ap
             INNER JOIN morador m ON ap.id_user = m.id_user
             INNER JOIN assembleias a ON ap.id_assembleia = a.id_assembleia
-            ORDER BY a.data DESC, m.nome ASC
+            WHERE a.status = 'A' {$where}
+            ORDER BY m.nome ASC
+        ");
+        $params = $idAssembleia ? [':id' => $idAssembleia] : [];
+        $stmt->execute($params);
+        return $stmt->fetchAll();
+    }
+
+    public function listarPresencasAgrupadas(): array{
+        $stmt = $this->pdo->query("
+            SELECT 
+                a.id_assembleia,
+                a.titulo,
+                a.data,
+                a.hora,
+                a.local,
+                COUNT(CASE WHEN ap.presenca = 'S' THEN 1 END) AS confirmados,
+                COUNT(CASE WHEN ap.presenca = 'N' THEN 1 END) AS negados,
+                COUNT(CASE WHEN ap.presenca = 'P' THEN 1 END) AS pendentes,
+                COUNT(ap.id_presenca) AS total
+            FROM assembleias a
+            LEFT JOIN assembleias_presencas ap ON a.id_assembleia = ap.id_assembleia
+            WHERE a.status = 'A'
+            GROUP BY a.id_assembleia
+            ORDER BY a.data DESC
         ");
         return $stmt->fetchAll();
     }
 
-    public function excluir(int $id): bool
-    {
-        $stmt = $this->pdo->prepare("UPDATE assembleias SET status = 'I' WHERE id_assembleia = :id");
-        return $stmt->execute([':id' => $id]);
+
+    public function excluir(int $id): bool{
+
+        $stmt = $this->pdo->prepare("
+            DELETE FROM assembleias_presencas WHERE id_assembleia = :id
+        ");
+        $stmt->execute([':id' => $id]);
+
+
+        $stmt2 = $this->pdo->prepare("
+            UPDATE assembleias SET status = 'I' WHERE id_assembleia = :id
+        ");
+        return $stmt2->execute([':id' => $id]);
     }
 
     public function verificarPresenca(int $idAssembleia, int $idUser): ?string

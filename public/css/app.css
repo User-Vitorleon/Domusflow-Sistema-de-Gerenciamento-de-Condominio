@@ -316,13 +316,6 @@ body {
     border: 1px solid var(--warning-border);
 }
 
-/* ── Badges (status visual) ── */
-.presenca-badge-pendente {
-    color: var(--warning-text);
-    background: var(--warning-bg);
-    border: 1px solid var(--warning-border);
-}
-
 .df-alert.d-none {
     display: none;
 }
@@ -492,83 +485,6 @@ body {
     color: var(--text);
 }
 
-/* ── Assembleia card ── */
-.assembleia-card {
-    background: var(--white);
-    border-radius: var(--radius-lg);
-    padding: 20px 24px;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border);
-    border-left: 4px solid #7C3AED;
-    margin-bottom: 14px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 12px;
-}
-
-.assembleia-card-body {
-    flex: 1;
-}
-
-.assembleia-card-body h4 {
-    margin: 0 0 8px 0;
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--text);
-}
-
-.assembleia-card-meta {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 10px;
-    flex-wrap: wrap;
-    color: var(--text-muted);
-    font-size: 13px;
-}
-
-.assembleia-card-pauta {
-    margin: 0 0 10px 0;
-    color: var(--text-muted);
-    font-size: 13px;
-    line-height: 1.6;
-}
-
-.assembleia-card-autor {
-    color: #94a3b8;
-    font-size: 12px;
-}
-
-.assembleia-card-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    align-items: flex-end;
-}
-
-.assembleia-presenca-confirmada {
-    color: #16A34A;
-    font-weight: 700;
-    font-size: 13px;
-}
-
-.assembleia-presenca-negada {
-    color: #EF4444;
-    font-weight: 700;
-    font-size: 13px;
-}
-
-@media (max-width: 768px) {
-    .assembleia-card {
-        flex-direction: column;
-    }
-    .assembleia-card-actions {
-        align-items: flex-start;
-        width: 100%;
-    }
-}
-
     .offcanvas-header {
     display: flex;
     margin-top: 15%;
@@ -576,84 +492,17 @@ body {
     padding: var(--bs-offcanvas-padding-y) var(--bs-offcanvas-padding-x);
 }
 
-/* ── Presença resumo ── */
-.presenca-resumo {
-    display: flex !important;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-bottom: 16px;
-}
 
-.presenca-resumo-total {
-    background: #F8FAFC;
-    border: 1px solid var(--border);
-    color: var(--text);
-}
-
-.presenca-resumo-item {
-    padding: 8px 16px;
-    border-radius: var(--radius);
-    font-size: 13px;
-    white-space: nowrap;
-}
-
-.presenca-resumo-confirmada {
-    background: #F0FDF4;
-    border: 1px solid #BBF7D0;
-    color: #16A34A;
-}
-
-.presenca-resumo-negada {
-    background: #FEF2F2;
-    border: 1px solid #FECACA;
-    color: #EF4444;
-}
-
-/* ── Presença badge ── */
-.presenca-badge {
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
-}
-
-.presenca-badge-confirmada {
-    color: #16A34A;
-    background: #F0FDF4;
-    border: 1px solid #BBF7D0;
-}
-
-.presenca-badge-negada {
-    color: #EF4444;
-    background: #FEF2F2;
-    border: 1px solid #FECACA;
-}
-
-/* ── Tabela presença ── */
-.presenca-table {
+/* ── Wrapper containers ── */
+.df-container-lg {
     width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-    overflow-x: auto;
+    max-width: 1000px;
+    margin: 0 auto;
 }
 
-.presenca-table th {
-    padding: 10px 12px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-    background: #F8FAFC;
-    white-space: nowrap;
-}
-
-.presenca-table td {
-    padding: 10px 12px;
-    border-bottom: 1px solid #F1F5F9;
-}
-
-.presenca-table tr:hover td {
-    background: #F8FAFC;
-}
-
+/* ═══════════════════════════════════════════
+   Dark Mode
+═══════════════════════════════════════════ */
 
 [data-theme="dark"] {
     --primary-dark:  #3b9fd4;
@@ -669,13 +518,11 @@ body {
     --gradient:      linear-gradient(135deg, #1a6eb5, #3b9fd4);
 }
 
-/* ── Base ── */
 [data-theme="dark"] body {
     background: var(--bg);
     color: var(--text);
 }
 
-/* ── Topbar ── */
 [data-theme="dark"] .df-topbar {
     background: #1e2029;
     border-bottom: 1px solid var(--border);
@@ -683,7 +530,8 @@ body {
 
 [data-theme="dark"] .df-topbar-name,
 [data-theme="dark"] .df-topbar-apto,
-[data-theme="dark"] .df-topbar-title {
+[data-theme="dark"] .df-topbar-title,
+[data-theme="dark"] .df-topbar-home-label {
     color: var(--text);
 }
 
@@ -692,15 +540,17 @@ body {
     color: var(--text-muted);
 }
 
-[data-theme="dark"] .df-topbar-home-label {
-    color: var(--text);
+[data-theme="dark"] .df-topbar-home:hover {
+    background: #2e3240 !important;
 }
 
-/* ── Cards ── */
+[data-theme="dark"] .df-topbar-home {
+    color: var(--text) !important;
+}
+
 [data-theme="dark"] .df-card,
 [data-theme="dark"] .morador-card,
 [data-theme="dark"] .aviso-card,
-[data-theme="dark"] .assembleia-card,
 [data-theme="dark"] .reserva-card,
 [data-theme="dark"] .feriado-card,
 [data-theme="dark"] .kpi-card,
@@ -710,7 +560,6 @@ body {
     color: var(--text);
 }
 
-/* ── Forms ── */
 [data-theme="dark"] .df-field input,
 [data-theme="dark"] .df-field select,
 [data-theme="dark"] .df-field textarea {
@@ -733,237 +582,6 @@ body {
     color: var(--text-muted);
 }
 
-/* ── Botões ── */
-[data-theme="dark"] .btn-ghost {
-    background: transparent;
-    border-color: var(--border);
-    color: var(--text-muted);
-}
-
-[data-theme="dark"] .btn-ghost:hover {
-    background: #2e3240;
-    color: var(--text);
-}
-
-[data-theme="dark"] .btn-success-sm {
-    background: #052e16;
-    color: #4ade80;
-    border-color: #166534;
-}
-
-[data-theme="dark"] .btn-success-sm:hover {
-    background: #14532d;
-}
-
-[data-theme="dark"] .btn-danger-sm {
-    background: #2d0a0a;
-    color: #f87171;
-    border-color: #7f1d1d;
-}
-
-[data-theme="dark"] .btn-danger-sm:hover {
-    background: #450a0a;
-}
-
-/* ── Alerts ── */
-[data-theme="dark"] .df-alert-error {
-    background: #2d0a0a;
-    color: #f87171;
-    border-color: #7f1d1d;
-}
-
-[data-theme="dark"] .df-alert-success {
-    background: #052e16;
-    color: #4ade80;
-    border-color: #166534;
-}
-
-[data-theme="dark"] .df-alert-warning {
-    background: #2d1b00;
-    color: #fbbf24;
-    border-color: #92400e;
-}
-
-/* ── Empty state ── */
-[data-theme="dark"] .empty-state {
-    color: var(--text-muted);
-}
-
-[data-theme="dark"] .empty-state h5 {
-    color: var(--text);
-}
-
-/* ── Tables ── */
-[data-theme="dark"] .df-table th,
-[data-theme="dark"] .presenca-table th {
-    background: #1a1c24;
-    color: var(--text-muted);
-    border-color: var(--border);
-}
-
-[data-theme="dark"] .df-table td,
-[data-theme="dark"] .presenca-table td {
-    border-color: var(--border);
-    color: var(--text);
-}
-
-[data-theme="dark"] .presenca-table tr:hover td {
-    background: #1a1c24;
-}
-
-/* ── Pagination ── */
-[data-theme="dark"] .page-link {
-    background: #1e2029;
-    border-color: var(--border);
-    color: var(--text);
-}
-
-[data-theme="dark"] .page-item.active .page-link {
-    background: var(--primary);
-    border-color: var(--primary);
-}
-
-[data-theme="dark"] .page-item.disabled .page-link {
-    background: #13151a;
-    color: var(--text-muted);
-}
-
-/* ── Presença badges ── */
-[data-theme="dark"] .presenca-resumo-total {
-    background: #1a1c24;
-    border-color: var(--border);
-    color: var(--text);
-}
-
-/* ── Morador info ── */
-[data-theme="dark"] .morador-info strong {
-    color: var(--text);
-}
-
-[data-theme="dark"] .morador-info span {
-    color: var(--text-muted);
-}
-
-/* ── Section title ── */
-[data-theme="dark"] .section-title {
-    color: var(--text);
-}
-
-/* ── Page header ── */
-[data-theme="dark"] .page-header h2 {
-    color: var(--text);
-}
-
-/* ── Dropdown menu ── */
-[data-theme="dark"] .dropdown-menu {
-    background: #1e2029;
-    border-color: var(--border);
-}
-
-[data-theme="dark"] .dropdown-item {
-    color: var(--text);
-}
-
-[data-theme="dark"] .dropdown-item:hover {
-    background: #2e3240;
-    color: var(--text);
-}
-
-/* ── Painel ── */
-[data-theme="dark"] .pn-card {
-    background: #1e2029;
-    border-color: var(--border);
-    color: var(--text) !important;
-}
-
-[data-theme="dark"] .pn-card:hover {
-    border-color: var(--primary);
-}
-
-[data-theme="dark"] .pn-card-title {
-    color: var(--text);
-}
-
-[data-theme="dark"] .pn-card-sub {
-    color: var(--text-muted);
-}
-
-[data-theme="dark"] .pn-help {
-    background: #1e2029;
-    border-color: var(--border);
-}
-
-[data-theme="dark"] .pn-help-title {
-    color: var(--text);
-}
-
-[data-theme="dark"] .pn-help-list li {
-    color: var(--text-muted);
-}
-
-/* ── Dashboard ── */
-[data-theme="dark"] .kpi-label {
-    color: var(--text-muted);
-}
-
-[data-theme="dark"] .kpi-value {
-    color: var(--text);
-}
-
-[data-theme="dark"] .chart-title {
-    color: var(--text);
-}
-
-/* ── Reserva cards ── */
-[data-theme="dark"] .reserva-header {
-    background: #2e3240;
-    color: var(--text);
-}
-
-[data-theme="dark"] .reserva-local {
-    color: var(--text);
-}
-
-/* ── Select dropdown nativo ── */
-[data-theme="dark"] select option {
-    background: #1e2029;
-    color: var(--text);
-}
-
-/* ── Inputs brancos do perfil (morador.css) ── */
-[data-theme="dark"] .field input,
-[data-theme="dark"] .field select,
-[data-theme="dark"] .field textarea {
-    background: #13151a;
-    border-color: var(--border);
-    color: var(--text);
-}
-
-[data-theme="dark"] .field input::placeholder {
-    color: var(--text-muted);
-}
-
-/* ── Perfil card ── */
-[data-theme="dark"] .perfil-card,
-[data-theme="dark"] .danger-zone {
-    background: #1e2029;
-    border-color: var(--border);
-}
-
-[data-theme="dark"] .perfil-nome,
-[data-theme="dark"] .section-title {
-    color: var(--text);
-}
-
-/* ── Assembleias ── */
-[data-theme="dark"] .assembleia-card-body h4,
-[data-theme="dark"] .assembleia-card-pauta,
-[data-theme="dark"] .assembleia-card-meta,
-[data-theme="dark"] .assembleia-card-autor {
-    color: var(--text);
-}
-
-/* ── Input foco e autofill dark ── */
 [data-theme="dark"] input,
 [data-theme="dark"] textarea,
 [data-theme="dark"] select {
@@ -986,7 +604,155 @@ body {
     -webkit-text-fill-color: var(--text) !important;
 }
 
-/* ── Filtros inline ── */
+[data-theme="dark"] .lp-field input {
+    background: rgba(255,255,255,0.08) !important;
+    color: #ffffff !important;
+    border-color: rgba(255,255,255,0.15) !important;
+}
+
+[data-theme="dark"] .lp-field input::placeholder {
+    color: rgba(255,255,255,0.5) !important;
+}
+
+[data-theme="dark"] .lp-field input:focus {
+    background: rgba(255,255,255,0.12) !important;
+    border-color: rgba(255,255,255,0.3) !important;
+}
+
+[data-theme="dark"] .btn-ghost {
+    background: transparent;
+    border-color: var(--border);
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .btn-ghost:hover {
+    background: #2e3240;
+    color: var(--text);
+}
+
+[data-theme="dark"] .btn-success-sm {
+    background: #052e16;
+    color: #4ade80;
+    border-color: #166534;
+}
+
+[data-theme="dark"] .btn-success-sm:hover { background: #14532d; }
+
+[data-theme="dark"] .btn-danger-sm {
+    background: #2d0a0a;
+    color: #f87171;
+    border-color: #7f1d1d;
+}
+
+[data-theme="dark"] .btn-danger-sm:hover { background: #450a0a; }
+
+[data-theme="dark"] .df-alert-error {
+    background: #2d0a0a;
+    color: #f87171;
+    border-color: #7f1d1d;
+}
+
+[data-theme="dark"] .df-alert-success {
+    background: #052e16;
+    color: #4ade80;
+    border-color: #166534;
+}
+
+[data-theme="dark"] .df-alert-warning {
+    background: #2d1b00;
+    color: #fbbf24;
+    border-color: #92400e;
+}
+
+[data-theme="dark"] .empty-state { color: var(--text-muted); }
+[data-theme="dark"] .empty-state h5 { color: var(--text); }
+
+[data-theme="dark"] .df-table th {
+    background: #1a1c24;
+    color: var(--text-muted);
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .df-table td {
+    border-color: var(--border);
+    color: var(--text);
+}
+
+[data-theme="dark"] .page-link {
+    background: #1e2029;
+    border-color: var(--border);
+    color: var(--text);
+}
+
+[data-theme="dark"] .page-item.active .page-link {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+[data-theme="dark"] .page-item.disabled .page-link {
+    background: #13151a;
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .morador-info strong { color: var(--text); }
+[data-theme="dark"] .morador-info span { color: var(--text-muted); }
+[data-theme="dark"] .section-title { color: var(--text); }
+[data-theme="dark"] .page-header h2 { color: var(--text); }
+[data-theme="dark"] .text-muted { color: #9aa0b4 !important; }
+
+[data-theme="dark"] .dropdown-menu {
+    background: #1e2029;
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .dropdown-item { color: var(--text); }
+[data-theme="dark"] .dropdown-item:hover { background: #2e3240; color: var(--text); }
+
+[data-theme="dark"] .pn-card {
+    background: #1e2029;
+    border-color: var(--border);
+    color: var(--text) !important;
+}
+
+[data-theme="dark"] .pn-card:hover { border-color: var(--primary); }
+[data-theme="dark"] .pn-card-title { color: var(--text); }
+[data-theme="dark"] .pn-card-sub { color: var(--text-muted); }
+
+[data-theme="dark"] .pn-help {
+    background: #1e2029;
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .pn-help-title { color: var(--text); }
+[data-theme="dark"] .pn-help-list li { color: var(--text-muted); }
+
+[data-theme="dark"] .kpi-label { color: var(--text-muted); }
+[data-theme="dark"] .kpi-value { color: var(--text); }
+[data-theme="dark"] .chart-title { color: var(--text); }
+
+[data-theme="dark"] .reserva-header { background: #2e3240; color: var(--text); }
+[data-theme="dark"] .reserva-local { color: var(--text); }
+
+[data-theme="dark"] select option { background: #1e2029; color: var(--text); }
+
+[data-theme="dark"] .field input,
+[data-theme="dark"] .field select,
+[data-theme="dark"] .field textarea {
+    background: #13151a;
+    border-color: var(--border);
+    color: var(--text);
+}
+
+[data-theme="dark"] .field input::placeholder { color: var(--text-muted); }
+
+[data-theme="dark"] .perfil-card,
+[data-theme="dark"] .danger-zone {
+    background: #1e2029;
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .perfil-nome { color: var(--text); }
+
 [data-theme="dark"] [style*="background: #F8FAFC"],
 [data-theme="dark"] [style*="background:#F8FAFC"] {
     background: #1a1c24 !important;
@@ -998,68 +764,25 @@ body {
     color: var(--text-muted) !important;
 }
 
-/* ── Foto upload area ── */
 [data-theme="dark"] .foto-upload-area {
     background: #1e2029;
     border-color: var(--border);
     color: var(--text-muted);
 }
 
-/* ── Filtros ── */
-[data-theme="dark"] .df-grid-3 > div,
-[data-theme="dark"] .df-grid-2 > div {
-    color: var(--text);
-}
-
-/* ── Text muted dark ── */
-[data-theme="dark"] .text-muted {
-    color: #9aa0b4 !important;
-}
-
-/* ── Topbar home hover ── */
-[data-theme="dark"] .df-topbar-home:hover {
-    background: #2e3240 !important;
-}
-
-[data-theme="dark"] .df-topbar-home {
-    color: var(--text) !important;
-}
-
-[data-theme="dark"] .df-topbar-home-label {
-    color: var(--text) !important;
-}
-
-/* ── Offcanvas dark ── */
 [data-theme="dark"] .offcanvas {
     background: #1e2029 !important;
     color: var(--text) !important;
 }
 
-[data-theme="dark"] .offcanvas-header {
-    border-bottom: 1px solid var(--border);
-}
+[data-theme="dark"] .offcanvas-header { border-bottom: 1px solid var(--border); }
+[data-theme="dark"] .offcanvas-title { color: var(--text) !important; }
+[data-theme="dark"] .offcanvas p { color: var(--text-muted) !important; }
+[data-theme="dark"] .offcanvas hr { border-color: var(--border) !important; }
+[data-theme="dark"] .btn-close { filter: invert(1); }
 
-[data-theme="dark"] .offcanvas-title {
-    color: var(--text) !important;
-}
-
-[data-theme="dark"] .offcanvas p {
-    color: var(--text-muted) !important;
-}
-
-[data-theme="dark"] .offcanvas hr {
-    border-color: var(--border) !important;
-}
-
-[data-theme="dark"] .btn-close {
-    filter: invert(1);
-}
-
-/* ── Responsivo ── */
 @media (max-width: 768px) {
     [data-theme="dark"] .pn-card {
         background: rgba(30, 32, 41, 0.95);
     }
 }
-
-

@@ -64,6 +64,8 @@ $routes = [
     'assembleia/presenca'            => ['AssembleiaController', 'confirmarPresenca'],
     'assembleia/excluir'             => ['AssembleiaController', 'excluir'],
     'assembleia/presencas'           => ['AssembleiaController', 'listarPresencas'],
+    'assembleia/presencas/detalhe'   => ['AssembleiaController', 'detalhePresencas'],
+
 
 ];
 

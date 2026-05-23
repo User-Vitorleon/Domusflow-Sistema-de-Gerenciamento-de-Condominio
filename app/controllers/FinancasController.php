@@ -311,18 +311,15 @@ public function historico(): void
         ];
     }
 
-    private function validarDatasLancamento(array $dados): ?string
-    {
-        $hoje = date('Y-m-d');
-        if ($dados['data_lanc'] < $hoje) {
+    private function validarDatasLancamento(array $dados): ?string{
+        if ($dados['data_lanc'] < date('Y-m-d')) {
             return 'A data de lançamento não pode ser inferior ao dia de hoje.';
         }
-        if ($dados['data_venc'] < $hoje) {
-            return 'A data de vencimento não pode ser inferior ao dia de hoje.';
+        if ($dados['data_venc'] <= date('Y-m-d')) {
+            return 'A data de vencimento deve ser superior ao dia de hoje.'; // ← só retorna a mensagem
         }
         return null;
     }
-
     private function lancarParaTodos(array $dados): void
     {
         $moradorRepo = new MoradorRepository();

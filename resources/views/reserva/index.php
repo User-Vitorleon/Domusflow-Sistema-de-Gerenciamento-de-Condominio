@@ -22,6 +22,13 @@ $privilegio = $usuario['privilegio'] ?? 1;
         <?php unset($_SESSION['erro_reserva']); ?>
     <?php endif; ?>
 
+    <?php if (isset($_SESSION['sucesso_reserva'])): ?>
+        <div class="df-alert df-alert-success">
+            <?= htmlspecialchars($_SESSION['sucesso_reserva']) ?>
+            <?php unset($_SESSION['sucesso_reserva']); ?>
+        </div>
+    <?php endif; ?>
+
     <div class="df-card">
         <?php if ($privilegio == 1): ?>
             <form action="<?= BASE_URL ?>/reserva/salvar" method="POST" id="formReserva">

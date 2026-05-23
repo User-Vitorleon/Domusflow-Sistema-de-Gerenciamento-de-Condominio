@@ -32,7 +32,7 @@ $privilegio = $usuario['privilegio'] ?? 1;
         </div>
     <?php endif; ?>
 
-    <?php if ($privilegio == 2): ?>
+    <?php if (in_array($privilegio, [2, 4])): ?>
 
     <div class="df-card" style="margin-bottom: 24px;">
         <h3 class="section-title">Registrar Lançamento</h3>
@@ -78,10 +78,7 @@ $privilegio = $usuario['privilegio'] ?? 1;
                     <label>Data de Vencimento</label>
                     <input type="date" name="data_venc" id="data_venc" required>
                 </div>
-                <div class="df-field">
-                    <label>Data de Lançamento</label>
-                    <input type="date" name="data_lanc" value="<?= date('Y-m-d') ?>" required>
-                </div>
+                <input type="hidden" name="data_lanc" value="<?= date('Y-m-d') ?>">
             </div>
 
             <div style="margin-top: 12px; padding: 12px 16px; background: #F8FAFC; border-radius: var(--radius); border: 1px solid var(--border);">
@@ -107,14 +104,6 @@ $privilegio = $usuario['privilegio'] ?? 1;
     <div class="df-card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
             <h3 class="section-title" style="margin: 0;">Todos os Lançamentos</h3>
-            <?php if ($privilegio == 2): ?>
-                <form action="<?= BASE_URL ?>/financeiro/fatura/gerarTodos" method="POST"
-                      onsubmit="return confirm('Gerar fatura para TODOS os moradores com pendências?')">
-                    <button type="submit" class="btn-primary" style="font-size: 13px; padding: 7px 14px;">
-                        <i class='bx bx-file'></i> Gerar Fatura para Todos
-                    </button>
-                </form>
-            <?php endif; ?>
         </div>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 16px; padding: 14px; background: #F8FAFC; border-radius: var(--radius); border: 1px solid var(--border);">
@@ -159,7 +148,7 @@ $privilegio = $usuario['privilegio'] ?? 1;
                     <thead>
                         <tr style="background: #F8FAFC;">
                             <th style="padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap;">#</th>
-                            <?php if ($privilegio == 2): ?>
+                            <?php if (in_array($privilegio, [2, 4])): ?>
                             <th style="padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border);">Nome</th>
                             <th style="padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border);">Bloco</th>
                             <th style="padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border);">Apto</th>
@@ -170,7 +159,7 @@ $privilegio = $usuario['privilegio'] ?? 1;
                             <th style="padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap;">Dt. Lançamento</th>
                             <th style="padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap;">Vencimento</th>
                             <th style="padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border);">Status</th>
-                            <?php if ($privilegio == 2): ?>
+                            <?php if (in_array($privilegio, [2, 4])): ?>
                             <th style="padding: 10px 12px; text-align: center; border-bottom: 1px solid var(--border);">Ação</th>
                             <?php endif; ?>
                         </tr>
@@ -203,7 +192,7 @@ $privilegio = $usuario['privilegio'] ?? 1;
                                 data-dt-lanc="<?= $dtLanc ?? '' ?>"
                                 data-dt-venc="<?= $l['data_vencimento'] ?>">
                                 <td style="padding: 10px 12px; color: var(--text-muted);">#<?= $l['id_lancamento'] ?></td>
-                                <?php if ($privilegio == 2): ?>
+                                <?php if (in_array($privilegio, [2, 4])): ?>
                                 <td style="padding: 10px 12px; font-weight: 500;"><?= htmlspecialchars($l['nome_morador'] ?? 'N/A') ?></td>
                                 <td style="padding: 10px 12px;"><?= htmlspecialchars($l['bloco'] ?? '-') ?></td>
                                 <td style="padding: 10px 12px;"><?= htmlspecialchars($l['apto'] ?? '-') ?></td>
@@ -236,7 +225,7 @@ $privilegio = $usuario['privilegio'] ?? 1;
                                         <?= $textoStatus ?>
                                     </span>
                                 </td>
-                                <?php if ($privilegio == 2): ?>
+                                <?php if (in_array($privilegio, [2, 4])): ?>
                                 <td style="padding: 10px 12px; text-align: center;">
                                     <form action="<?= BASE_URL ?>/financeiro/lancamento/excluir" method="POST"
                                           onsubmit="return confirm('Deseja excluir este lançamento?')" style="display:inline">
@@ -346,7 +335,7 @@ function limparFiltros() {
     window.location.href = '<?= BASE_URL ?>/financeiro/lancamento';
 }
 
-<?php if ($privilegio == 2): ?>
+<?php if (in_array($privilegio, [2, 4])): ?>
 document.querySelector('form[action*="lancamento/salvar"]').addEventListener('submit', function(e) {
     e.preventDefault();
     const form = this;
