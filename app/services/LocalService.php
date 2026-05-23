@@ -7,17 +7,21 @@ class LocalService
     private LocalRepository   $localRepo;
     private MoradorRepository $moradorRepo;
 
-    public function __construct()
+    public function __construct(?LocalRepository $localRepo = null, ?MoradorRepository $moradorRepo = null)
     {
-        $this->localRepo   = new LocalRepository();
-        $this->moradorRepo = new MoradorRepository();
+        $this->localRepo   = $localRepo ?? new LocalRepository();
+        $this->moradorRepo = $moradorRepo ?? new MoradorRepository();
     }
 
-    public function cadastrar(array $dados, int $id_logado): array
+    public function cadastrar(array $dados, int $idLogado): array
     {
-        $solicitante = $this->moradorRepo->findById($id_logado);
-        if (!$solicitante || !in_array($solicitante['privilegio'] ?? 0, [2, 4])) {
+        if (!$this->temPermissao($idLogado)) {
             return ['sucesso' => false, 'mensagem' => 'Sem permissão.'];
+        }
+
+        $nomeLocal = trim($dados['nome_local'] ?? '');
+        if ($nomeLocal === '') {
+            return ['sucesso' => false, 'mensagem' => 'Informe o nome do local.'];
         }
 
         if ((int)$dados['capacidade'] <= 0) {
@@ -25,12 +29,18 @@ class LocalService
         }
 
         $this->localRepo->save([
-            'local'       => $dados['nome_local'],
+            'local'       => $nomeLocal,
             'capacidade'  => $dados['capacidade'],
             'disp_uso'    => $dados['disponivel'],
-            'id_user_cad' => $id_logado,
+            'id_user_cad' => $idLogado,
         ]);
 
         return ['sucesso' => true];
+    }
+
+    private function temPermissao(int $idUsuario): bool
+    {
+        $usuario = $this->moradorRepo->findById($idUsuario);
+        return $usuario && in_array($usuario['privilegio'] ?? 0, [2, 4], true);
     }
 }

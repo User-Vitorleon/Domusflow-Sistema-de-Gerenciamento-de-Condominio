@@ -17,12 +17,6 @@ html {
     scroll-behavior: smooth;
 }
 
-.presenca-badge-pendente {
-    color: #CA8A04;
-    background: #FFFBEB;
-    border: 1px solid #FDE68A;
-}
-
 img {
     display: block;
     max-width: 100%;
@@ -56,6 +50,20 @@ a:hover {
     --warning: #F59E0B;
     --error: #EF4444;
     --info: #3B82F6;
+
+    /* Tons de fundo/borda para alerts e badges */
+    --success-bg:     #F0FDF4;
+    --success-border: #BBF7D0;
+    --success-text:   #16A34A;
+
+    --warning-bg:     #FFFBEB;
+    --warning-border: #FDE68A;
+    --warning-text:   #CA8A04;
+    --warning-text-strong: #D97706;
+
+    --error-bg:     #FEF2F2;
+    --error-border: #FECACA;
+    --error-text:   #DC2626;
 
     --radius: 10px;
     --radius-lg: 16px;
@@ -248,9 +256,9 @@ body {
 
 .btn-success-sm {
     padding: 5px 12px;
-    background: #F0FDF4;
-    color: #16A34A;
-    border: 1px solid #BBF7D0;
+    background: var(--success-bg);
+    color: var(--success-text);
+    border: 1px solid var(--success-border);
     border-radius: 7px;
     font-size: 13px;
     font-weight: 600;
@@ -264,9 +272,9 @@ body {
 
 .btn-danger-sm {
     padding: 5px 12px;
-    background: #FEF2F2;
-    color: #DC2626;
-    border: 1px solid #FECACA;
+    background: var(--error-bg);
+    color: var(--error-text);
+    border: 1px solid var(--error-border);
     border-radius: 7px;
     font-size: 13px;
     font-weight: 600;
@@ -291,21 +299,28 @@ body {
 }
 
 .df-alert-error {
-    background: #FEF2F2;
-    color: #DC2626;
-    border: 1px solid #FECACA;
+    background: var(--error-bg);
+    color: var(--error-text);
+    border: 1px solid var(--error-border);
 }
 
 .df-alert-success {
-    background: #F0FDF4;
-    color: #16A34A;
-    border: 1px solid #BBF7D0;
+    background: var(--success-bg);
+    color: var(--success-text);
+    border: 1px solid var(--success-border);
 }
 
 .df-alert-warning {
-    background: #FFFBEB;
-    color: #D97706;
-    border: 1px solid #FDE68A;
+    background: var(--warning-bg);
+    color: var(--warning-text-strong);
+    border: 1px solid var(--warning-border);
+}
+
+/* ── Badges (status visual) ── */
+.presenca-badge-pendente {
+    color: var(--warning-text);
+    background: var(--warning-bg);
+    border: 1px solid var(--warning-border);
 }
 
 .df-alert.d-none {
@@ -638,4 +653,413 @@ body {
 .presenca-table tr:hover td {
     background: #F8FAFC;
 }
+
+
+[data-theme="dark"] {
+    --primary-dark:  #3b9fd4;
+    --primary:       #5bbfe8;
+    --primary-light: #7dd4f0;
+    --white:         #1e2029;
+    --bg:            #13151a;
+    --border:        #2e3240;
+    --text-muted:    #9aa0b4;
+    --text:          #e8eaf0;
+    --shadow:        0 1px 3px rgba(0,0,0,.4), 0 4px 16px rgba(0,0,0,.3);
+    --shadow-md:     0 4px 24px rgba(0,0,0,.4);
+    --gradient:      linear-gradient(135deg, #1a6eb5, #3b9fd4);
+}
+
+/* ── Base ── */
+[data-theme="dark"] body {
+    background: var(--bg);
+    color: var(--text);
+}
+
+/* ── Topbar ── */
+[data-theme="dark"] .df-topbar {
+    background: #1e2029;
+    border-bottom: 1px solid var(--border);
+}
+
+[data-theme="dark"] .df-topbar-name,
+[data-theme="dark"] .df-topbar-apto,
+[data-theme="dark"] .df-topbar-title {
+    color: var(--text);
+}
+
+[data-theme="dark"] .df-topbar-logout,
+[data-theme="dark"] .df-topbar-tema {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .df-topbar-home-label {
+    color: var(--text);
+}
+
+/* ── Cards ── */
+[data-theme="dark"] .df-card,
+[data-theme="dark"] .morador-card,
+[data-theme="dark"] .aviso-card,
+[data-theme="dark"] .assembleia-card,
+[data-theme="dark"] .reserva-card,
+[data-theme="dark"] .feriado-card,
+[data-theme="dark"] .kpi-card,
+[data-theme="dark"] .chart-card {
+    background: #1e2029;
+    border-color: var(--border);
+    color: var(--text);
+}
+
+/* ── Forms ── */
+[data-theme="dark"] .df-field input,
+[data-theme="dark"] .df-field select,
+[data-theme="dark"] .df-field textarea {
+    background: #13151a;
+    border-color: var(--border);
+    color: var(--text);
+}
+
+[data-theme="dark"] .df-field input::placeholder,
+[data-theme="dark"] .df-field textarea::placeholder {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .df-field input[readonly] {
+    background: #1a1c24;
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .df-field label {
+    color: var(--text-muted);
+}
+
+/* ── Botões ── */
+[data-theme="dark"] .btn-ghost {
+    background: transparent;
+    border-color: var(--border);
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .btn-ghost:hover {
+    background: #2e3240;
+    color: var(--text);
+}
+
+[data-theme="dark"] .btn-success-sm {
+    background: #052e16;
+    color: #4ade80;
+    border-color: #166534;
+}
+
+[data-theme="dark"] .btn-success-sm:hover {
+    background: #14532d;
+}
+
+[data-theme="dark"] .btn-danger-sm {
+    background: #2d0a0a;
+    color: #f87171;
+    border-color: #7f1d1d;
+}
+
+[data-theme="dark"] .btn-danger-sm:hover {
+    background: #450a0a;
+}
+
+/* ── Alerts ── */
+[data-theme="dark"] .df-alert-error {
+    background: #2d0a0a;
+    color: #f87171;
+    border-color: #7f1d1d;
+}
+
+[data-theme="dark"] .df-alert-success {
+    background: #052e16;
+    color: #4ade80;
+    border-color: #166534;
+}
+
+[data-theme="dark"] .df-alert-warning {
+    background: #2d1b00;
+    color: #fbbf24;
+    border-color: #92400e;
+}
+
+/* ── Empty state ── */
+[data-theme="dark"] .empty-state {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .empty-state h5 {
+    color: var(--text);
+}
+
+/* ── Tables ── */
+[data-theme="dark"] .df-table th,
+[data-theme="dark"] .presenca-table th {
+    background: #1a1c24;
+    color: var(--text-muted);
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .df-table td,
+[data-theme="dark"] .presenca-table td {
+    border-color: var(--border);
+    color: var(--text);
+}
+
+[data-theme="dark"] .presenca-table tr:hover td {
+    background: #1a1c24;
+}
+
+/* ── Pagination ── */
+[data-theme="dark"] .page-link {
+    background: #1e2029;
+    border-color: var(--border);
+    color: var(--text);
+}
+
+[data-theme="dark"] .page-item.active .page-link {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+[data-theme="dark"] .page-item.disabled .page-link {
+    background: #13151a;
+    color: var(--text-muted);
+}
+
+/* ── Presença badges ── */
+[data-theme="dark"] .presenca-resumo-total {
+    background: #1a1c24;
+    border-color: var(--border);
+    color: var(--text);
+}
+
+/* ── Morador info ── */
+[data-theme="dark"] .morador-info strong {
+    color: var(--text);
+}
+
+[data-theme="dark"] .morador-info span {
+    color: var(--text-muted);
+}
+
+/* ── Section title ── */
+[data-theme="dark"] .section-title {
+    color: var(--text);
+}
+
+/* ── Page header ── */
+[data-theme="dark"] .page-header h2 {
+    color: var(--text);
+}
+
+/* ── Dropdown menu ── */
+[data-theme="dark"] .dropdown-menu {
+    background: #1e2029;
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .dropdown-item {
+    color: var(--text);
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+    background: #2e3240;
+    color: var(--text);
+}
+
+/* ── Painel ── */
+[data-theme="dark"] .pn-card {
+    background: #1e2029;
+    border-color: var(--border);
+    color: var(--text) !important;
+}
+
+[data-theme="dark"] .pn-card:hover {
+    border-color: var(--primary);
+}
+
+[data-theme="dark"] .pn-card-title {
+    color: var(--text);
+}
+
+[data-theme="dark"] .pn-card-sub {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .pn-help {
+    background: #1e2029;
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .pn-help-title {
+    color: var(--text);
+}
+
+[data-theme="dark"] .pn-help-list li {
+    color: var(--text-muted);
+}
+
+/* ── Dashboard ── */
+[data-theme="dark"] .kpi-label {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .kpi-value {
+    color: var(--text);
+}
+
+[data-theme="dark"] .chart-title {
+    color: var(--text);
+}
+
+/* ── Reserva cards ── */
+[data-theme="dark"] .reserva-header {
+    background: #2e3240;
+    color: var(--text);
+}
+
+[data-theme="dark"] .reserva-local {
+    color: var(--text);
+}
+
+/* ── Select dropdown nativo ── */
+[data-theme="dark"] select option {
+    background: #1e2029;
+    color: var(--text);
+}
+
+/* ── Inputs brancos do perfil (morador.css) ── */
+[data-theme="dark"] .field input,
+[data-theme="dark"] .field select,
+[data-theme="dark"] .field textarea {
+    background: #13151a;
+    border-color: var(--border);
+    color: var(--text);
+}
+
+[data-theme="dark"] .field input::placeholder {
+    color: var(--text-muted);
+}
+
+/* ── Perfil card ── */
+[data-theme="dark"] .perfil-card,
+[data-theme="dark"] .danger-zone {
+    background: #1e2029;
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .perfil-nome,
+[data-theme="dark"] .section-title {
+    color: var(--text);
+}
+
+/* ── Assembleias ── */
+[data-theme="dark"] .assembleia-card-body h4,
+[data-theme="dark"] .assembleia-card-pauta,
+[data-theme="dark"] .assembleia-card-meta,
+[data-theme="dark"] .assembleia-card-autor {
+    color: var(--text);
+}
+
+/* ── Input foco e autofill dark ── */
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select {
+    background: #13151a !important;
+    color: var(--text) !important;
+    border-color: var(--border) !important;
+}
+
+[data-theme="dark"] input:focus,
+[data-theme="dark"] textarea:focus,
+[data-theme="dark"] select:focus {
+    background: #13151a !important;
+    color: var(--text) !important;
+}
+
+[data-theme="dark"] input:-webkit-autofill,
+[data-theme="dark"] input:-webkit-autofill:hover,
+[data-theme="dark"] input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0px 1000px #13151a inset !important;
+    -webkit-text-fill-color: var(--text) !important;
+}
+
+/* ── Filtros inline ── */
+[data-theme="dark"] [style*="background: #F8FAFC"],
+[data-theme="dark"] [style*="background:#F8FAFC"] {
+    background: #1a1c24 !important;
+    border-color: var(--border) !important;
+}
+
+[data-theme="dark"] [style*="background: #F8FAFC"] label,
+[data-theme="dark"] [style*="background:#F8FAFC"] label {
+    color: var(--text-muted) !important;
+}
+
+/* ── Foto upload area ── */
+[data-theme="dark"] .foto-upload-area {
+    background: #1e2029;
+    border-color: var(--border);
+    color: var(--text-muted);
+}
+
+/* ── Filtros ── */
+[data-theme="dark"] .df-grid-3 > div,
+[data-theme="dark"] .df-grid-2 > div {
+    color: var(--text);
+}
+
+/* ── Text muted dark ── */
+[data-theme="dark"] .text-muted {
+    color: #9aa0b4 !important;
+}
+
+/* ── Topbar home hover ── */
+[data-theme="dark"] .df-topbar-home:hover {
+    background: #2e3240 !important;
+}
+
+[data-theme="dark"] .df-topbar-home {
+    color: var(--text) !important;
+}
+
+[data-theme="dark"] .df-topbar-home-label {
+    color: var(--text) !important;
+}
+
+/* ── Offcanvas dark ── */
+[data-theme="dark"] .offcanvas {
+    background: #1e2029 !important;
+    color: var(--text) !important;
+}
+
+[data-theme="dark"] .offcanvas-header {
+    border-bottom: 1px solid var(--border);
+}
+
+[data-theme="dark"] .offcanvas-title {
+    color: var(--text) !important;
+}
+
+[data-theme="dark"] .offcanvas p {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .offcanvas hr {
+    border-color: var(--border) !important;
+}
+
+[data-theme="dark"] .btn-close {
+    filter: invert(1);
+}
+
+/* ── Responsivo ── */
+@media (max-width: 768px) {
+    [data-theme="dark"] .pn-card {
+        background: rgba(30, 32, 41, 0.95);
+    }
+}
+
 

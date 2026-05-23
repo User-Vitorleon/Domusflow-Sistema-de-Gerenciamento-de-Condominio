@@ -2,7 +2,7 @@
 $paginaTitulo = 'Avisos';
 $paginaAtiva  = 'avisos';
 require_once __DIR__ . '/../layout/header.php';
-$prev = $usuario['privilegio'] ?? 1;
+$privilegio = $usuario['privilegio'] ?? 1;
 ?>
 
 <main class="main-content">
@@ -23,7 +23,7 @@ $prev = $usuario['privilegio'] ?? 1;
         <div class="df-alert df-alert-error"><?= htmlspecialchars($_SESSION['erro_aviso']) ?><?php unset($_SESSION['erro_aviso']); ?></div>
     <?php endif; ?>
 
-    <?php if (in_array($prev, [2, 4])): ?>
+    <?php if (in_array($privilegio, [2, 4])): ?>
     <div class="df-card" style="margin-bottom: 24px;">
         <h3 class="section-title">Publicar Aviso</h3>
         <form action="<?= BASE_URL ?>/avisos/salvar" method="POST">
@@ -65,7 +65,7 @@ $prev = $usuario['privilegio'] ?? 1;
                             em <?= date('d/m/Y \à\s H:i', strtotime($aviso['created_at'])) ?>
                         </small>
                     </div>
-                    <?php if (in_array($prev, [2, 4])): ?>
+                    <?php if (in_array($privilegio, [2, 4])): ?>
                         <form action="<?= BASE_URL ?>/avisos/excluir" method="POST"
                               onsubmit="return confirm('Deseja remover este aviso?')">
                             <input type="hidden" name="id_aviso" value="<?= $aviso['id_aviso'] ?>">

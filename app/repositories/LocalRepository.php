@@ -1,4 +1,5 @@
 <?php
+
 class LocalRepository
 {
     private PDO $pdo;
@@ -43,8 +44,8 @@ class LocalRepository
     public function findById(int $id): ?array
     {
         $stmt = $this->pdo->prepare("
-        SELECT * FROM locais_festivos WHERE id_local = :id
-    ");
+            SELECT * FROM locais_festivos WHERE id_local = :id
+        ");
         $stmt->execute([':id' => $id]);
         $result = $stmt->fetch();
         return $result ?: null;

@@ -1,4 +1,5 @@
 <?php
+
 class VeiculoRepository
 {
     private PDO $pdo;
@@ -8,13 +9,12 @@ class VeiculoRepository
         $this->pdo = getConnection();
     }
 
-    // Busca todos os veículos com nome do morador e de quem cadastrou
     public function findAll(): array
     {
         $stmt = $this->pdo->query("
             SELECT v.*,
-                   dono.nome      AS nome_morador,
-                   cad.nome       AS cadastrado_por
+                   dono.nome AS nome_morador,
+                   cad.nome  AS cadastrado_por
             FROM veiculos v
             JOIN morador dono ON dono.id_user = v.id_user
             JOIN morador cad  ON cad.id_user  = v.id_user_cad
@@ -23,8 +23,7 @@ class VeiculoRepository
         return $stmt->fetchAll();
     }
 
-    // Busca veículos de um morador específico
-    public function findByUsuario(int $id_user): array
+    public function findByUsuario(int $idUser): array
     {
         $stmt = $this->pdo->prepare("
             SELECT v.*,
@@ -36,11 +35,10 @@ class VeiculoRepository
             WHERE v.id_user = :id
             ORDER BY v.principal DESC, v.created_at DESC
         ");
-        $stmt->execute([':id' => $id_user]);
+        $stmt->execute([':id' => $idUser]);
         return $stmt->fetchAll();
     }
 
-    // Consulta rápida por placa (porteiro)
     public function findByPlaca(string $placa): ?array
     {
         $stmt = $this->pdo->prepare("
@@ -62,15 +60,15 @@ class VeiculoRepository
     public function findById(int $id): ?array
     {
         $stmt = $this->pdo->prepare("
-        SELECT v.*,
-               dono.nome  AS nome_morador,
-               dono.apto  AS apto,
-               dono.bloco AS bloco
-        FROM veiculos v
-        JOIN morador dono ON dono.id_user = v.id_user
-        WHERE v.id_veiculo = :id
-        LIMIT 1
-    ");
+            SELECT v.*,
+                   dono.nome  AS nome_morador,
+                   dono.apto  AS apto,
+                   dono.bloco AS bloco
+            FROM veiculos v
+            JOIN morador dono ON dono.id_user = v.id_user
+            WHERE v.id_veiculo = :id
+            LIMIT 1
+        ");
         $stmt->execute([':id' => $id]);
         return $stmt->fetch() ?: null;
     }
@@ -82,30 +80,27 @@ class VeiculoRepository
         return (int)$stmt->fetchColumn() > 0;
     }
 
-    // Conta veículos de um usuário
-    public function countByUser(int $id_user): int
+    public function countByUser(int $idUser): int
     {
         $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM veiculos WHERE id_user = :id");
-        $stmt->execute([':id' => $id_user]);
+        $stmt->execute([':id' => $idUser]);
         return (int)$stmt->fetchColumn();
     }
 
-    // Desmarca todos os veículos principais de um usuário
-    public function desmarcarPrincipal(int $id_user): bool
+    public function desmarcarPrincipal(int $idUser): bool
     {
         $stmt = $this->pdo->prepare("
             UPDATE veiculos SET principal = 0 WHERE id_user = :id
         ");
-        return $stmt->execute([':id' => $id_user]);
+        return $stmt->execute([':id' => $idUser]);
     }
 
-    // Marca um veículo como principal
-    public function marcarPrincipal(int $id_veiculo): bool
+    public function marcarPrincipal(int $idVeiculo): bool
     {
         $stmt = $this->pdo->prepare("
             UPDATE veiculos SET principal = 1 WHERE id_veiculo = :id
         ");
-        return $stmt->execute([':id' => $id_veiculo]);
+        return $stmt->execute([':id' => $idVeiculo]);
     }
 
     public function save(array $data): int|bool
@@ -151,49 +146,39 @@ class VeiculoRepository
     public function countAll(): int
     {
         $stmt = $this->pdo->query("SELECT COUNT(id_veiculo) FROM veiculos");
-        return (int) $stmt->fetchColumn();
+        return (int)$stmt->fetchColumn();
     }
 
     public function topMarcas(int $limite = 3): array
     {
-        $stmt = $this->pdo->prepare("
-        SELECT marca, COUNT(id_veiculo) AS total
-        FROM veiculos
-        WHERE marca IS NOT NULL AND marca <> ''
-        GROUP BY marca
-        ORDER BY total DESC, marca ASC
-        LIMIT :limite
-    ");
-        $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->topPorCampo('marca', $limite);
     }
 
     public function topCores(int $limite = 3): array
     {
-        $stmt = $this->pdo->prepare("
-        SELECT cor, COUNT(id_veiculo) AS total
-        FROM veiculos
-        WHERE cor IS NOT NULL AND cor <> ''
-        GROUP BY cor
-        ORDER BY total DESC, cor ASC
-        LIMIT :limite
-    ");
-        $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->topPorCampo('cor', $limite);
     }
 
     public function topModelos(int $limite = 3): array
     {
+        return $this->topPorCampo('modelo', $limite);
+    }
+
+    private function topPorCampo(string $coluna, int $limite): array
+    {
+        $colunasPermitidas = ['marca', 'cor', 'modelo'];
+        if (!in_array($coluna, $colunasPermitidas, true)) {
+            return [];
+        }
+
         $stmt = $this->pdo->prepare("
-        SELECT modelo, COUNT(id_veiculo) AS total
-        FROM veiculos
-        WHERE modelo IS NOT NULL AND modelo <> ''
-        GROUP BY modelo
-        ORDER BY total DESC, modelo ASC
-        LIMIT :limite
-    ");
+            SELECT {$coluna}, COUNT(id_veiculo) AS total
+            FROM veiculos
+            WHERE {$coluna} IS NOT NULL AND {$coluna} <> ''
+            GROUP BY {$coluna}
+            ORDER BY total DESC, {$coluna} ASC
+            LIMIT :limite
+        ");
         $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

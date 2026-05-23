@@ -156,7 +156,7 @@
     color: #dc2626;
 }
 
-/* ── Badge de perfil ── */
+
 .df-topbar-role {
     font-size: 10px;
     font-weight: 600;
@@ -167,31 +167,31 @@
     white-space: nowrap;
 }
 
-/* Morador */
+
 .df-topbar-role--1 {
     background: #eff6ff;
     color: #1d4ed8;
 }
 
-/* Síndico */
+
 .df-topbar-role--2 {
     background: #f0fdf4;
     color: #15803d;
 }
 
-/* Funcionário */
+
 .df-topbar-role--3 {
     background: #fffbeb;
     color: #b45309;
 }
 
-/* Admin */
+
 .df-topbar-role--4 {
     background: #fdf4ff;
     color: #7e22ce;
 }
 
-/* ── Mobile ── */
+
 @media (max-width: 680px) {
     .df-topbar-inner {
         max-width: 100%;
@@ -208,4 +208,20 @@
         font-size: 14px;
         text-align: center;
     }
+}
+
+.df-topbar-tema {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    padding: 6px;
+    border-radius: 8px;
+    transition: background var(--transition);
+}
+
+.df-topbar-tema:hover {
+    background: rgba(255,255,255,0.1);
 }

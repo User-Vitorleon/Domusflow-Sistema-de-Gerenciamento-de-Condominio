@@ -4,7 +4,7 @@ $paginaAtiva  = 'veiculo';
 $cssExtra     = 'veiculo.css';
 $jsExtra      = 'veiculo.js';
 require_once __DIR__ . '/../layout/header.php';
-$prev = $usuario['privilegio'] ?? 1;
+$privilegio = $usuario['privilegio'] ?? 1;
 
 $cores = [
     'Amarelo',
@@ -41,14 +41,12 @@ $cores = [
             <?php unset($_SESSION['erro_veiculo']); ?>
         <?php endif; ?>
 
-        <!-- Formulário: síndico/morador/admin cadastram por qualquer morador -->
-        <!-- Morador cadastra o próprio veículo (máx 2) -->
-        <?php if (in_array($prev, [1, 2, 4])): ?>
+        <?php if (in_array($privilegio, [1, 2, 4])): ?>
             <div class="df-card" style="margin-bottom: 24px;">
                 <h3 class="section-title">Cadastrar Veículo</h3>
 
-                <!-- Contador de vagas (só para morador) -->
-                <?php if ($prev == 1): ?>
+
+                <?php if ($privilegio == 1): ?>
                     <div class="veiculo-counter">
                         <div class="veiculo-counter-bar">
                             <div class="veiculo-counter-dot <?= count($veiculos) >= 1 ? 'usado' : '' ?>"></div>
@@ -60,7 +58,7 @@ $cores = [
 
                 <form action="<?= BASE_URL ?>/veiculo/salvar" method="POST"
                     data-total="<?= count($veiculos) ?>"
-                    data-prev="<?= $prev ?>">
+                    data-prev="<?= $privilegio ?>">
 
                     <div class="df-grid-2">
                         <div class="df-field">
@@ -91,8 +89,7 @@ $cores = [
                         </div>
                     </div>
 
-                    <!-- Síndico/admin escolhem o morador dono -->
-                    <?php if (in_array($prev, [2, 3, 4])): ?>
+                    <?php if (in_array($privilegio, [2, 3, 4])): ?>
                         <div class="df-field">
                             <label>Morador (dono do veículo)</label>
                             <select name="id_user" required>
@@ -107,11 +104,10 @@ $cores = [
                             </select>
                         </div>
                     <?php else: ?>
-                        <!-- Morador: id_user é o próprio -->
+
                         <input type="hidden" name="id_user" value="<?= $usuario['id_user'] ?>">
                     <?php endif; ?>
 
-                    <!-- Checkbox principal -->
                     <div class="df-field df-field-check">
                         <input type="checkbox" name="principal" id="principal" value="1">
                         <label for="principal">Definir como veículo principal</label>
@@ -125,10 +121,9 @@ $cores = [
             </div>
         <?php endif; ?>
 
-        <!-- Tabela de veículos -->
         <div class="df-card">
             <h3 class="section-title">
-                <?= in_array($prev, [2, 3, 4]) ? 'Todos os Veículos' : 'Meus Veículos' ?>
+                <?= in_array($privilegio, [2, 3, 4]) ? 'Todos os Veículos' : 'Meus Veículos' ?>
             </h3>
 
             <?php if (empty($veiculos)): ?>
@@ -146,11 +141,11 @@ $cores = [
                                 <th>Marca</th>
                                 <th>Modelo</th>
                                 <th>Cor</th>
-                                <?php if (in_array($prev, [2, 3, 4])): ?>
+                                <?php if (in_array($privilegio, [2, 3, 4])): ?>
                                     <th>Morador</th>
                                     <th>Cadastrado por</th>
                                 <?php endif; ?>
-                                <th></th> <!-- ações -->
+                                <th></th> 
                             </tr>
                         </thead>
                         <tbody>
@@ -162,16 +157,15 @@ $cores = [
                                     <td><?= htmlspecialchars($v['marca']) ?></td>
                                     <td><?= htmlspecialchars($v['modelo']) ?></td>
                                     <td><?= htmlspecialchars($v['cor']) ?></td>
-                                    <?php if (in_array($prev, [2, 3, 4])): ?>
+                                    <?php if (in_array($privilegio, [2, 3, 4])): ?>
                                         <td><?= htmlspecialchars($v['nome_morador']) ?></td>
                                         <td><?= htmlspecialchars($v['cadastrado_por']) ?></td>
                                     <?php endif; ?>
                                     <td>
                                         <?php
-                                        // Síndico/admin podem excluir qualquer um
-                                        // Morador só pode excluir o próprio
-                                        $podeExcluir = in_array($prev, [2, 4]) ||
-                                            ($prev == 1 && $v['id_user'] == $usuario['id_user']);
+
+                                        $podeExcluir = in_array($privilegio, [2, 4]) ||
+                                            ($privilegio == 1 && $v['id_user'] == $usuario['id_user']);
                                         ?>
                                         <?php if ($podeExcluir): ?>
                                             <form action="<?= BASE_URL ?>/veiculo/excluir" method="POST"

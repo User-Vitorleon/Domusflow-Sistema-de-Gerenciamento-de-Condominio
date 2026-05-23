@@ -1,35 +1,29 @@
-/* app.js — DomusFlow · Global
-   Sidebar toggle · Nav ativo */
+document.addEventListener('DOMContentLoaded', function () {
+    const temaBtn  = document.getElementById('toggleTema');
+    const iconeLua = document.getElementById('iconeLua');
+    const iconeSol = document.getElementById('iconeSol');
 
-(function () {
-    'use strict';
-
-    // Sidebar toggle
-    const sidebar = document.querySelector('.sidebar');
-    const toggle = document.querySelector('.toggle');
-
-    if (sidebar && toggle) {
-        toggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            sidebar.classList.toggle('close');
-        });
+    function aplicarTema(tema) {
+        document.documentElement.setAttribute('data-theme', tema);
+        if (!iconeLua || !iconeSol) return;
+        if (tema === 'dark') {
+            iconeLua.style.display = 'none';
+            iconeSol.style.display = 'block';
+        } else {
+            iconeLua.style.display = 'block';
+            iconeSol.style.display = 'none';
+        }
     }
 
-    // Fecha sidebar ao clicar fora (mobile)
-    document.addEventListener('click', (e) => {
-        if (!sidebar) return;
-        if (window.innerWidth < 768 && !sidebar.contains(e.target)) {
-            sidebar.classList.add('close');
-        }
-    });
+    const temaSalvo = localStorage.getItem('domusflow-tema') || 'light';
+    aplicarTema(temaSalvo);
 
-    // Marca nav-link ativo pela URL
-    const currentPath = window.location.pathname;
-    document.querySelectorAll('.nav-link a').forEach((link) => {
-        const href = link.getAttribute('href');
-        if (href && currentPath.endsWith(href.replace(/^.*\//, '/'))) {
-            link.closest('.nav-link')?.classList.add('active');
-        }
-    });
-
-})();
+    if (temaBtn) {
+        temaBtn.addEventListener('click', function () {
+            const atual = document.documentElement.getAttribute('data-theme');
+            const novo  = atual === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('domusflow-tema', novo);
+            aplicarTema(novo);
+        });
+    }
+});

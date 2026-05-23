@@ -2,7 +2,7 @@
 $paginaTitulo = 'Lançamentos';
 $paginaAtiva  = 'financeiro';
 require_once __DIR__ . '/../../layout/header.php';
-$prev = $usuario['privilegio'] ?? 1;
+$privilegio = $usuario['privilegio'] ?? 1;
 ?>
 
 <main class="main-content">
@@ -32,8 +32,8 @@ $prev = $usuario['privilegio'] ?? 1;
         </div>
     <?php endif; ?>
 
-    <?php if ($prev == 2): ?>
-    <!-- Formulário de lançamento -->
+    <?php if ($privilegio == 2): ?>
+
     <div class="df-card" style="margin-bottom: 24px;">
         <h3 class="section-title">Registrar Lançamento</h3>
         <form action="<?= BASE_URL ?>/financeiro/lancamento/salvar" method="POST">
@@ -84,7 +84,6 @@ $prev = $usuario['privilegio'] ?? 1;
                 </div>
             </div>
 
-            <!-- Checkbox estilizado -->
             <div style="margin-top: 12px; padding: 12px 16px; background: #F8FAFC; border-radius: var(--radius); border: 1px solid var(--border);">
                 <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 14px; font-weight: 500;">
                     <input type="checkbox" name="todos_moradores" id="todos_moradores" value="1"
@@ -105,11 +104,10 @@ $prev = $usuario['privilegio'] ?? 1;
     </div>
     <?php endif; ?>
 
-    <!-- Grid de lançamentos -->
     <div class="df-card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
             <h3 class="section-title" style="margin: 0;">Todos os Lançamentos</h3>
-            <?php if ($prev == 2): ?>
+            <?php if ($privilegio == 2): ?>
                 <form action="<?= BASE_URL ?>/financeiro/fatura/gerarTodos" method="POST"
                       onsubmit="return confirm('Gerar fatura para TODOS os moradores com pendências?')">
                     <button type="submit" class="btn-primary" style="font-size: 13px; padding: 7px 14px;">
@@ -119,7 +117,6 @@ $prev = $usuario['privilegio'] ?? 1;
             <?php endif; ?>
         </div>
 
-        <!-- Filtros -->
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 16px; padding: 14px; background: #F8FAFC; border-radius: var(--radius); border: 1px solid var(--border);">
             <div class="df-field" style="margin: 0;">
                 <label style="font-size: 11px;">Busca geral</label>
@@ -162,7 +159,7 @@ $prev = $usuario['privilegio'] ?? 1;
                     <thead>
                         <tr style="background: #F8FAFC;">
                             <th style="padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap;">#</th>
-                            <?php if ($prev == 2): ?>
+                            <?php if ($privilegio == 2): ?>
                             <th style="padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border);">Nome</th>
                             <th style="padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border);">Bloco</th>
                             <th style="padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border);">Apto</th>
@@ -173,7 +170,7 @@ $prev = $usuario['privilegio'] ?? 1;
                             <th style="padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap;">Dt. Lançamento</th>
                             <th style="padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap;">Vencimento</th>
                             <th style="padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border);">Status</th>
-                            <?php if ($prev == 2): ?>
+                            <?php if ($privilegio == 2): ?>
                             <th style="padding: 10px 12px; text-align: center; border-bottom: 1px solid var(--border);">Ação</th>
                             <?php endif; ?>
                         </tr>
@@ -206,7 +203,7 @@ $prev = $usuario['privilegio'] ?? 1;
                                 data-dt-lanc="<?= $dtLanc ?? '' ?>"
                                 data-dt-venc="<?= $l['data_vencimento'] ?>">
                                 <td style="padding: 10px 12px; color: var(--text-muted);">#<?= $l['id_lancamento'] ?></td>
-                                <?php if ($prev == 2): ?>
+                                <?php if ($privilegio == 2): ?>
                                 <td style="padding: 10px 12px; font-weight: 500;"><?= htmlspecialchars($l['nome_morador'] ?? 'N/A') ?></td>
                                 <td style="padding: 10px 12px;"><?= htmlspecialchars($l['bloco'] ?? '-') ?></td>
                                 <td style="padding: 10px 12px;"><?= htmlspecialchars($l['apto'] ?? '-') ?></td>
@@ -239,7 +236,7 @@ $prev = $usuario['privilegio'] ?? 1;
                                         <?= $textoStatus ?>
                                     </span>
                                 </td>
-                                <?php if ($prev == 2): ?>
+                                <?php if ($privilegio == 2): ?>
                                 <td style="padding: 10px 12px; text-align: center;">
                                     <form action="<?= BASE_URL ?>/financeiro/lancamento/excluir" method="POST"
                                           onsubmit="return confirm('Deseja excluir este lançamento?')" style="display:inline">
@@ -322,7 +319,7 @@ function toggleMorador() {
     campo.querySelector('select').required = !checkbox.checked;
 }
 
-// Filtros client-side
+
 let timer;
 function filtrarLancamentos() {
     clearTimeout(timer);
@@ -349,9 +346,7 @@ function limparFiltros() {
     window.location.href = '<?= BASE_URL ?>/financeiro/lancamento';
 }
 
-
-// Validação duplicado
-<?php if ($prev == 2): ?>
+<?php if ($privilegio == 2): ?>
 document.querySelector('form[action*="lancamento/salvar"]').addEventListener('submit', function(e) {
     e.preventDefault();
     const form = this;

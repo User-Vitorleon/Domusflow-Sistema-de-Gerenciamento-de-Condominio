@@ -34,7 +34,6 @@ function statusBadge(string $s): string
 
         <div class="oc-layout-grid">
 
-            <!-- Coluna esquerda: Formulário -->
             <div class="oc-col-form">
                 <div class="df-card">
                     <h4 style="font-size:15px;font-weight:700;margin-bottom:4px">Nova Ocorrência</h4>
@@ -77,7 +76,6 @@ function statusBadge(string $s): string
                                 style="resize:vertical"><?= htmlspecialchars($_POST['descricao'] ?? '') ?></textarea>
                         </div>
 
-                        <!-- Fotos (Em Desenvolvimento) -->
                         <div class="df-field">
                             <label>Fotos <span style="font-size:11px;color:#aaa;font-weight:400">(opcional)</span></label>
                             <div class="oc-foto-area" onclick="abrirModalFotos()" title="Adicionar fotos">
@@ -109,7 +107,6 @@ function statusBadge(string $s): string
                 </div>
             </div>
 
-            <!-- Coluna direita: Lista de ocorrências -->
             <div class="oc-col-lista">
                 <div class="df-card" style="padding:0;overflow:hidden">
                     <div style="padding:14px 16px;border-bottom:1px solid #eee">
@@ -154,11 +151,9 @@ function statusBadge(string $s): string
                 </div>
             </div>
 
-        </div><!-- fecha oc-layout-grid -->
+        </div>
 
-    </div><!-- fecha df-page -->
-
-    <!-- ===== MODAL FOTOS ===== -->
+    </div>
     <div class="oc-modal-overlay" id="modalFotos" style="display:none" onclick="fecharModalFotos()">
         <div class="oc-modal" onclick="event.stopPropagation()" style="max-width:420px;text-align:center">
             <div class="oc-modal-header">

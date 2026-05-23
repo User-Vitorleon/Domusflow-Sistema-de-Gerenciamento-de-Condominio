@@ -1,22 +1,20 @@
-/* ═══════════════════════════════════════════════════
-   DomusFlow — dashboard.js
-   Vue 3 · Chart.js · KPIs + Ocorrências Morador
-═══════════════════════════════════════════════════ */
-
 (function () {
     'use strict';
 
     const { createApp } = Vue;
 
-    // ── Gráfico de Reservas (Síndico/Admin) ─────────────────
+    const CORES_OCORRENCIAS = ['#EF4444', '#F59E0B', '#22C55E', '#94A3B8'];
+    const LABELS_PADRAO = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    const DADOS_PADRAO  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
     function montarGraficoReservas() {
         const canvas = document.getElementById('chartReservas');
-        if (!canvas) return;
+        if (!canvas) {
+            return;
+        }
 
-        const labels = window.APP_DASHBOARD?.chartLabels
-            ?? ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-        const dados = window.APP_DASHBOARD?.chartDados
-            ?? [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        const labels = window.APP_DASHBOARD?.chartLabels ?? LABELS_PADRAO;
+        const dados  = window.APP_DASHBOARD?.chartDados  ?? DADOS_PADRAO;
 
         new Chart(canvas, {
             type: 'bar',
@@ -50,13 +48,15 @@
         });
     }
 
-    // ── Gráfico de Ocorrências (Morador) ────────────────────
-    function montarGraficoOcorrencias() {
-        const canvas = document.getElementById('chartOcorrenciasMorador');
-        if (!canvas) return;
-
-        const config = window.APP_DASHBOARD?.chartOcorrenciasMorador;
-        if (!config) return;
+    function montarDoughnutOcorrencias(canvasId, configKey, opcoes = {}) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) {
+            return;
+        }
+        const config = window.APP_DASHBOARD?.[configKey];
+        if (!config) {
+            return;
+        }
 
         new Chart(canvas, {
             type: 'doughnut',
@@ -64,21 +64,48 @@
                 labels: config.labels,
                 datasets: [{
                     data: config.dados,
-                    backgroundColor: ['#EF4444', '#F59E0B', '#22C55E', '#94A3B8'],
+                    backgroundColor: CORES_OCORRENCIAS,
                     borderWidth: 0
                 }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: opcoes.maintainAspectRatio ?? false,
                 plugins: {
-                    legend: { position: 'bottom' }
+                    legend: opcoes.legend ?? { position: 'bottom' }
                 },
-                cutout: '68%'
+                cutout: opcoes.cutout ?? '68%'
             }
         });
     }
 
-    // ── Vue App (KPIs — usado só se houver #app na view) ────
+    function montarGraficoOcorrencias() {
+        montarDoughnutOcorrencias('chartOcorrenciasMorador', 'chartOcorrenciasMorador');
+    }
+
+    function montarGraficoOcorrenciasSindico() {
+        montarDoughnutOcorrencias('chartOcorrenciasSindico', 'chartOcorrenciasSindico', {
+            maintainAspectRatio: true,
+            legend: { display: false },
+            cutout: '65%'
+        });
+    }
+
+    function montarGraficoOcorrenciasAdmin() {
+        montarDoughnutOcorrencias('chartOcorrenciasAdmin', 'chartOcorrenciasAdmin', {
+            maintainAspectRatio: true,
+            legend: { display: false },
+            cutout: '65%'
+        });
+    }
+
+    function montarTodosGraficos() {
+        montarGraficoReservas();
+        montarGraficoOcorrencias();
+        montarGraficoOcorrenciasSindico();
+        montarGraficoOcorrenciasAdmin();
+    }
+
     const appEl = document.getElementById('app');
 
     if (appEl) {
@@ -88,76 +115,15 @@
                     resumo: {
                         reservasPendentes: window.APP_DASHBOARD?.reservasPendentes ?? 0,
                         locaisDisponiveis: window.APP_DASHBOARD?.locaisDisponiveis ?? 0,
-                        moradoresAtivos: window.APP_DASHBOARD?.moradoresAtivos ?? 0,
+                        moradoresAtivos:   window.APP_DASHBOARD?.moradoresAtivos   ?? 0
                     }
                 };
             },
             mounted() {
-                montarGraficoReservas();
-                montarGraficoOcorrencias();
-                montarGraficoOcorrenciasSindico();
-                montarGraficoOcorrenciasAdmin();
+                montarTodosGraficos();
             }
         }).mount('#app');
     } else {
-        // Views sem Vue (morador, funcionario) — inicia gráficos diretamente
-        document.addEventListener('DOMContentLoaded', function () {
-            montarGraficoReservas();
-            montarGraficoOcorrencias();
-            montarGraficoOcorrenciasSindico();
-            montarGraficoOcorrenciasAdmin();
-        });
+        document.addEventListener('DOMContentLoaded', montarTodosGraficos);
     }
-
-    function montarGraficoOcorrenciasAdmin() {
-        const canvas = document.getElementById('chartOcorrenciasAdmin');
-        if (!canvas) return;
-        const config = window.APP_DASHBOARD?.chartOcorrenciasAdmin;
-        if (!config) return;
-        new Chart(canvas, {
-            type: 'doughnut',
-            data: {
-                labels: config.labels,
-                datasets: [{
-                    data: config.dados,
-                    backgroundColor: ['#EF4444', '#F59E0B', '#22C55E', '#94A3B8'],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: { legend: { display: false } },
-                cutout: '65%'
-            }
-        });
-    }
-    function montarGraficoOcorrenciasSindico() {
-        const canvas = document.getElementById('chartOcorrenciasSindico');
-        if (!canvas) return;
-
-        const config = window.APP_DASHBOARD?.chartOcorrenciasSindico;
-        if (!config) return;
-
-        new Chart(canvas, {
-            type: 'doughnut',
-            data: {
-                labels: config.labels,
-                datasets: [{
-                    data: config.dados,
-                    backgroundColor: ['#EF4444', '#F59E0B', '#22C55E', '#94A3B8'],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: { display: false }
-                },
-                cutout: '65%'
-            }
-        });
-    }
-
 })();

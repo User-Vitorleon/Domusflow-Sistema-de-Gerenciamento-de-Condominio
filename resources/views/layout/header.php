@@ -3,26 +3,33 @@ $paginaTitulo = $paginaTitulo ?? 'DomusFlow';
 $cssExtra     = $cssExtra     ?? null;
 $cssTela      = $cssTela      ?? null;
 
-$semTopo = in_array($paginaTitulo, ['Login', 'Cadastro']);
+$telasSemTopo = ['Login', 'Cadastro'];
+$semTopo      = in_array($paginaTitulo, $telasSemTopo, true);
 
-$primeiro_nome = null;
-$apto          = null;
-$bloco         = null;
+$primeiroNome = null;
+$apartamento  = null;
+$bloco        = null;
 
 if (isset($usuario) && is_array($usuario)) {
-    $primeiro_nome = explode(' ', $usuario['nome'] ?? '')[0] ?? null;
-    $apto          = $usuario['apto']  ?? null;
-    $bloco         = $usuario['bloco'] ?? null;
+    $primeiroNome = explode(' ', $usuario['nome'] ?? '')[0] ?? null;
+    $apartamento  = $usuario['apto']  ?? null;
+    $bloco        = $usuario['bloco'] ?? null;
 }
 
-// ── Sino: conta notificações não lidas ──────────────────────────
-$sino_count = 0;
+$sinoCount = 0;
 if (!$semTopo && isset($_SESSION['usuario_id'])) {
     require_once __DIR__ . '/../../../app/repositories/AvisosRepository.php';
-    $sinoRepo   = new AvisosRepository();
-    $desde      = $_SESSION['avisos_visto_em'] ?? '2000-01-01 00:00:00';
-    $sino_count = $sinoRepo->contarNovos($desde);
+    $sinoRepo  = new AvisosRepository();
+    $desde     = $_SESSION['avisos_visto_em'] ?? '2000-01-01 00:00:00';
+    $sinoCount = $sinoRepo->contarNovos($desde);
 }
+
+$rotulosPerfil = [
+    1 => 'Morador(a)',
+    2 => 'Síndico(a)',
+    3 => 'Funcionário(a)',
+    4 => 'Admin',
+];
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -47,7 +54,7 @@ if (!$semTopo && isset($_SESSION['usuario_id'])) {
 
 <body>
 
-    <?php if (!$semTopo && $primeiro_nome): ?>
+    <?php if (!$semTopo && $primeiroNome): ?>
         <header class="df-topbar">
             <div class="df-topbar-inner">
 
@@ -67,40 +74,53 @@ if (!$semTopo && isset($_SESSION['usuario_id'])) {
 
                 <div class="df-topbar-user">
 
-                    <!-- ── Sino de Ocorrências ── -->
                     <a href="<?= BASE_URL ?>/avisos" class="oc-sino" title="Avisos" aria-label="Avisos">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
                             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
                             <path d="M13.73 21a2 2 0 0 1-3.46 0" />
                         </svg>
-                        <?php if ($sino_count > 0): ?>
-                            <span class="oc-sino-badge"><?= $sino_count > 9 ? '9+' : $sino_count ?></span>
+                        <?php if ($sinoCount > 0): ?>
+                            <span class="oc-sino-badge"><?= $sinoCount > 9 ? '9+' : $sinoCount ?></span>
                         <?php endif; ?>
                     </a>
 
                     <div class="df-topbar-userinfo">
 
-                        <!-- Linha 1: badge + nome -->
                         <div class="df-topbar-name-row">
                             <?php
-                            $perfis = [1 => 'Morador(a)', 2 => 'Síndico(a)', 3 => 'Funcionário(a)', 4 => 'Admin'];
-                            $prev   = $usuario['privilegio'] ?? 1;
-                            $label  = $perfis[$prev] ?? 'Morador';
+                                $privilegio = (int) ($usuario['privilegio'] ?? 1);
+                                $rotulo     = $rotulosPerfil[$privilegio] ?? 'Morador';
                             ?>
-                            <span class="df-topbar-role df-topbar-role--<?= $prev ?>"><?= $label ?></span>
-                            <span class="df-topbar-name"><?= htmlspecialchars($primeiro_nome) ?></span>
+                            <span class="df-topbar-role df-topbar-role--<?= $privilegio ?>"><?= $rotulo ?></span>
+                            <span class="df-topbar-name"><?= htmlspecialchars($primeiroNome) ?></span>
                         </div>
 
-                        <!-- Linha 2: bloco + apto -->
-                        <?php if ($apto || $bloco): ?>
+                        <?php if ($apartamento || $bloco): ?>
                             <span class="df-topbar-apto">
                                 <?php if ($bloco): ?>Bl. <?= htmlspecialchars($bloco) ?><?php endif; ?>
-                                <?php if ($apto): ?>&nbsp;Ap. <?= htmlspecialchars($apto) ?><?php endif; ?>
+                                <?php if ($apartamento): ?>&nbsp;Ap. <?= htmlspecialchars($apartamento) ?><?php endif; ?>
                             </span>
                         <?php endif; ?>
 
                     </div>
+
+                                    <button id="toggleTema" class="df-topbar-tema" aria-label="Alternar tema" title="Alternar tema">
+                    <svg id="iconeLua" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                    </svg>
+                    <svg id="iconeSol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" style="display:none">
+                        <circle cx="12" cy="12" r="5"/>
+                        <line x1="12" y1="1" x2="12" y2="3"/>
+                        <line x1="12" y1="21" x2="12" y2="23"/>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                        <line x1="1" y1="12" x2="3" y2="12"/>
+                        <line x1="21" y1="12" x2="23" y2="12"/>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                </button>
 
                     <a href="<?= BASE_URL ?>/logout" class="df-topbar-logout" aria-label="Sair">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -112,6 +132,11 @@ if (!$semTopo && isset($_SESSION['usuario_id'])) {
                         <span class="df-topbar-logout-label">Sair</span>
                     </a>
                 </div>
+
+                <script>
+    const t = localStorage.getItem('domusflow-tema');
+    if (t) document.documentElement.setAttribute('data-theme', t);
+</script>
 
             </div>
         </header>

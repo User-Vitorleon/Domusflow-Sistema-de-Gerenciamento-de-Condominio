@@ -12,34 +12,31 @@ class AuthService
 
     public function login(string $cpf, string $senha): array
     {
-        $cpf = preg_replace('/[^0-9]/', '', $cpf);
+        $cpf     = $this->somenteDigitos($cpf);
         $usuario = $this->repo->findByCpf($cpf);
 
-
         if (!$usuario) {
-            return ['sucesso' => false, 'mensagem' => 'CPF ou senha incorretos.'];
+            return $this->credenciaisInvalidas();
         }
 
-        // 2. conta bloqueada ou deletada?
-        if ($usuario['status'] === 'B' || $usuario['status'] === 'E') {
-            return ['sucesso' => false, 'mensagem' => 'Esta conta não pode ser acessada. Entre em contato com o síndico.'];
+        if ($this->contaInacessivel($usuario['status'])) {
+            return [
+                'sucesso'  => false,
+                'mensagem' => 'Esta conta não pode ser acessada. Entre em contato com o síndico.',
+            ];
         }
 
-        // 3. valida a senha
         if (!password_verify($senha, $usuario['senha'])) {
-            return ['sucesso' => false, 'mensagem' => 'CPF ou senha incorretos.'];
+            return $this->credenciaisInvalidas();
         }
 
-        // só agora salva na sessão
         $_SESSION['usuario_id']   = $usuario['id_user'];
         $_SESSION['usuario_nome'] = $usuario['nome'];
 
-        // Se estiver pendente, avisamos o Controller para mandar para /pendente
         if ($usuario['status'] === 'P') {
             return ['sucesso' => true, 'redirecionar' => BASE_URL . '/pendente'];
         }
 
-        // Se chegou aqui, está Liberado (L)
         $_SESSION['usuario_privilegio'] = $usuario['privilegio'];
         return ['sucesso' => true, 'redirecionar' => BASE_URL . '/painel'];
     }
@@ -52,5 +49,20 @@ class AuthService
     public function checarAprovacao(int $id): bool
     {
         return $this->repo->getStatus($id) === 'L';
+    }
+
+    private function somenteDigitos(string $valor): string
+    {
+        return preg_replace('/[^0-9]/', '', $valor);
+    }
+
+    private function contaInacessivel(string $status): bool
+    {
+        return $status === 'B' || $status === 'E';
+    }
+
+    private function credenciaisInvalidas(): array
+    {
+        return ['sucesso' => false, 'mensagem' => 'CPF ou senha incorretos.'];
     }
 }

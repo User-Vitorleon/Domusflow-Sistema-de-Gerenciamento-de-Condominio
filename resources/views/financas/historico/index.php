@@ -3,9 +3,8 @@ $paginaTitulo = 'Meu Histórico';
 $paginaAtiva  = 'financeiro';
 require_once __DIR__ . '/../../layout/header.php';
 
-// Separar pendentes e faturas geradas
-$pendentes = array_filter($historico, fn($h) => $h['status'] === 'P');
-$geradas   = array_filter($historico, fn($h) => $h['status'] === 'F');
+$pendentes = array_filter($historico, fn($h) => $h['status'] === 'F');
+$pagas     = array_filter($historico, fn($h) => $h['status'] === 'G');
 $totalPendente = array_sum(array_column(iterator_to_array($pendentes ?? new ArrayIterator([])), 'valor'));
 ?>
 
@@ -24,22 +23,11 @@ $totalPendente = array_sum(array_column(iterator_to_array($pendentes ?? new Arra
         <div class="df-alert df-alert-error"><?= htmlspecialchars($_SESSION['erro_fatura']) ?><?php unset($_SESSION['erro_fatura']); ?></div>
     <?php endif; ?>
 
-    <!-- ── PENDÊNCIAS ── -->
     <div class="df-card" style="margin-bottom: 24px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
-            <h3 class="section-title" style="margin: 0;">Pendências</h3>
-            <?php if (!empty($pendentes)): ?>
-                <form action="<?= BASE_URL ?>/financeiro/fatura/gerar" method="POST"
-                      onsubmit="return confirm('Confirma a geração da fatura com todas as suas pendências?')">
-                    <input type="hidden" name="id_user" value="<?= $_SESSION['usuario_id'] ?>">
-                    <button type="submit" class="btn-primary" style="font-size: 13px; padding: 7px 14px;">
-                        <i class='bx bx-file'></i> Gerar Fatura
-                    </button>
-                </form>
-            <?php endif; ?>
+            <h3 class="section-title" style="margin: 0;">Novos Boletos</h3>
         </div>
 
-        <!-- Filtros pendências -->
         <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; margin-bottom: 14px; padding: 12px; background: #F8FAFC; border-radius: var(--radius); border: 1px solid var(--border);">
             <div class="df-field" style="margin: 0;">
                 <label style="font-size: 11px;">Buscar</label>
@@ -73,6 +61,8 @@ $totalPendente = array_sum(array_column(iterator_to_array($pendentes ?? new Arra
                             <th style="padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap;">Dt. Lançamento</th>
                             <th style="padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap;">Vencimento</th>
                             <th style="padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border);">Status</th>
+                            <th style="padding: 10px 12px; text-align: center; border-bottom: 1px solid var(--border);">Ação</th>
+                        
                         </tr>
                     </thead>
                     <tbody id="tabelaPendentes">
@@ -108,13 +98,18 @@ $totalPendente = array_sum(array_column(iterator_to_array($pendentes ?? new Arra
                                         Pendente
                                     </span>
                                 </td>
+                                <td style="padding: 10px 12px; text-align: center;">
+                                    <a href="<?= BASE_URL ?>/financeiro/boleto?id=<?= $h['id_lancamento'] ?>"
+                                        class="btn-success-sm">
+                                            <i class='bx bx-money'></i> Pagar
+                                    </a>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
 
-            <!-- Total pendente -->
             <div style="margin-top: 14px; padding: 12px 16px; background: #FFFBEB; border-radius: var(--radius); border: 1px solid #FDE68A; display: flex; justify-content: space-between; align-items: center;">
                 <strong>Total Pendente</strong>
                 <strong style="color: #CA8A04; font-size: 16px;">
@@ -124,11 +119,9 @@ $totalPendente = array_sum(array_column(iterator_to_array($pendentes ?? new Arra
         <?php endif; ?>
     </div>
 
-    <!-- ── FATURAS GERADAS ── -->
     <div class="df-card">
-        <h3 class="section-title" style="margin-bottom: 16px;">Faturas Geradas</h3>
+        <h3 class="section-title" style="margin-bottom: 16px;">Faturas Pagas</h3>
 
-        <!-- Filtros faturas -->
         <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; margin-bottom: 14px; padding: 12px; background: #F8FAFC; border-radius: var(--radius); border: 1px solid var(--border);">
             <div class="df-field" style="margin: 0;">
                 <label style="font-size: 11px;">Buscar</label>
@@ -144,7 +137,7 @@ $totalPendente = array_sum(array_column(iterator_to_array($pendentes ?? new Arra
             </div>
         </div>
 
-        <?php if (empty($geradas)): ?>
+        <?php if (empty($pagas)): ?>
             <div class="empty-state">
                 <i class='bx bx-file'></i>
                 <h5>Nenhuma fatura gerada</h5>
@@ -165,7 +158,7 @@ $totalPendente = array_sum(array_column(iterator_to_array($pendentes ?? new Arra
                         </tr>
                     </thead>
                     <tbody id="tabelaGeradas">
-                        <?php foreach ($geradas as $h):
+                        <?php foreach ($pagas as $h):
                             $corModelo = strtoupper($h['modelo']) === 'TAXA' ? '#2563EB' : '#DC2626';
                         ?>
                             <tr style="border-bottom: 1px solid #F1F5F9;"
@@ -190,8 +183,13 @@ $totalPendente = array_sum(array_column(iterator_to_array($pendentes ?? new Arra
                                 </td>
                                 <td style="padding: 10px 12px;">
                                     <span style="padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; color: #16A34A; background: #F0FDF4; border: 1px solid #BBF7D0;">
-                                        Fatura Gerada
+                                        Fatura Paga
                                     </span>
+                                </td>
+                                <td style="padding: 10px 12px; text-align: center;">
+                                    <a href="<?= BASE_URL ?>/financeiro/boleto?id=<?= $h['id_lancamento'] ?>" class="btn-ghost">
+                                        <i class='bx bx-download'></i> Baixar
+                                    </a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

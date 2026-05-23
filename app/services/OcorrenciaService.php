@@ -1,5 +1,4 @@
 <?php
-
 require_once __DIR__ . '/../repositories/OcorrenciaRepository.php';
 
 class OcorrenciaService
@@ -11,8 +10,7 @@ class OcorrenciaService
         $this->repo = new OcorrenciaRepository();
     }
 
-    // ── Abrir ocorrência ─────────────────────────────────────────────────────
-    public function abrir(array $post, int $id_user): array
+    public function abrir(array $post, int $idUser): array
     {
         $titulo    = trim($post['titulo']    ?? '');
         $descricao = trim($post['descricao'] ?? '');
@@ -23,16 +21,15 @@ class OcorrenciaService
         }
 
         $id = $this->repo->criar([
-            'id_user'   => $id_user,
+            'id_user'   => $idUser,
             'titulo'    => $titulo,
             'descricao' => $descricao,
             'categoria' => $categoria,
         ]);
 
-        // Tramite inicial automático
         $this->repo->adicionarTramite([
             'id_ocorrencia' => $id,
-            'id_user_cad'   => $id_user,
+            'id_user_cad'   => $idUser,
             'nome_user_cad' => $_SESSION['usuario_nome'] ?? 'Morador',
             'descricao'     => 'OCORRÊNCIA ABERTA PELO MORADOR.',
             'status_novo'   => 'A',
@@ -41,26 +38,30 @@ class OcorrenciaService
         return ['sucesso' => true];
     }
 
-    // ── Cancelar ocorrência (morador via rota /cancelar) ─────────────────────
-    public function cancelar(int $id_ocorrencia, int $id_user): array
+    public function cancelar(int $idOcorrencia, int $idUser): array
     {
-        $ocorrencia = $this->repo->findById($id_ocorrencia);
+        $ocorrencia = $this->repo->findById($idOcorrencia);
 
         if (!$ocorrencia) {
             return ['sucesso' => false, 'mensagem' => 'Ocorrência não encontrada.'];
         }
-        if ((int)$ocorrencia['id_user'] !== $id_user) {
-            return ['sucesso' => false, 'mensagem' => 'Você não tem permissão para cancelar esta ocorrência.'];
+        if ((int)$ocorrencia['id_user'] !== $idUser) {
+            return [
+                'sucesso'  => false,
+                'mensagem' => 'Você não tem permissão para cancelar esta ocorrência.',
+            ];
         }
-        // Morador só pode cancelar em status A (Aberto)
         if ($ocorrencia['status'] !== 'A') {
-            return ['sucesso' => false, 'mensagem' => 'Esta ocorrência não pode ser cancelada no status atual.'];
+            return [
+                'sucesso'  => false,
+                'mensagem' => 'Esta ocorrência não pode ser cancelada no status atual.',
+            ];
         }
 
-        $this->repo->atualizarStatus($id_ocorrencia, 'C');
+        $this->repo->atualizarStatus($idOcorrencia, 'C');
         $this->repo->adicionarTramite([
-            'id_ocorrencia' => $id_ocorrencia,
-            'id_user_cad'   => $id_user,
+            'id_ocorrencia' => $idOcorrencia,
+            'id_user_cad'   => $idUser,
             'nome_user_cad' => $_SESSION['usuario_nome'] ?? 'Morador',
             'descricao'     => 'OCORRÊNCIA CANCELADA PELO MORADOR.',
             'status_novo'   => 'C',
@@ -69,54 +70,64 @@ class OcorrenciaService
         return ['sucesso' => true];
     }
 
-    public function tramitarMorador(int $id_ocorrencia, string $descricao, string $acao, int $id_user): array
+    public function tramitarMorador(int $idOcorrencia, string $descricao, string $acao, int $idUser): array
     {
-        $ocorrencia = $this->repo->findById($id_ocorrencia);
+        $ocorrencia = $this->repo->findById($idOcorrencia);
 
         if (!$ocorrencia) {
             return ['sucesso' => false, 'mensagem' => 'Ocorrência não encontrada.'];
         }
-        if ((int)$ocorrencia['id_user'] !== $id_user) {
-            return ['sucesso' => false, 'mensagem' => 'Você não tem permissão para tramitar esta ocorrência.'];
+        if ((int)$ocorrencia['id_user'] !== $idUser) {
+            return [
+                'sucesso'  => false,
+                'mensagem' => 'Você não tem permissão para tramitar esta ocorrência.',
+            ];
         }
 
         $statusAtual = $ocorrencia['status'];
 
         if ($statusAtual === 'R' || $statusAtual === 'C') {
-            return ['sucesso' => false, 'mensagem' => 'Não é possível tramitar uma ocorrência ' . ($statusAtual === 'R' ? 'resolvida' : 'cancelada') . '.'];
+            $rotulo = $statusAtual === 'R' ? 'resolvida' : 'cancelada';
+            return [
+                'sucesso'  => false,
+                'mensagem' => "Não é possível tramitar uma ocorrência {$rotulo}.",
+            ];
         }
         if ($acao === 'cancelar' && $statusAtual !== 'A') {
-            return ['sucesso' => false, 'mensagem' => 'Só é possível cancelar ocorrências em status Aberto.'];
+            return [
+                'sucesso'  => false,
+                'mensagem' => 'Só é possível cancelar ocorrências em status Aberto.',
+            ];
         }
 
-        $status_novo = $statusAtual;
+        $statusNovo = $statusAtual;
         if ($acao === 'cancelar') {
-            $status_novo = 'C';
-            $this->repo->atualizarStatus($id_ocorrencia, $status_novo);
+            $statusNovo = 'C';
+            $this->repo->atualizarStatus($idOcorrencia, $statusNovo);
         }
 
         $this->repo->adicionarTramite([
-            'id_ocorrencia' => $id_ocorrencia,
-            'id_user_cad'   => $id_user,
+            'id_ocorrencia' => $idOcorrencia,
+            'id_user_cad'   => $idUser,
             'nome_user_cad' => $_SESSION['usuario_nome'] ?? 'Morador',
             'descricao'     => strtoupper($descricao),
-            'status_novo'   => $status_novo,
+            'status_novo'   => $statusNovo,
         ]);
 
         return ['sucesso' => true];
     }
 
-    public function tramitar(array $post, int $id_user_cad): array
+    public function tramitar(array $post, int $idUserCad): array
     {
-        $id_ocorrencia = (int)($post['id_ocorrencia'] ?? 0);
-        $descricao     = trim($post['descricao'] ?? '');
-        $status_novo   = trim($post['status_novo'] ?? '');
+        $idOcorrencia = (int)($post['id_ocorrencia'] ?? 0);
+        $descricao    = trim($post['descricao']    ?? '');
+        $statusNovo   = trim($post['status_novo']  ?? '');
 
-        if (!$id_ocorrencia || !$descricao || !$status_novo) {
+        if (!$idOcorrencia || !$descricao || !$statusNovo) {
             return ['sucesso' => false, 'mensagem' => 'Preencha todos os campos.'];
         }
 
-        $ocorrencia = $this->repo->findById($id_ocorrencia);
+        $ocorrencia = $this->repo->findById($idOcorrencia);
         if (!$ocorrencia) {
             return ['sucesso' => false, 'mensagem' => 'Ocorrência não encontrada.'];
         }
@@ -124,41 +135,46 @@ class OcorrenciaService
         $statusAtual = $ocorrencia['status'];
 
         if ($statusAtual === 'C') {
-            return ['sucesso' => false, 'mensagem' => 'Ocorrência cancelada não permite novas tramitações.'];
+            return [
+                'sucesso'  => false,
+                'mensagem' => 'Ocorrência cancelada não permite novas tramitações.',
+            ];
         }
-        if ($statusAtual === 'R' && $status_novo !== 'R') {
-            return ['sucesso' => false, 'mensagem' => 'Ocorrência resolvida não permite alteração de status.'];
+        if ($statusAtual === 'R' && $statusNovo !== 'R') {
+            return [
+                'sucesso'  => false,
+                'mensagem' => 'Ocorrência resolvida não permite alteração de status.',
+            ];
         }
 
         $permitidos = match ($statusAtual) {
-            'A' => ['A', 'E', 'R', 'C'],
-            'E' => ['E', 'R', 'C'],
-            'R' => ['R'],
-            default => []
+            'A'     => ['A', 'E', 'R', 'C'],
+            'E'     => ['E', 'R', 'C'],
+            'R'     => ['R'],
+            default => [],
         };
 
-        if (!in_array($status_novo, $permitidos, true)) {
+        if (!in_array($statusNovo, $permitidos, true)) {
             return ['sucesso' => false, 'mensagem' => 'Transição de status não permitida.'];
         }
 
-        $this->repo->atualizarStatus($id_ocorrencia, $status_novo);
+        $this->repo->atualizarStatus($idOcorrencia, $statusNovo);
         $this->repo->adicionarTramite([
-            'id_ocorrencia' => $id_ocorrencia,
-            'id_user_cad'   => $id_user_cad,
+            'id_ocorrencia' => $idOcorrencia,
+            'id_user_cad'   => $idUserCad,
             'nome_user_cad' => $_SESSION['usuario_nome'] ?? 'Síndico',
             'descricao'     => strtoupper($descricao),
-            'status_novo'   => $status_novo,
+            'status_novo'   => $statusNovo,
         ]);
 
-        $this->repo->criarNotificacao((int)$ocorrencia['id_user'], $id_ocorrencia);
+        $this->repo->criarNotificacao((int)$ocorrencia['id_user'], $idOcorrencia);
 
         return ['sucesso' => true];
     }
 
-    // ── Listagens ─────────────────────────────────────────────────────────────
-    public function listarParaMorador(int $id_user): array
+    public function listarParaMorador(int $idUser): array
     {
-        return $this->repo->listarPorUsuario($id_user);
+        return $this->repo->listarPorUsuario($idUser);
     }
 
     public function listarParaPainel(array $filtros, int $limit = 15, int $offset = 0): array
@@ -174,9 +190,11 @@ class OcorrenciaService
     public function buscarDetalhes(int $id, int $limit = 10, int $offset = 0): ?array
     {
         $ocorrencia = $this->repo->findById($id);
-        if (!$ocorrencia) return null;
+        if (!$ocorrencia) {
+            return null;
+        }
 
-        $ocorrencia['tramites'] = $this->repo->listarTramites($id, $limit, $offset);
+        $ocorrencia['tramites']       = $this->repo->listarTramites($id, $limit, $offset);
         $ocorrencia['total_tramites'] = $this->repo->contarTramites($id);
 
         return $ocorrencia;
@@ -187,14 +205,14 @@ class OcorrenciaService
         return $this->repo->contarPorStatus();
     }
 
-    public function notificacoesNaoLidas(int $id_user): int
+    public function notificacoesNaoLidas(int $idUser): int
     {
-        return $this->repo->contarNaoLidas($id_user);
+        return $this->repo->contarNaoLidas($idUser);
     }
 
-    public function marcarNotificacoesLidas(int $id_user): void
+    public function marcarNotificacoesLidas(int $idUser): void
     {
-        $this->repo->marcarTodasLidas($id_user);
+        $this->repo->marcarTodasLidas($idUser);
     }
 
     public function listarMoradoresComOcorrencias(): array

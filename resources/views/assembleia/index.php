@@ -2,7 +2,7 @@
 $paginaTitulo = 'Assembleias';
 $paginaAtiva  = 'assembleia';
 require_once __DIR__ . '/../layout/header.php';
-$prev = $usuario['privilegio'] ?? 1;
+$privilegio = $usuario['privilegio'] ?? 1;
 ?>
 
 <main class="main-content">
@@ -33,7 +33,7 @@ $prev = $usuario['privilegio'] ?? 1;
         </div>
     <?php endif; ?>
 
-    <?php if (in_array($prev, [2, 4])): ?>
+    <?php if (in_array($privilegio, [2, 4])): ?>
     <div class="df-card" style="margin-bottom: 24px;">
         <h3 class="section-title">Convocar Assembleia</h3>
         <form action="<?= BASE_URL ?>/assembleia/salvar" method="POST">
@@ -79,7 +79,7 @@ $prev = $usuario['privilegio'] ?? 1;
         <?php else: ?>
             <?php foreach ($avisos as $a):
                 $presenca = null;
-                if ($prev == 1) {
+                if ($privilegio == 1) {
                     $presenca = $assembleiaRepo->verificarPresenca($a['id_assembleia'], (int)$_SESSION['usuario_id']);
                 }
             ?>
@@ -113,7 +113,7 @@ $prev = $usuario['privilegio'] ?? 1;
                     </div>
 
                     <div class="assembleia-card-actions">
-                        <?php if ($prev == 1): ?>
+                        <?php if ($privilegio == 1): ?>
                             <?php if ($presenca === 'S'): ?>
                                 <span class="assembleia-presenca-confirmada">
                                     <i class='bx bx-check-circle'></i> Presença Confirmada
@@ -147,7 +147,7 @@ $prev = $usuario['privilegio'] ?? 1;
                             <?php endif; ?>
                         <?php endif; ?>
 
-                        <?php if (in_array($prev, [2, 4])): ?>
+                        <?php if (in_array($privilegio, [2, 4])): ?>
                             <form action="<?= BASE_URL ?>/assembleia/excluir" method="POST"
                                   onsubmit="return confirm('Deseja remover esta assembleia?')">
                                 <input type="hidden" name="id_assembleia" value="<?= $a['id_assembleia'] ?>">

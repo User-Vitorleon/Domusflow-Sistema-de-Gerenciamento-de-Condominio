@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../services/AuthService.php';
+require_once __DIR__ . '/../middleware/AuthGuard.php';
 
 class AuthController
 {
@@ -12,22 +13,20 @@ class AuthController
 
     public function login(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: ' . BASE_URL . '/');
-            exit();
-        }
+        AuthGuard::requerePost('/');
 
         $resultado = $this->authService->login(
             $_POST['user_cpf']   ?? '',
             $_POST['user_senha'] ?? ''
         );
 
-        if ($resultado['sucesso'] || isset($resultado['redirecionar'])) {
+        if (isset($resultado['redirecionar'])) {
             header('Location: ' . $resultado['redirecionar']);
-        } else {
-            $_SESSION['erro_login'] = $resultado['mensagem'];
-            header('Location: ' . BASE_URL . '/');
+            exit();
         }
+
+        $_SESSION['erro_login'] = $resultado['mensagem'];
+        header('Location: ' . BASE_URL . '/');
         exit();
     }
 
@@ -35,20 +34,7 @@ class AuthController
     {
         session_unset();
         session_destroy();
-
-        // Garante que cookie de sessão seja apagado
-        if (ini_get("session.use_cookies")) {
-            $params = session_get_cookie_params();
-            setcookie(
-                session_name(),
-                '',
-                time() - 42000,
-                $params["path"],
-                $params["domain"],
-                $params["secure"],
-                $params["httponly"]
-            );
-        }
+        $this->limparCookieSessao();
 
         header('Location: ' . BASE_URL . '/');
         exit();
@@ -56,22 +42,38 @@ class AuthController
 
     public function pendente(): void
     {
-        if (!isset($_SESSION['usuario_id'])) {
-            header('Location: ' . BASE_URL . '/');
-            exit();
-        }
+        AuthGuard::requereLogin();
         require_once __DIR__ . '/../../resources/views/pendente/index.php';
     }
 
     public function checar(): void
     {
+        header('Content-Type: application/json');
+
         if (!isset($_SESSION['usuario_id'])) {
             echo json_encode(['aprovado' => false]);
             exit();
         }
-        $aprovado = $this->authService->checarAprovacao((int)$_SESSION['usuario_id']);
-        header('Content-Type: application/json');
+
+        $aprovado = $this->authService->checarAprovacao((int) $_SESSION['usuario_id']);
         echo json_encode(['aprovado' => $aprovado]);
         exit();
+    }
+
+    private function limparCookieSessao(): void
+    {
+        if (!ini_get('session.use_cookies')) {
+            return;
+        }
+        $params = session_get_cookie_params();
+        setcookie(
+            session_name(),
+            '',
+            time() - 42000,
+            $params['path'],
+            $params['domain'],
+            $params['secure'],
+            $params['httponly']
+        );
     }
 }

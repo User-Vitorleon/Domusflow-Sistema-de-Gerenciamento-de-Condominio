@@ -11,7 +11,7 @@ $cssExtra     = 'dashboard.css';
         <p class="text-muted">Pendências do dia</p>
     </div>
 
-    <!-- OCORRÊNCIAS SEM ATALHO (só números) -->
+
     <div class="row g-3 mb-5">
         <div class="col-md-6 col-xl-3">
             <div class="card border-0 shadow-sm text-center">
@@ -127,7 +127,6 @@ $cssExtra     = 'dashboard.css';
 
             <div class="col-12 col-md-6">
                 <div class="dashboard-placeholder h-100">
-                    <!-- Avisos recentes: módulo ainda não desenvolvido -->
                     Avisos recentes em desenvolvimento
                 </div>
             </div>
