@@ -1,0 +1,452 @@
+Listagem de caminhos de pasta
+O número de série do volume é 5EE0-0292
+C:.
+|   .htaccess
+|   composer.json
+|   composer.lock
+|   estrutura.txt
+|   index.php
+|   
++---.git
+|   |   COMMIT_EDITMSG
+|   |   config
+|   |   description
+|   |   FETCH_HEAD
+|   |   HEAD
+|   |   index
+|   |   ORIG_HEAD
+|   |   packed-refs
+|   |   
+|   +---hooks
+|   |       applypatch-msg.sample
+|   |       commit-msg.sample
+|   |       fsmonitor-watchman.sample
+|   |       post-update.sample
+|   |       pre-applypatch.sample
+|   |       pre-commit.sample
+|   |       pre-merge-commit.sample
+|   |       pre-push.sample
+|   |       pre-rebase.sample
+|   |       pre-receive.sample
+|   |       prepare-commit-msg.sample
+|   |       push-to-checkout.sample
+|   |       sendemail-validate.sample
+|   |       update.sample
+|   |       
+|   +---info
+|   |       exclude
+|   |       
+|   +---logs
+|   |   |   HEAD
+|   |   |   
+|   |   \---refs
+|   |       +---heads
+|   |       |   |   develop
+|   |       |   |   
+|   |       |   \---feature
+|   |       |           css-e-painel
+|   |       |           
+|   |       \---remotes
+|   |           \---origin
+|   |               |   develop
+|   |               |   HEAD
+|   |               |   main
+|   |               |   
+|   |               \---feature
+|   |                       connection
+|   |                       crud-sessao
+|   |                       css-e-painel
+|   |                       database
+|   |                       home-layout
+|   |                       modulo-veiculos
+|   |                       PHPMailer-Email
+|   |                       ui-redesign-v2
+|   |                       
+|   +---objects
+|   |   +---02
+|   |   |       d2620935e1de5b97dccdb5762420458a08ea1b
+|   |   |       
+|   |   +---1a
+|   |   |       59204e67ac2238c7a745d2e6aadf16fd705064
+|   |   |       
+|   |   +---1d
+|   |   |       86bdde411092f5bffdf0aec7bc82052db90ada
+|   |   |       
+|   |   +---21
+|   |   |       2c5e1bcdd0fac5554a8c1506e51311693c5592
+|   |   |       
+|   |   +---24
+|   |   |       7301015f7a679b12ade23dcb78480a4b1805d2
+|   |   |       
+|   |   +---2e
+|   |   |       580da5e67be2be08408d05ffbacaf3eb34c419
+|   |   |       
+|   |   +---2f
+|   |   |       31f3af61e302b42123b729375a318ac5fdda56
+|   |   |       
+|   |   +---3a
+|   |   |       792a4728db878411689226d32ef8a8e9d7b729
+|   |   |       
+|   |   +---3f
+|   |   |       c4565276209e3b5e0b01739baa1c520a8daa54
+|   |   |       
+|   |   +---40
+|   |   |       00ca202d71ccde13f05947092977ef7c9c89f6
+|   |   |       
+|   |   +---51
+|   |   |       2baa34fe37ec2dafa27e3902df36740c5f8b16
+|   |   |       
+|   |   +---53
+|   |   |       4dfa880b9fb50327936f7a3cf3b6a2bae2c65b
+|   |   |       8e9015fedfa765a817c3f257267df124ed232f
+|   |   |       
+|   |   +---58
+|   |   |       1ff0ddf0b9c931f1b73b06be5704cfa97f4d6e
+|   |   |       
+|   |   +---59
+|   |   |       09e2f5c44c317b3b52b5e5a08963b854669850
+|   |   |       
+|   |   +---5f
+|   |   |       75e72192c25ff3bbc38e4ff120ee6160c21f7f
+|   |   |       
+|   |   +---68
+|   |   |       f945af9032cd5451bc68865cb886fd6ac1df88
+|   |   |       
+|   |   +---70
+|   |   |       23ed12da137082b0be60a005bdfa5e5ce2f3be
+|   |   |       
+|   |   +---71
+|   |   |       ccee4b097d31120750cb144606dc37db3c6e8a
+|   |   |       
+|   |   +---84
+|   |   |       9d31e446e39c30b02e727027697e9075460dbb
+|   |   |       
+|   |   +---87
+|   |   |       0e6a7396c01122361419fc593d5907cf09d95e
+|   |   |       
+|   |   +---88
+|   |   |       5c7f9635ee7fc32ec0698cfdb169c4a5ddecc3
+|   |   |       
+|   |   +---8a
+|   |   |       a98c6e84244b0d389774d0cec0ec8bb443716b
+|   |   |       
+|   |   +---93
+|   |   |       7810fcaf9e6a3659ecbbc4167a8d267a70f40f
+|   |   |       
+|   |   +---98
+|   |   |       c3b4d7eee6a4bfed112320a63cfbc3f2e1e667
+|   |   |       
+|   |   +---99
+|   |   |       a6a5a1a7407387a1900232b58312bd25307c0b
+|   |   |       
+|   |   +---a1
+|   |   |       c4a26da0fc406da6aae504157d025c882be72c
+|   |   |       
+|   |   +---a4
+|   |   |       ab5c46e85a4d82cca81cbed1c8c722c33316ba
+|   |   |       
+|   |   +---a9
+|   |   |       3e4450a21687fce656cde44f9ec990f598b1ec
+|   |   |       
+|   |   +---c2
+|   |   |       d0e1b8f81880a476d7ae9787424b89600334fd
+|   |   |       
+|   |   +---c3
+|   |   |       6b0c08381c45271ebf379b778dabb78a8dd7ca
+|   |   |       
+|   |   +---c6
+|   |   |       3b73cea28b599a5de6a6a692ad65bf9508c153
+|   |   |       
+|   |   +---d2
+|   |   |       a675a127c22b6c479ca2bb96d8a00df285c47e
+|   |   |       
+|   |   +---d5
+|   |   |       80f81360172f7392bd8442426deaadf9a5db42
+|   |   |       
+|   |   +---dd
+|   |   |       7406894e40158f2b1f38a5184c49ffc0bb21ec
+|   |   |       
+|   |   +---e4
+|   |   |       fc61b75b52bc0bf21f855e7b190475ec40cdbb
+|   |   |       
+|   |   +---e7
+|   |   |       0c4e155f0ff449272a3679a368f6226dbc89a8
+|   |   |       86a5eaaa2c78dce7caafcf9f8c300f9dc5df9c
+|   |   |       d14ddff84bf8261e790ba8631bd60993ac7aea
+|   |   |       
+|   |   +---f4
+|   |   |       d35623d92e902252c8efeeff43b313bbe3c239
+|   |   |       
+|   |   +---f9
+|   |   |       c35c942644235d125bb758af61ba5537ad5fd6
+|   |   |       
+|   |   +---fc
+|   |   |       3c0178aa7bb931a66d03d1584041cab331aec3
+|   |   |       
+|   |   +---info
+|   |   \---pack
+|   |           pack-2894f7f6677b254df1327207a49f054fadc6d074.idx
+|   |           pack-2894f7f6677b254df1327207a49f054fadc6d074.pack
+|   |           pack-2894f7f6677b254df1327207a49f054fadc6d074.rev
+|   |           
+|   \---refs
+|       +---heads
+|       |   |   develop
+|       |   |   
+|       |   \---feature
+|       |           css-e-painel
+|       |           
+|       +---remotes
+|       |   \---origin
+|       |       |   develop
+|       |       |   HEAD
+|       |       |   main
+|       |       |   
+|       |       \---feature
+|       |               connection
+|       |               crud-sessao
+|       |               css-e-painel
+|       |               database
+|       |               home-layout
+|       |               modulo-veiculos
+|       |               PHPMailer-Email
+|       |               ui-redesign-v2
+|       |               
+|       \---tags
++---app
+|   +---controllers
+|   |       AuthController.php
+|   |       DashboardController.php
+|   |       FeriadoController.php
+|   |       FinancasController.php
+|   |       HomeController.php
+|   |       MoradorController.php
+|   |       OcorrenciaController.php
+|   |       PainelController.php
+|   |       ReservaController.php
+|   |       VeiculoController.php
+|   |       
+|   +---models
+|   |       Local.php
+|   |       Morador.php
+|   |       Reserva.php
+|   |       Veiculo.php
+|   |       
+|   +---repositories
+|   |       FinancasRepository.php
+|   |       LocalRepository.php
+|   |       MoradorRepository.php
+|   |       OcorrenciaRepository.php
+|   |       ReservaRepository.php
+|   |       VeiculoRepository.php
+|   |       
+|   \---services
+|           AuthService.php
+|           EmailService.php
+|           FeriadoService.php
+|           LocalService.php
+|           MoradorService.php
+|           OcorrenciaService.php
+|           ReservaService.php
+|           VeiculoService.php
+|           
++---config
+|       app.php
+|       database.php
+|       routes.php
+|       
++---database
+|   +---migrations
+|   |   |   domusflow_bd_prod.sql
+|   |   |   
+|   |   \---bd_old
+|   |           domusflow_bd_old.sql
+|   |           domusflow_bd_old2.sql
+|   |           domusflow_seed_old.sql
+|   |           domusflow_seed_old2.sql
+|   |           
+|   \---seeds
+|           seed.php
+|           
++---docs
+|       CONTRIBUTING.md
+|       README.md
+|       
++---public
+|   +---assets
+|   |   \---img
+|   |           DomusFlow.png
+|   |           fundo_painel.jpg
+|   |           logo_icon.png
+|   |           predios_fundo_login.jpg
+|   |           
+|   +---css
+|   |       app.css
+|   |       cadastro.css
+|   |       dashboard.css
+|   |       header.css
+|   |       login.css
+|   |       morador.css
+|   |       ocorrencia.css
+|   |       painel.css
+|   |       pendente.css
+|   |       veiculo.css
+|   |       
+|   \---js
+|           app.js
+|           cadastro.js
+|           dashboard.js
+|           login.js
+|           ocorrencia.js
+|           pendente.js
+|           reserva.js
+|           utils.js
+|           veiculo.js
+|           
++---resources
+|   \---views
+|       +---cadastro
+|       |       index.php
+|       |       
+|       +---dashboard
+|       |       index.php
+|       |       
+|       +---financas
+|       |   +---historico
+|       |   |       index.php
+|       |   |       
+|       |   +---lancamento
+|       |   |       index.php
+|       |   |       
+|       |   \---taxas
+|       |           index.php
+|       |           
+|       +---home
+|       |       index.php
+|       |       
+|       +---layout
+|       |       footer.php
+|       |       header.php
+|       |       
+|       +---moradores
+|       |   |   pendentes.php
+|       |   |   
+|       |   \---update
+|       |           index.php
+|       |           
+|       +---ocorrencia
+|       |   |   detalhes.php
+|       |   |   index.php
+|       |   |   painel.php
+|       |   |   
+|       |   \---partials
+|       |           _detalhe_ocorrencia.php
+|       |           
+|       +---painel
+|       |       index.php
+|       |       
+|       +---pendente
+|       |       index.php
+|       |       
+|       +---reserva
+|       |       index.php
+|       |       
+|       \---veiculo
+|               consulta.php
+|               index.php
+|               
+\---vendor
+    |   autoload.php
+    |   
+    +---composer
+    |       autoload_classmap.php
+    |       autoload_namespaces.php
+    |       autoload_psr4.php
+    |       autoload_real.php
+    |       autoload_static.php
+    |       ClassLoader.php
+    |       installed.json
+    |       installed.php
+    |       InstalledVersions.php
+    |       LICENSE
+    |       platform_check.php
+    |       
+    \---phpmailer
+        \---phpmailer
+            |   COMMITMENT
+            |   composer.json
+            |   get_oauth_token.php
+            |   LICENSE
+            |   README.md
+            |   SECURITY.md
+            |   SMTPUTF8.md
+            |   VERSION
+            |   
+            +---language
+            |       phpmailer.lang-af.php
+            |       phpmailer.lang-ar.php
+            |       phpmailer.lang-as.php
+            |       phpmailer.lang-az.php
+            |       phpmailer.lang-ba.php
+            |       phpmailer.lang-be.php
+            |       phpmailer.lang-bg.php
+            |       phpmailer.lang-bn.php
+            |       phpmailer.lang-ca.php
+            |       phpmailer.lang-cs.php
+            |       phpmailer.lang-da.php
+            |       phpmailer.lang-de.php
+            |       phpmailer.lang-el.php
+            |       phpmailer.lang-eo.php
+            |       phpmailer.lang-es.php
+            |       phpmailer.lang-et.php
+            |       phpmailer.lang-fa.php
+            |       phpmailer.lang-fi.php
+            |       phpmailer.lang-fo.php
+            |       phpmailer.lang-fr.php
+            |       phpmailer.lang-gl.php
+            |       phpmailer.lang-he.php
+            |       phpmailer.lang-hi.php
+            |       phpmailer.lang-hr.php
+            |       phpmailer.lang-hu.php
+            |       phpmailer.lang-hy.php
+            |       phpmailer.lang-id.php
+            |       phpmailer.lang-it.php
+            |       phpmailer.lang-ja.php
+            |       phpmailer.lang-ka.php
+            |       phpmailer.lang-ko.php
+            |       phpmailer.lang-ku.php
+            |       phpmailer.lang-lt.php
+            |       phpmailer.lang-lv.php
+            |       phpmailer.lang-mg.php
+            |       phpmailer.lang-mn.php
+            |       phpmailer.lang-ms.php
+            |       phpmailer.lang-nb.php
+            |       phpmailer.lang-nl.php
+            |       phpmailer.lang-pl.php
+            |       phpmailer.lang-pt.php
+            |       phpmailer.lang-pt_br.php
+            |       phpmailer.lang-ro.php
+            |       phpmailer.lang-ru.php
+            |       phpmailer.lang-si.php
+            |       phpmailer.lang-sk.php
+            |       phpmailer.lang-sl.php
+            |       phpmailer.lang-sr.php
+            |       phpmailer.lang-sr_latn.php
+            |       phpmailer.lang-sv.php
+            |       phpmailer.lang-tl.php
+            |       phpmailer.lang-tr.php
+            |       phpmailer.lang-uk.php
+            |       phpmailer.lang-ur.php
+            |       phpmailer.lang-vi.php
+            |       phpmailer.lang-zh.php
+            |       phpmailer.lang-zh_cn.php
+            |       
+            \---src
+                    DSNConfigurator.php
+                    Exception.php
+                    OAuth.php
+                    OAuthTokenProvider.php
+                    PHPMailer.php
+                    POP3.php
+                    SMTP.php
+                    

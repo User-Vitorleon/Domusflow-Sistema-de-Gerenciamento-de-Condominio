@@ -1,0 +1,269 @@
+/* cadastro.css — DomusFlow · Escopo isolado desta tela
+   Herda de app.css: --primary-dark, --primary, --radius,
+   --radius-lg, --shadow, --border, --transition, --font,
+   --bg, --white, --text, --text-muted, --error */
+
+/* 1. BODY */
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    padding: 28px 16px 40px;
+    box-sizing: border-box;
+    font-family: var(--font) !important;
+    background: var(--bg) !important;
+}
+
+/* 2. WRAPPER */
+.cad-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+}
+
+/* 3. LOGO */
+.cad-brand {
+    margin: 0;
+}
+
+.cad-brand-img {
+    width: 180px;
+    height: auto;
+    display: block;
+}
+
+/* 4. CARD */
+.cad-card {
+    width: 100%;
+    max-width: 660px;
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    padding: 28px 32px;
+    box-sizing: border-box;
+}
+
+/* 5. CABEÇALHO */
+.cad-header {
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+}
+
+.cad-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 2px;
+}
+
+.cad-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+/* 6. ALERTA */
+.cad-alert-error {
+    background: #FEF2F2 !important;
+    border-color: #FECACA !important;
+    color: #DC2626 !important;
+    font-size: 13px !important;
+    margin-bottom: 14px;
+}
+
+/* 7. FORM */
+.cad-form {
+    display: flex;
+    flex-direction: column;
+}
+
+/* 8. LABEL DE SEÇÃO */
+.cad-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin: 16px 0 8px;
+}
+
+.cad-section-label:first-of-type {
+    margin-top: 0;
+}
+
+/* 9. GRID */
+.cad-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+/* 10. CAMPOS — fontes maiores, padding compacto */
+.cad-form .df-field {
+    margin-bottom: 0;
+    gap: 4px;
+}
+
+.cad-form .df-field label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.cad-form .df-field input {
+    font-family: var(--font) !important;
+    font-size: 15px;
+    padding: 9px 12px;
+}
+
+/* 11. CAMPO COM OLHO (senha) */
+.cad-input-eye {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.cad-input-eye input {
+    width: 100%;
+    padding-right: 40px !important;
+}
+
+.cad-eye {
+    position: absolute;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    cursor: pointer;
+    color: #aaa;
+    padding: 0;
+    transition: color var(--transition);
+}
+
+.cad-eye:hover {
+    color: #555;
+}
+
+.cad-eye svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+}
+
+.cad-eye .icon-hide {
+    display: none;
+}
+
+/* 12. AÇÕES */
+.cad-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+/* 13. BOTÃO VOLTAR */
+.cad-btn-voltar {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-muted) !important;
+    font-family: var(--font) !important;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none !important;
+    cursor: pointer;
+    transition: background var(--transition), color var(--transition);
+}
+
+.cad-btn-voltar:hover {
+    background: var(--bg);
+    color: var(--text) !important;
+}
+
+/* 14. BOTÃO CRIAR CONTA */
+.cad-btn-criar {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    background: var(--primary-dark);
+    border: none;
+    border-radius: var(--radius);
+    color: #ffffff !important;
+    font-family: var(--font) !important;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity var(--transition), box-shadow var(--transition);
+}
+
+.cad-btn-criar:hover {
+    opacity: 0.88;
+    box-shadow: var(--shadow-md);
+}
+
+.cad-btn-criar i,
+.cad-btn-voltar i {
+    font-size: 15px;
+    line-height: 1;
+}
+
+.cad-field-senha .field-error-msg {
+    display: block;
+    width: 100%;
+    font-size: 12px;
+    color: var(--error);
+    font-weight: 500;
+    margin-top: 4px;
+    order: 3;
+}
+
+.cad-field-senha {
+    display: flex;
+    flex-direction: column;
+}
+
+/* 15. RESPONSIVO */
+@media (max-width: 600px) {
+    body {
+        padding: 24px 16px 36px;
+    }
+
+    .cad-brand-img {
+        width: 150px;
+    }
+
+    .cad-card {
+        padding: 20px 16px;
+    }
+
+    .cad-grid-2 {
+        grid-template-columns: 1fr;
+    }
+
+    .cad-actions {
+        flex-direction: column-reverse;
+    }
+
+    .cad-btn-criar,
+    .cad-btn-voltar {
+        width: 100%;
+        justify-content: center;
+    }
+}
