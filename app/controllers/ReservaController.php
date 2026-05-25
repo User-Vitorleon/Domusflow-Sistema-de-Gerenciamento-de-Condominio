@@ -91,7 +91,7 @@ class ReservaController
         } else {
             $_SESSION['sucesso_reserva'] = 'Reserva negada com sucesso!';
         }
-        
+
         $this->redirecionar('/reserva');
     }    
 
@@ -104,7 +104,7 @@ class ReservaController
         $offset       = ($pagina - 1) * $porPagina;
 
         return [
-            'pagina'              => $pagina,        // ← adiciona
+            'pagina'              => $pagina,        
             'totalPaginas'        => $totalPaginas,
             'reservasParaAprovar' => $this->reservaService->listarPendentesGeral($offset, $porPagina),
         ];
