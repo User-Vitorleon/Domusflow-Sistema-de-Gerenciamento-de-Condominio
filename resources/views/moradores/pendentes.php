@@ -31,14 +31,30 @@ require_once __DIR__ . '/../layout/header.php';
                 Morador <?= $_GET['status'] === 'liberado' ? 'liberado' : 'negado' ?> com sucesso.
             </div>
         <?php endif; ?>
+        <?php if (isset($_SESSION['erro_pendentes'])): ?>
+            <div class="df-alert df-alert-error">
+                <?= htmlspecialchars($_SESSION['erro_pendentes']) ?>
+                <?php unset($_SESSION['erro_pendentes']); ?>
+            </div>
+        <?php endif; ?>
 
         <div class="card shadow-sm border-0 mb-4">
             <div class="card-body">
                 <form method="GET" action="<?= BASE_URL ?>/moradores/pendentes" class="row g-3 align-items-end">
-                    <div class="col-md-4">
+                    <div class="col-md-2">
                         <label for="nome" class="form-label">Nome</label>
                         <input type="text" name="nome" id="nome" class="form-control"
                             value="<?= htmlspecialchars($filtros['nome'] ?? '') ?>">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="perfil" class="form-label">Perfil</label>
+                        <select name="perfil" id="perfil" class="form-control">
+                            <option value="">Todos</option>
+                            <option value="1" <?= ($filtros['perfil'] ?? '') === '1' ? 'selected' : '' ?>>Morador</option>
+                            <option value="3" <?= ($filtros['perfil'] ?? '') === '3' ? 'selected' : '' ?>>Porteiro</option>
+                            <option value="2" <?= ($filtros['perfil'] ?? '') === '2' ? 'selected' : '' ?>>Síndico</option>
+                            <option value="4" <?= ($filtros['perfil'] ?? '') === '4' ? 'selected' : '' ?>>Administrador</option>
+                        </select>
                     </div>
                     <div class="col-md-2">
                         <label for="bloco" class="form-label">Bloco</label>
@@ -94,6 +110,7 @@ require_once __DIR__ . '/../layout/header.php';
                                         class="link-ordenacao">Bloco</a>
                                 </th>
                                 <th>Apto</th>
+                                <th>Perfil</th>
                                 <th>Solicitação</th>
                                 <th class="text-center">Ações</th>
                             </tr>
@@ -106,6 +123,15 @@ require_once __DIR__ . '/../layout/header.php';
                                     <td><?= htmlspecialchars($m['cpf']) ?></td>
                                     <td><?= htmlspecialchars($m['bloco']) ?></td>
                                     <td><?= htmlspecialchars($m['apto']) ?></td>
+                                    <?php
+                                        $perfis = [1 => ['Morador','perfil-badge-morador'], 2 => ['Síndico','perfil-badge-sindico'], 3 => ['Porteiro','perfil-badge-porteiro'], 4 => ['Admin','perfil-badge-admin']];
+                                        $p = (int)($m['privilegio'] ?? 1);
+                                        ?>
+                                        <td>
+                                            <span class="<?= $perfis[$p][1] ?? 'perfil-badge-morador' ?>">
+                                                <?= $perfis[$p][0] ?? 'Morador' ?>
+                                            </span>
+                                        </td>
                                     <td><?= !empty($m['created_at']) ? date('d/m/Y', strtotime($m['created_at'])) : '-' ?></td>
                                     <td class="text-center">
                                         <form action="<?= BASE_URL ?>/moradores/liberar" method="POST"
@@ -116,7 +142,6 @@ require_once __DIR__ . '/../layout/header.php';
                                             <button type="submit" name="acao" value="negar"
                                                 class="btn btn-danger btn-sm">Negar</button>
                                         </form>
-                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>

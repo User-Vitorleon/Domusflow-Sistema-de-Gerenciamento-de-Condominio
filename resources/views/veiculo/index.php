@@ -141,6 +141,8 @@ $cores = [
                                 <th>Marca</th>
                                 <th>Modelo</th>
                                 <th>Cor</th>
+                                <th>Principal</th>
+                                <th>Ação</th>
                                 <?php if (in_array($privilegio, [2, 3, 4])): ?>
                                     <th>Morador</th>
                                     <th>Cadastrado por</th>
@@ -157,6 +159,11 @@ $cores = [
                                     <td><?= htmlspecialchars($v['marca']) ?></td>
                                     <td><?= htmlspecialchars($v['modelo']) ?></td>
                                     <td><?= htmlspecialchars($v['cor']) ?></td>
+                                    <td>           
+                                        <?php if ($v['principal']): ?>
+                                            <span class="perfil-badge-sindico">⭐Principal</span>
+                                        <?php endif; ?>
+                                    </td>
                                     <?php if (in_array($privilegio, [2, 3, 4])): ?>
                                         <td><?= htmlspecialchars($v['nome_morador']) ?></td>
                                         <td><?= htmlspecialchars($v['cadastrado_por']) ?></td>

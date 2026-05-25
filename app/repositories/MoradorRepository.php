@@ -51,6 +51,12 @@ class MoradorRepository
         return (int)$stmt->fetchColumn() > 0;
     }
 
+    public function existeEmailParaOutro(string $email, int $idAtual): bool{
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM morador WHERE email = :email AND id_user != :id");
+        $stmt->execute([':email' => $email, ':id' => $idAtual]);
+        return (int)$stmt->fetchColumn() > 0;
+    }
+
     public function findPendentes(): array
     {
         $stmt = $this->pdo->query("
@@ -65,7 +71,7 @@ class MoradorRepository
     public function findPendentesComFiltros(array $filtros, int $limit, int $offset): array
     {
         $sql = "
-            SELECT id_user, nome, apto, bloco, cpf, created_at
+            SELECT id_user, nome, apto, bloco, cpf, created_at, privilegio
             FROM morador
             WHERE status = 'P'
         ";
@@ -136,6 +142,11 @@ class MoradorRepository
         if (!empty($filtros['data_solicitacao'])) {
             $sql .= ' AND DATE(created_at) = :data_solicitacao';
             $bindings[':data_solicitacao'] = $filtros['data_solicitacao'];
+        }
+
+        if (isset($filtros['perfil']) && $filtros['perfil'] !== '') {
+            $sql .= ' AND privilegio = :perfil';
+            $bindings[':perfil'] = (int) $filtros['perfil'];
         }
 
         return ['sql' => $sql, 'bindings' => $bindings];

@@ -37,7 +37,7 @@ class AuthService
             return ['sucesso' => true, 'redirecionar' => BASE_URL . '/pendente'];
         }
 
-        $_SESSION['usuario_privilegio'] = $usuario['privilegio'];
+        $_SESSION['usuario_privilegio'] = (int) $usuario['privilegio'];
         return ['sucesso' => true, 'redirecionar' => BASE_URL . '/painel'];
     }
 

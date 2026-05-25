@@ -57,6 +57,10 @@ class ReservaController
     }
 
     public function decidir(): void{
+
+        AuthGuard::requereLogin();
+        $this->requireSindicoOuAdmin(); 
+
         $idReserva = (int)($_POST['id_reserva'] ?? 0);
         $acao      = $_POST['acao'] ?? null;
 
@@ -173,5 +177,11 @@ class ReservaController
     {
         header('Location: ' . BASE_URL . $caminho);
         exit();
+    }
+
+    private function requireSindicoOuAdmin(): void{
+        if (!in_array((int) ($_SESSION['usuario_privilegio'] ?? 0), [2, 4], true)) {
+            $this->redirecionar('/reserva');
+        }
     }
 }

@@ -5,8 +5,9 @@ $jsExtra      = 'cadastro.js';
 require_once __DIR__ . '/../layout/header.php';
 $erro = $_SESSION['erro_cadastro'] ?? null;
 unset($_SESSION['erro_cadastro']);
-?>
 
+?>
+<?php $d = $_SESSION['dados_cadastro'] ?? []; unset($_SESSION['dados_cadastro']); ?>
 <main class="cad-page">
 
     <figure class="cad-brand">
@@ -18,7 +19,7 @@ unset($_SESSION['erro_cadastro']);
 
         <div class="cad-header">
             <h1 class="cad-title">Criar conta</h1>
-            <p class="cad-sub">Após o cadastro, aguarde a aprovação do síndico.</p>
+            <p class="cad-sub">Após o cadastro, aguarde a aprovação.</p>
         </div>
 
         <?php if ($erro): ?>
@@ -35,13 +36,14 @@ unset($_SESSION['erro_cadastro']);
                 <div class="df-field">
                     <label for="user_name">Nome Completo</label>
                     <input type="text" id="user_name" name="user_name"
-                        placeholder="João Silva" required>
+                        placeholder="João Silva"  value="<?= htmlspecialchars($d['user_name'] ?? '') ?>" required>
                 </div>
                 <div class="df-field">
                     <label for="user_cpf">CPF</label>
                     <input type="text" id="user_cpf" name="user_cpf"
                         placeholder="000.000.000-00" maxlength="14"
-                        inputmode="numeric" autocomplete="off" required>
+                        inputmode="numeric" autocomplete="off"  value="<?= htmlspecialchars($d['user_cpf'] ?? '') ?>"
+                        required>
                 </div>
             </div>
 
@@ -50,26 +52,37 @@ unset($_SESSION['erro_cadastro']);
                 <div class="df-field">
                     <label for="user_apto">Apartamento</label>
                     <input type="text" id="user_apto" name="user_apto"
-                        placeholder="23A" maxlength="4" required>
+                        placeholder="23A" maxlength="4"  value="<?= htmlspecialchars($d['user_apto'] ?? '') ?>" required>
                 </div>
                 <div class="df-field">
                     <label for="user_bloco">Bloco</label>
                     <input type="text" id="user_bloco" name="user_bloco"
-                        placeholder="A" maxlength="3" required>
+                        placeholder="A" maxlength="3"  value="<?= htmlspecialchars($d['user_bloco'] ?? '') ?>" required>
                 </div>
             </div>
+
+            <p class="cad-section-label">Perfil</p>
+                <div class="df-field">
+                    <label for="user_privilegio">Tipo de cadastro</label>
+                    <select id="user_privilegio" name="user_privilegio"  value="<?= htmlspecialchars($d['user_privilegio'] ?? '') ?>" required>
+                        <option value="1" <?= ($d['user_privilegio'] ?? '1') === '1' ? 'selected' : '' ?>>Morador</option>
+                        <option value="3" <?= ($d['user_privilegio'] ?? '') === '3' ? 'selected' : '' ?>>Porteiro</option>
+                        <option value="2" <?= ($d['user_privilegio'] ?? '') === '2' ? 'selected' : '' ?>>Síndico</option>
+                        <option value="4" <?= ($d['user_privilegio'] ?? '') === '4' ? 'selected' : '' ?>>Administrador</option>
+                    </select>
+                </div>
 
             <p class="cad-section-label">Contato</p>
             <div class="cad-grid-2">
                 <div class="df-field">
                     <label for="user_email">Email</label>
                     <input type="email" id="user_email" name="user_email"
-                        placeholder="joao@email.com" required>
+                        placeholder="joao@email.com"  value="<?= htmlspecialchars($d['user_email'] ?? '') ?>" required>
                 </div>
                 <div class="df-field">
                     <label for="user_cell">Telefone</label>
                     <input type="tel" id="user_cell" name="user_cell"
-                        placeholder="(00) 00000-0000" maxlength="15" required>
+                        placeholder="(00) 00000-0000" maxlength="15"  value="<?= htmlspecialchars($d['user_cell'] ?? '') ?>" required>
                 </div>
                 <div class="df-field">
                     <label for="user_recado">
@@ -101,7 +114,7 @@ unset($_SESSION['erro_cadastro']);
                     <label for="user_senha">Senha</label>
                     <div class="cad-input-eye">
                         <input type="password" id="user_senha" name="user_senha"
-                            placeholder="••••••••" required>
+                            placeholder="••••••••"  value="<?= htmlspecialchars($d['user_senha'] ?? '') ?>" required>
                         <button type="button" class="cad-eye"
                             aria-label="Mostrar senha" aria-pressed="false">
                             <svg class="icon-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false">
@@ -120,7 +133,7 @@ unset($_SESSION['erro_cadastro']);
                     <label for="user_confirm_senha">Confirmar Senha</label>
                     <div class="cad-input-eye">
                         <input type="password" id="user_confirm_senha" name="user_confirm_senha"
-                            placeholder="••••••••" required>
+                            placeholder="••••••••"  value="<?= htmlspecialchars($d['user_confirm_senha'] ?? '') ?>" required>
                         <button type="button" class="cad-eye"
                             aria-label="Mostrar confirmação de senha" aria-pressed="false">
                             <svg class="icon-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false">

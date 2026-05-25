@@ -177,7 +177,7 @@ public function historico(): void
 
     public function gerarBoleto(): void
     {
-        $this->requireAuth();
+        AuthGuard::requereUsuarioAtivo();
 
         $idLancamento = (int)($_GET['id'] ?? 0);
 
@@ -199,7 +199,7 @@ public function historico(): void
     }
 
     public function confirmarPagamento(): void{
-        $this->requireAuth();
+        AuthGuard::requereUsuarioAtivo();
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirecionar('/financeiro/historico');
@@ -219,7 +219,7 @@ public function historico(): void
     }
     
     public function gerarFaturaUnica(): void{
-        $this->requireAuth();
+        AuthGuard::requereUsuarioAtivo();
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: ' . BASE_URL . '/financeiro/historico');
@@ -312,14 +312,18 @@ public function historico(): void
     }
 
     private function validarDatasLancamento(array $dados): ?string{
+        if (empty($dados['data_lanc']) || empty($dados['data_venc'])) {
+            return 'As datas de lançamento e vencimento são obrigatórias.';
+        }
         if ($dados['data_lanc'] < date('Y-m-d')) {
             return 'A data de lançamento não pode ser inferior ao dia de hoje.';
         }
         if ($dados['data_venc'] <= date('Y-m-d')) {
-            return 'A data de vencimento deve ser superior ao dia de hoje.'; // ← só retorna a mensagem
+            return 'A data de vencimento deve ser superior ao dia de hoje.';
         }
         return null;
     }
+
     private function lancarParaTodos(array $dados): void
     {
         $moradorRepo = new MoradorRepository();

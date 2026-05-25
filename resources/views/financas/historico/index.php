@@ -5,7 +5,7 @@ require_once __DIR__ . '/../../layout/header.php';
 
 $pendentes = array_filter($historico, fn($h) => $h['status'] === 'F');
 $pagas     = array_filter($historico, fn($h) => $h['status'] === 'G');
-$totalPendente = array_sum(array_column(iterator_to_array($pendentes ?? new ArrayIterator([])), 'valor'));
+$totalPendente = array_sum(array_column($pendentes, 'valor'));
 ?>
 
 <main class="main-content">

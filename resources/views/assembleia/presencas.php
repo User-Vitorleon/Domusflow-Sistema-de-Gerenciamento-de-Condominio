@@ -17,8 +17,8 @@ require_once __DIR__ . '/../layout/header.php';
         <h3 class="section-title">Filtros</h3>
         <div class="df-grid-3">
             <div class="df-field">
-                <label>Buscar morador</label>
-                <input type="text" id="filtroNome" placeholder="Nome, apto ou bloco..."
+                <label>Buscar assembleia ou local</label>
+                <input type="text" id="filtroNome" placeholder="Titulos"
                        oninput="filtrarPresencas()">
             </div>
             <div class="df-field">
@@ -33,14 +33,10 @@ require_once __DIR__ . '/../layout/header.php';
                 </select>
             </div>
             <div class="df-field">
-                <label>Presença</label>
-                <select id="filtroPresenca" onchange="filtrarPresencas()">
-                    <option value="">Todas</option>
-                    <option value="S">Confirmadas</option>
-                    <option value="N">Negadas</option>
-                    <option value="P">Pendentes</option>
-                </select>
+                <label>Data</label>
+                <input type="date" id="filtroData" onchange="filtrarPresencas()">
             </div>
+
         </div>
         <div class="df-actions" style="padding-top: 8px; margin-top: 0; border-top: none;">
             <button class="btn-ghost" onclick="limparFiltros()">Limpar filtros</button>
@@ -65,16 +61,19 @@ require_once __DIR__ . '/../layout/header.php';
                             <th>Assembleia</th>
                             <th>Data</th>
                             <th>Local</th>
-                            <th style="text-align:center;">✓ Confirmados</th>
-                            <th style="text-align:center;">⏳ Pendentes</th>
-                            <th style="text-align:center;">✗ Recusados</th>
+                            <th style="text-align:center;">Confirmados</th>
+                            <th style="text-align:center;">Pendentes</th>
+                            <th style="text-align:center;">Recusados</th>
                             <th style="text-align:center;">Total</th>
                             <th style="text-align:center;">Detalhes</th>
                         </tr>
                     </thead>
                     <tbody id="tabelaPresencas">
                         <?php foreach ($presencasAgrupadas as $a): ?>
-                            <tr data-assembleia="<?= htmlspecialchars($a['titulo']) ?>">
+                            <tr
+                                data-assembleia="<?= htmlspecialchars($a['titulo']) ?>"
+                                data-local="<?= htmlspecialchars($a['local']) ?>"
+                                data-data="<?= htmlspecialchars($a['data']) ?>">
                                 <td><strong><?= htmlspecialchars($a['titulo']) ?></strong></td>
                                 <td><?= date('d/m/Y', strtotime($a['data'])) ?></td>
                                 <td><?= htmlspecialchars($a['local']) ?></td>
@@ -91,7 +90,7 @@ require_once __DIR__ . '/../layout/header.php';
                                 <td style="text-align:center;">
                                     <a href="<?= BASE_URL ?>/assembleia/presencas/detalhe?id=<?= $a['id_assembleia'] ?>"
                                     class="btn-primary" style="font-size:12px;padding:5px 12px;">
-                                        <i class='bx bx-list-ul'></i> Ver
+                                        Ver
                                     </a>
                                 </td>
                             </tr>
@@ -109,37 +108,28 @@ require_once __DIR__ . '/../layout/header.php';
 function filtrarPresencas() {
     const nome       = document.getElementById('filtroNome').value.toLowerCase();
     const assembleia = document.getElementById('filtroAssembleia').value;
-    const presenca   = document.getElementById('filtroPresenca').value;
-
-    let confirmadas = 0, negadas = 0, total = 0, pendentes = 0;
+    const data       = document.getElementById('filtroData').value;
 
     document.querySelectorAll('#tabelaPresencas tr').forEach(row => {
-        const rowNome       = row.dataset.nome       ?? '';
-        const rowApto       = row.dataset.apto       ?? '';
-        const rowBloco      = row.dataset.bloco      ?? '';
         const rowAssembleia = row.dataset.assembleia ?? '';
-        const rowPresenca   = row.dataset.presenca   ?? '';
+        const rowLocal      = row.dataset.local      ?? '';
+        const rowData       = row.dataset.data       ?? '';
+        const textoBusca    = `${rowAssembleia} ${rowLocal}`.toLowerCase();
 
         let ok = true;
-        if (nome && !rowNome.includes(nome) && !rowApto.includes(nome) && !rowBloco.includes(nome)) ok = false;
+        if (nome && !textoBusca.includes(nome)) ok = false;
         if (assembleia && rowAssembleia !== assembleia) ok = false;
-        if (presenca && rowPresenca !== presenca) ok = false;
+        if (data && rowData !== data) ok = false;
 
         row.style.display = ok ? '' : 'none';
-
-        if (ok) {
-            total++;
-            if (rowPresenca === 'S') confirmadas++;
-            if (rowPresenca === 'N') negadas++;
-            if (rowPresenca === 'P') pendentes++; 
-        }
     });
+}
 
-
-    document.getElementById('totalConfirmadas').textContent = confirmadas;
-    document.getElementById('totalNegadas').textContent     = negadas;
-    document.getElementById('totalGeral').textContent       = total;
-    document.getElementById('totalPendentes').textContent   = pendentes;
+function limparFiltros() {
+    document.getElementById('filtroNome').value = '';
+    document.getElementById('filtroAssembleia').value = '';
+    document.getElementById('filtroData').value = '';
+    filtrarPresencas();
 }
 </script>
 

@@ -1,9 +1,4 @@
-/* cadastro.css — DomusFlow · Escopo isolado desta tela
-   Herda de app.css: --primary-dark, --primary, --radius,
-   --radius-lg, --shadow, --border, --transition, --font,
-   --bg, --white, --text, --text-muted, --error */
 
-/* 1. BODY */
 body {
     display: flex;
     flex-direction: column;
@@ -239,7 +234,6 @@ body {
     flex-direction: column;
 }
 
-/* 15. RESPONSIVO */
 @media (max-width: 600px) {
     body {
         padding: 24px 16px 36px;

@@ -1,7 +1,5 @@
 <?php
-
-require_once __DIR__ . '/../repositories/MoradorRepository.php';
-
+    require_once __DIR__ . '/../repositories/MoradorRepository.php';
 class AuthGuard
 {
     public static function requereUsuarioAtivo(): array

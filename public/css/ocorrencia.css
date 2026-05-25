@@ -1062,6 +1062,45 @@
     justify-content: center !important;
 }
 
+/* ── Dark Mode ── */
+[data-theme="dark"] .oc-filtros-card {
+    background: #1e2029;
+    border-color: #2e3240;
+}
+
+[data-theme="dark"] .oc-filtros-header {
+    color: #e8eaf0;
+}
+
+[data-theme="dark"] .oc-table th {
+    background: #1a1c24;
+    color: #9aa0b4;
+    border-color: #2e3240;
+}
+
+[data-theme="dark"] .oc-table td {
+    color: #e8eaf0;
+    border-color: #2e3240;
+}
+
+[data-theme="dark"] .oc-table-row:hover td {
+    background: #1a1c24;
+}
+
+[data-theme="dark"] .oc-contador {
+    background: #1e2029;
+    border-color: #2e3240;
+}
+
+[data-theme="dark"] .oc-contador-label {
+    color: #9aa0b4;
+}
+
+[data-theme="dark"] .oc-mobile-card {
+    background: #1e2029;
+    border-color: #2e3240;
+}
+
 /* ── Responsividade ──────────────────────────────────────────────────────────── */
 @media (max-width: 640px) {
     .oc-table-wrap {

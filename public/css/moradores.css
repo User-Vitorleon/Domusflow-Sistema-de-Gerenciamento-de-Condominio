@@ -1,6 +1,4 @@
-/* morador.css — DomusFlow */
 
-/* ── Layout de página ─────────────────────────────────────────────────────── */
 .perfil-page {
     display: flex;
     justify-content: center;
@@ -19,7 +17,7 @@
     margin-right: auto;
 }
 
-/* ── Topo do perfil ───────────────────────────────────────────────────────── */
+
 .perfil-topo {
     display: flex;
     align-items: center;
@@ -56,7 +54,7 @@
     white-space: nowrap;
 }
 
-/* ── Seções do formulário ─────────────────────────────────────────────────── */
+
 .section-title {
     font-size: 11px;
     font-weight: 700;
@@ -66,7 +64,7 @@
     margin: 20px 0 12px;
 }
 
-/* ── Grid de campos ───────────────────────────────────────────────────────── */
+
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -102,14 +100,12 @@
     background: #fff;
 }
 
-/* ── Divisor ──────────────────────────────────────────────────────────────── */
+
 .divider {
     border: none;
     border-top: 1px solid #dde1e7;
     margin: 20px 0 16px;
 }
-
-/* ── Botão salvar ─────────────────────────────────────────────────────────── */
 .btn-salvar {
     display: inline-flex;
     align-items: center;
@@ -131,7 +127,8 @@
     background: var(--primary-dark, #0a5f88);
 }
 
-/* ── Zona de perigo ───────────────────────────────────────────────────────── */
+
+
 .danger-zone {
     margin-top: 20px;
     padding: 16px;
@@ -191,7 +188,106 @@
     opacity: 0.8;
 }
 
-/* ── Responsivo ───────────────────────────────────────────────────────────── */
+.perfil-badge-morador {
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #2563EB;
+    background: #EFF6FF;
+    border: 1px solid #BFDBFE;
+}
+
+.perfil-badge-sindico {
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #7C3AED;
+    background: #F5F3FF;
+    border: 1px solid #DDD6FE;
+}
+
+.perfil-badge-porteiro {
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #CA8A04;
+    background: #FFFBEB;
+    border: 1px solid #FDE68A;
+}
+
+.perfil-badge-admin {
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #DC2626;
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+}
+
+
+/* ── Dark Mode ── */
+[data-theme="dark"] .card {
+    background: #1e2029 !important;
+    border-color: #2e3240 !important;
+}
+
+[data-theme="dark"] .form-label {
+    color: #9aa0b4 !important;
+}
+
+[data-theme="dark"] .form-control {
+    background: #13151a !important;
+    border-color: #2e3240 !important;
+    color: #e8eaf0 !important;
+}
+
+[data-theme="dark"] .table th {
+    background: #1a1c24 !important;
+    color: #9aa0b4 !important;
+    border-color: #2e3240 !important;
+}
+
+[data-theme="dark"] .table td {
+    color: #e8eaf0 !important;
+    border-color: #2e3240 !important;
+}
+
+[data-theme="dark"] .table tbody tr:hover td {
+    background: #1a1c24 !important;
+}
+
+[data-theme="dark"] .link-ordenacao {
+    color: #5bbfe8 !important;
+}
+
+[data-theme="dark"] .table,
+[data-theme="dark"] .table > thead,
+[data-theme="dark"] .table > tbody,
+[data-theme="dark"] .table > thead > tr > th,
+[data-theme="dark"] .table > tbody > tr > td,
+[data-theme="dark"] .table > tbody > tr {
+    background-color: #1e2029 !important;
+    color: #e8eaf0 !important;
+    border-color: #2e3240 !important;
+}
+
+[data-theme="dark"] .table > thead > tr > th {
+    background-color: #1a1c24 !important;
+    color: #9aa0b4 !important;
+}
+
+[data-theme="dark"] .table > tbody > tr:hover > td {
+    background-color: #1a1c24 !important;
+}
+
+[data-theme="dark"] .table-responsive {
+    background: #1e2029 !important;
+}
+
 @media (max-width: 600px) {
     .form-grid {
         grid-template-columns: 1fr;

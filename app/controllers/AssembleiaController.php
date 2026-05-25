@@ -89,6 +89,7 @@ class AssembleiaController
         $repo    = new MoradorRepository();
         $usuario = $repo->findById((int)$_SESSION['usuario_id']);
 
+        $assembleias = $this->repo->listar();
         $presencasAgrupadas = $this->repo->listarPresencasAgrupadas();
 
         require_once __DIR__ . '/../../resources/views/assembleia/presencas.php';

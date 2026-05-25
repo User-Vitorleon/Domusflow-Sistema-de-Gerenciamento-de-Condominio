@@ -15,12 +15,11 @@ class MoradorController
         $this->service = new MoradorService();
     }
 
-public function formCadastro(): void
-    {
+    public function formCadastro(): void{
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-        session_unset();
+
         require_once __DIR__ . '/../../resources/views/cadastro/index.php';
     }
 
@@ -38,18 +37,30 @@ public function formCadastro(): void
             'telefone_recado' => $_POST['user_recado']        ?? null,
             'senha'           => $_POST['user_senha']         ?? '',
             'conf_senha'      => $_POST['user_confirm_senha'] ?? '',
+            'privilegio'      => (int)($_POST['user_privilegio'] ?? 1),
+            'termos'          => $_POST['termos']             ?? '',
         ]);
 
-        if ($resultado['sucesso']) {
+       if ($resultado['sucesso']) {
             $this->redirecionar('/pendente');
         }
 
-        $_SESSION['erro_cadastro'] = $resultado['mensagem'];
+        $_SESSION['erro_cadastro']   = $resultado['mensagem'];
+        $_SESSION['dados_cadastro']  = [
+            'user_name'          => $_POST['user_name']          ?? '',
+            'user_cpf'           => $_POST['user_cpf']           ?? '',
+            'user_apto'          => $_POST['user_apto']          ?? '',
+            'user_bloco'         => $_POST['user_bloco']         ?? '',
+            'user_email'         => $_POST['user_email']         ?? '',
+            'user_cell'          => $_POST['user_cell']          ?? '',
+            'user_recado'        => $_POST['user_recado']        ?? '',
+            'user_privilegio'    => $_POST['user_privilegio']    ?? '1',
+        ];
         $this->redirecionar('/cadastro');
+
     }
 
-public function pendentes(): void
-    {
+    public function pendentes(): void{
         $this->requireSindico();
 
         $repo    = new MoradorRepository();
@@ -77,7 +88,13 @@ public function pendentes(): void
             (int) $_SESSION['usuario_id']
         );
 
-        $this->redirecionar('/moradores/pendentes?status=' . ($resultado['status'] ?? 'erro'));
+        if (!$resultado['sucesso']) {
+            $_SESSION['erro_pendentes'] = $resultado['mensagem'];
+            $this->redirecionar('/moradores/pendentes');
+        }
+
+        $this->redirecionar('/moradores/pendentes?status=' . $resultado['status']);
+
     }
 
 public function formUpdate(): void
@@ -158,10 +175,13 @@ public function gestao(): void
         $this->requireAdmin();
         AuthGuard::requerePost('/moradores/gestao');
 
-        $sucesso = $this->service->atualizarPrivilegio(
-            (int) $_POST['id_morador'],
-            (int) $_POST['privilegio']
-        );
+
+        $idMorador  = (int) ($_POST['id_morador']  ?? 0);
+        $privilegio = (int) ($_POST['privilegio']  ?? 0);
+
+        $sucesso = ($idMorador > 0)
+            ? $this->service->atualizarPrivilegio($idMorador, $privilegio)
+            : false;
 
         $this->redirecionar('/moradores/gestao?' . ($sucesso ? 'sucesso=1' : 'erro=1'));
     }
@@ -176,13 +196,14 @@ private function extrairFiltrosPendentes(): array
             'data_solicitacao' => trim($_GET['data_solicitacao'] ?? ''),
             'ordenar'          => trim($_GET['ordenar']          ?? 'nome'),
             'direcao'          => trim($_GET['direcao']          ?? 'asc'),
+            'perfil'           => trim($_GET['perfil'] ?? ''),
         ];
     }
 
     private function requireSindico(): void
     {
         if (!isset($_SESSION['usuario_id'])
-            || !in_array($_SESSION['usuario_privilegio'] ?? 0, [2, 4], true)
+            || !in_array((int) ($_SESSION['usuario_privilegio'] ?? 0), [2, 4], true)
         ) {
             $this->redirecionar('/painel');
         }
