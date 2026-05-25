@@ -110,10 +110,10 @@ $totalPendente = array_sum(array_column($pendentes, 'valor'));
                 </table>
             </div>
 
-            <div style="margin-top: 14px; padding: 12px 16px; background: #FFFBEB; border-radius: var(--radius); border: 1px solid #FDE68A; display: flex; justify-content: space-between; align-items: center;">
-                <strong>Total Pendente</strong>
-                <strong style="color: #CA8A04; font-size: 16px;">
-                    R$ <?= number_format(array_sum(array_column(iterator_to_array(new ArrayIterator(array_values($pendentes))), 'valor')), 2, ',', '.') ?>
+            <div style="margin-top: 14px; padding: 12px 16px; background: var(--bg-secondary); border-radius: var(--radius); border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                <strong style="color: var(--text-primary);">Total Pendente</strong>
+                <strong style="color: var(--warning, #CA8A04); font-size: 16px;">
+                    R$ <?= number_format($totalPendente, 2, ',', '.') ?>
                 </strong>
             </div>
         <?php endif; ?>
