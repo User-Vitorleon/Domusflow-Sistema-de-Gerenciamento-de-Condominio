@@ -163,4 +163,19 @@ class MoradorService
         }
         return $this->repo->atualizarPrivilegio($id, $privilegio);
     }
+
+    public function resetarSenha(int $idMorador): array{
+        $morador = $this->repo->findById($idMorador);
+        if (!$morador) {
+            return ['sucesso' => false, 'mensagem' => 'Morador não encontrado.'];
+        }
+
+        $novaSenha = substr(str_replace(['+', '/', '='], '', base64_encode(random_bytes(8))), 0, 8);
+        $this->repo->atualizarSenha($idMorador, hashSenha($novaSenha));
+
+        $emailService = new EmailService();
+        $emailService->senhaResetada($morador['email'], $morador['nome'], $novaSenha);
+
+        return ['sucesso' => true];
+    }
 }

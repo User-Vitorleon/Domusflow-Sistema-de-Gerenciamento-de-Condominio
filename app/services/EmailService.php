@@ -276,4 +276,38 @@ class EmailService
         $corpo = $this->template('Conta Criada com Sucesso!', '#0E9FD1', '🏢', $conteudo);
         return $this->enviar($destinatario, $nome, $assunto, $corpo);
     }
+
+    public function senhaResetada(string $destinatario, string $nome, string $novaSenha): bool{
+        $assunto  = '🔑 Sua senha foi redefinida';
+        $conteudo = "
+            <p>Olá, <strong>{$nome}</strong>!</p>
+            <p>O administrador do condomínio redefiniu sua senha de acesso ao DomusFlow.</p>
+            " . $this->caixaInfo("
+                🔑 <strong>Sua nova senha temporária:</strong><br><br>
+                <span style='font-size:22px;font-weight:700;letter-spacing:3px;color:#111827;'>{$novaSenha}</span>
+            ", '#F59E0B') . "
+            <p>Por segurança, acesse o sistema e altere sua senha em <strong>Atualizar Dados</strong>.</p>
+            <p>Se você não solicitou esta alteração, entre em contato com o síndico.</p>
+            <p style='margin-top:24px;'>Atenciosamente,<br><strong>Equipe DomusFlow</strong></p>
+        ";
+        $corpo = $this->template('Senha Redefinida', '#F59E0B', '🔑', $conteudo);
+        return $this->enviar($destinatario, $nome, $assunto, $corpo);
+    }
+
+    public function senhaEsquecida(string $destinatario, string $nome, string $novaSenha): bool{
+        $assunto  = '🔑 Recuperação de senha — DomusFlow';
+        $conteudo = "
+            <p>Olá, <strong>{$nome}</strong>!</p>
+            <p>Recebemos uma solicitação de recuperação de senha para sua conta.</p>
+            " . $this->caixaInfo("
+                🔑 <strong>Sua nova senha temporária:</strong><br><br>
+                <span style='font-size:22px;font-weight:700;letter-spacing:3px;color:#111827;'>{$novaSenha}</span>
+            ", '#0E9FD1') . "
+            <p>Acesse o sistema com essa senha e altere-a em <strong>Atualizar Dados</strong>.</p>
+            <p>Se você não fez essa solicitação, ignore este e-mail.</p>
+            <p style='margin-top:24px;'>Atenciosamente,<br><strong>Equipe DomusFlow</strong></p>
+        ";
+        $corpo = $this->template('Recuperação de Senha', '#0E9FD1', '🔑', $conteudo);
+        return $this->enviar($destinatario, $nome, $assunto, $corpo);
+    }
 }

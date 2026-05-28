@@ -72,6 +72,9 @@ unset($_SESSION['erro_login']);
                         <line x1="15" y1="12" x2="3" y2="12" />
                     </svg>
                 </button>
+                <a href="<?= BASE_URL ?>/recuperar-senha" class="lp-forgot">
+                    Esqueci minha senha
+                </a>
 
             </form>
         </div>
@@ -85,6 +88,7 @@ unset($_SESSION['erro_login']);
         </div>
 
     </section>
+    
 
 </main>
 

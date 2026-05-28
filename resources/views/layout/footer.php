@@ -7,5 +7,4 @@
     <script src="<?= BASE_URL ?>/public/js/<?= $jsExtra ?>"></script>
 <?php endif; ?>
 </body>
-
 </html>

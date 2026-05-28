@@ -295,4 +295,37 @@ class MoradorRepository
             ':id'         => $id,
         ]);
     }
+
+    public function findTodosComFiltros(array $filtros): array{
+        $sql      = "SELECT * FROM morador WHERE 1=1";
+        $bindings = [];
+
+        if (!empty($filtros['nome'])) {
+            $sql .= ' AND nome LIKE :nome';
+            $bindings[':nome'] = '%' . $filtros['nome'] . '%';
+        }
+        if (!empty($filtros['apto'])) {
+            $sql .= ' AND apto LIKE :apto';
+            $bindings[':apto'] = '%' . $filtros['apto'] . '%';
+        }
+        if (!empty($filtros['bloco'])) {
+            $sql .= ' AND bloco LIKE :bloco';
+            $bindings[':bloco'] = '%' . $filtros['bloco'] . '%';
+        }
+        if (!empty($filtros['status'])) {
+            $sql .= ' AND status = :status';
+            $bindings[':status'] = $filtros['status'];
+        }
+
+        $sql .= ' ORDER BY nome ASC';
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($bindings);
+        return $stmt->fetchAll();
+    }
+
+    public function atualizarSenha(int $id, string $senhaHash): bool{
+        $stmt = $this->pdo->prepare("UPDATE morador SET senha = :senha WHERE id_user = :id");
+        return $stmt->execute([':senha' => $senhaHash, ':id' => $id]);
+    }
+
 }

@@ -1,6 +1,9 @@
 <?php
 require_once __DIR__ . '/../services/AuthService.php';
 require_once __DIR__ . '/../middleware/AuthGuard.php';
+require_once __DIR__ . '/../repositories/MoradorRepository.php';
+require_once __DIR__ . '/../services/MoradorService.php';
+
 
 class AuthController
 {
@@ -75,5 +78,34 @@ class AuthController
             $params['secure'],
             $params['httponly']
         );
+    }
+
+    public function recuperarSenha(): void{
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        require_once __DIR__ . '/../../resources/views/home/recuperar-senha.php';
+    }
+
+    public function enviarRecuperacao(): void{
+        AuthGuard::requerePost('/recuperar-senha');
+
+        $cpf = preg_replace('/[^0-9]/', '', $_POST['user_cpf'] ?? '');
+
+        $repo    = new MoradorRepository();
+        $morador = $repo->findByCpf($cpf);
+
+        $mensagemGenerica = 'Se o CPF informado estiver cadastrado e ativo, você receberá um e-mail com a nova senha.';
+
+        if (!$morador || $morador['status'] !== 'L') {
+            $_SESSION['sucesso_recuperacao'] = $mensagemGenerica;
+            header('Location: ' . BASE_URL . '/recuperar-senha');
+            exit();
+        }
+
+        $service = new MoradorService();
+        $service->resetarSenha((int) $morador['id_user']);
+
+        $_SESSION['sucesso_recuperacao'] = $mensagemGenerica;
+        header('Location: ' . BASE_URL . '/recuperar-senha');
+        exit();
     }
 }

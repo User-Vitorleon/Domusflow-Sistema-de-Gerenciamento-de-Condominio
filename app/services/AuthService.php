@@ -65,4 +65,5 @@ class AuthService
     {
         return ['sucesso' => false, 'mensagem' => 'CPF ou senha incorretos.'];
     }
+
 }

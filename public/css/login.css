@@ -293,4 +293,41 @@ body::before {
         width: 100%;
         box-sizing: border-box;
     }
+
+
+}
+
+    .lp-recover-desc {
+        color: #ffffff !important;
+        font-size: 13px;
+        margin-bottom: 16px;
+        line-height: 1.5;
+    }
+
+    .lp-brand--compact {
+        margin-bottom: 8px;
+    }
+
+    .lp-brand--compact .lp-brand-img {
+        width: 110px;
+    }
+
+    .lp-right--centered {
+        min-height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .lp-forgot {
+    display: block;
+    text-align: center;
+    margin-top: 12px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.75) !important;
+    text-decoration: none;
+}
+
+.lp-forgot:hover {
+    color: #ffffff !important;
 }

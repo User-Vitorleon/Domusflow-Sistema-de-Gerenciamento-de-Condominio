@@ -159,15 +159,33 @@ public function inativar(): void
         $this->redirecionar('/');
     }
 
-public function gestao(): void
-    {
+    public function gestao(): void{
         $this->requireAdmin();
 
-        $repo      = new MoradorRepository();
-        $usuario   = $repo->findById((int) $_SESSION['usuario_id']);
-        $moradores = $repo->findTodos();
+        $repo    = new MoradorRepository();
+        $usuario = $repo->findById((int) $_SESSION['usuario_id']);
+
+        $filtros   = [
+            'nome'   => trim($_GET['nome']   ?? ''),
+            'apto'   => trim($_GET['apto']   ?? ''),
+            'bloco'  => trim($_GET['bloco']  ?? ''),
+            'status' => trim($_GET['status'] ?? ''),
+        ];
+        $moradores = $repo->findTodosComFiltros($filtros);
 
         require_once __DIR__ . '/../../resources/views/moradores/gestao/index.php';
+    }
+
+    public function resetarSenha(): void{
+        $this->requireAdmin();
+        AuthGuard::requerePost('/moradores/gestao');
+
+        $idMorador = (int) ($_POST['id_morador'] ?? 0);
+        $resultado = ($idMorador > 0)
+            ? $this->service->resetarSenha($idMorador)
+            : ['sucesso' => false];
+
+        $this->redirecionar('/moradores/gestao?' . ($resultado['sucesso'] ? 'reset=1' : 'erro=1'));
     }
 
     public function gestaoSalvar(): void
