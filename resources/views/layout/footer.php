@@ -6,5 +6,8 @@
 <?php if (!empty($jsExtra)): ?>
     <script src="<?= BASE_URL ?>/public/js/<?= $jsExtra ?>"></script>
 <?php endif; ?>
+<script>
+    window.BASE_URL = '<?= BASE_URL ?>';
+</script>
 </body>
 </html>

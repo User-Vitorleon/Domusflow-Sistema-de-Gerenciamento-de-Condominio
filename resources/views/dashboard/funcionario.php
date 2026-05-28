@@ -11,42 +11,33 @@ $cssExtra     = 'dashboard.css';
         <p class="text-muted">Pendências do dia</p>
     </div>
 
-
     <div class="row g-3 mb-5">
         <div class="col-md-6 col-xl-3">
-            <div class="card border-0 shadow-sm text-center">
-                <div class="card-body">
-                    <i class="bx bx-error-circle fs-1 text-danger mb-2"></i>
-                    <h3 class="text-danger"><?= (int) ($ocorrenciasFuncionario['aberto'] ?? 0) ?></h3>
-                    <p class="text-muted mb-0">Ocorrências Abertas</p>
-                </div>
+            <div class="kpi-card text-center">
+                <i class="bx bx-error-circle fs-1 text-danger mb-2"></i>
+                <h3 class="text-danger"><?= (int) ($ocorrenciasFuncionario['aberto'] ?? 0) ?></h3>
+                <p class="text-muted mb-0">Ocorrências Abertas</p>
             </div>
         </div>
         <div class="col-md-6 col-xl-3">
-            <div class="card border-0 shadow-sm text-center">
-                <div class="card-body">
-                    <i class="bx bx-time-five fs-1 text-warning mb-2"></i>
-                    <h3 class="text-warning"><?= (int) ($ocorrenciasFuncionario['andamento'] ?? 0) ?></h3>
-                    <p class="text-muted mb-0">Em Espera</p>
-                </div>
+            <div class="kpi-card text-center">
+                <i class="bx bx-time-five fs-1 text-warning mb-2"></i>
+                <h3 class="text-warning"><?= (int) ($ocorrenciasFuncionario['andamento'] ?? 0) ?></h3>
+                <p class="text-muted mb-0">Em Espera</p>
             </div>
         </div>
         <div class="col-md-6 col-xl-3">
-            <div class="card border-0 shadow-sm text-center">
-                <div class="card-body">
-                    <i class="bx bx-user-check fs-1 text-info mb-2"></i>
-                    <h3 class="text-info"><?= (int) ($moradoresPendentes ?? 0) ?></h3>
-                    <p class="text-muted mb-0">Moradores Pendentes</p>
-                </div>
+            <div class="kpi-card text-center">
+                <i class="bx bx-user-check fs-1 text-info mb-2"></i>
+                <h3 class="text-info"><?= (int) ($moradoresPendentes ?? 0) ?></h3>
+                <p class="text-muted mb-0">Moradores Pendentes</p>
             </div>
         </div>
         <div class="col-md-6 col-xl-3">
-            <div class="card border-0 shadow-sm text-center">
-                <div class="card-body">
-                    <i class="bx bx-calendar-check fs-1 text-success mb-2"></i>
-                    <h3 class="text-success"><?= $reservasPendentes ?></h3>
-                    <p class="text-muted mb-0">Reservas Pendentes</p>
-                </div>
+            <div class="kpi-card text-center">
+                <i class="bx bx-calendar-check fs-1 text-success mb-2"></i>
+                <h3 class="text-success"><?= $reservasPendentes ?></h3>
+                <p class="text-muted mb-0">Reservas Pendentes</p>
             </div>
         </div>
     </div>
@@ -126,11 +117,13 @@ $cssExtra     = 'dashboard.css';
             </div>
 
             <div class="col-12 col-md-6">
-                <div class="dashboard-placeholder h-100">
-                    Avisos recentes em desenvolvimento
+                <div class="chart-card h-100">
+                    <h5 class="chart-title">Avisos Recentes</h5>
+                    <div class="dashboard-placeholder">Em desenvolvimento</div>
                 </div>
             </div>
         </div>
+    </section>
 
 </main>
 
