@@ -11,7 +11,7 @@ $catalogoModulos = [
     ['titulo' => 'Reservas',            'sub' => 'Solicite e gerencie reservas de espaços comuns','href' => '/reserva',             'icon' => 'calendar',   'privilegios' => [1, 2, 4]],
     ['titulo' => 'Consultar Placa',     'sub' => 'Pesquisar veículos pela placa',                 'href' => '/veiculo/consultar',   'icon' => 'search',     'privilegios' => [3, 4]],
     ['titulo' => 'Novos Usuários',      'sub' => 'Controle de novos moradores',                   'href' => '/moradores/pendentes', 'icon' => 'user-check', 'privilegios' => [2, 4]],
-    ['titulo' => 'Veículos',            'sub' => 'Cadastre e gerencie seus veículos',             'href' => '/veiculo',             'icon' => 'car',        'privilegios' => [1, 2, 4]],
+    ['titulo' => 'Veículos',            'sub' => 'Cadastre e gerencie seus veículos',             'href' => '/veiculo',             'icon' => 'car',        'privilegios' => [1, 2, 3, 4]],
     ['titulo' => 'Ocorrências',         'sub' => 'Registre e acompanhe ocorrências no condomínio','href' => '/ocorrencia',          'icon' => 'ocorrencia', 'privilegios' => [1, 2, 4]],
     ['titulo' => 'Avisos',              'sub' => 'Acompanhe os últimos avisos registrados',       'href' => '/avisos',              'icon' => 'avisos',     'privilegios' => [1, 2, 4]],
     ['titulo' => 'Assembleia',          'sub' => 'Próximas Assembleias agendadas',                'href' => '/assembleia',          'icon' => 'assembleia', 'privilegios' => [1]],

@@ -92,14 +92,14 @@ class DashboardController
         ];
     }
 
-    private function montarFinanceiroResumo(): array
-    {
+    private function montarFinanceiroResumo(): array{
         return [
             'totalPendenteGeral'  => $this->financasRepo->totalGeralPendente(),
             'countLancPendentes'  => $this->financasRepo->countLancamentosPendentes(),
             'countInadimplentes'  => $this->financasRepo->countMoradoresInadimplentes(),
             'countFaturas'        => $this->financasRepo->countFaturasGeradas(),
             'ultimosMoradores'    => $this->financasRepo->ultimosMoradoresCadastrados(5),
+            'boletosVencendo'     => $this->financasRepo->boletosVencendoEmBreve((int) $_SESSION['usuario_id'], 5),
         ];
     }
 

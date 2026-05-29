@@ -11,6 +11,23 @@ $jsExtra = 'dashboard.js';
         <h2>Dashboard</h2>
         <p class="text-muted">Bem-vindo, <?= htmlspecialchars(explode(' ', $usuario['nome'])[0]) ?>!</p>
     </div>
+    <?php if (!empty($boletosVencendo)): ?>
+        <div class="df-alert df-alert-warning" style="margin-bottom: 20px;">
+            <i class='bx bx-error-circle' style="font-size:18px;"></i>
+            <div>
+                <strong>Atenção!</strong> Você tem <?= count($boletosVencendo) ?> boleto(s) vencendo nos próximos 5 dias:
+                <ul style="margin: 6px 0 0 16px; font-size: 13px;">
+                    <?php foreach ($boletosVencendo as $b): ?>
+                        <li>
+                            <?= htmlspecialchars($b['descricao']) ?> —
+                            <strong>R$ <?= number_format($b['valor'], 2, ',', '.') ?></strong>
+                            · vence em <?= date('d/m/Y', strtotime($b['data_vencimento'])) ?>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        </div>
+    <?php endif; ?>
 
     <section class="dashboard-section">
         <h3 class="section-title">Próximos Feriados</h3>

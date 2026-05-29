@@ -517,3 +517,15 @@
         grid-template-columns: repeat(2, 1fr);
     }
 }
+
+.df-table tbody tr {
+    transition: background var(--transition);
+}
+
+.df-table tbody tr:hover {
+    background: var(--bg) !important;
+}
+
+[data-theme="dark"] .df-table tbody tr:hover {
+    background: #2e3240 !important;
+}

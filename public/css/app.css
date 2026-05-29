@@ -846,3 +846,15 @@ body {
     background: #1e2029;
     border-color: var(--border);
 }
+
+.df-table tbody tr {
+    transition: background var(--transition);
+}
+
+.df-table tbody tr:hover {
+    background: var(--bg) !important;
+}
+
+[data-theme="dark"] .df-table tbody tr:hover {
+    background: #2e3240 !important;
+}

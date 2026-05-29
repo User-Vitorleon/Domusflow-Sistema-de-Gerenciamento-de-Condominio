@@ -322,6 +322,19 @@ class FinancasRepository
         return $stmt->execute([':id' => $idLancamento]);
     }
 
+    public function boletosVencendoEmBreve(int $idUser, int $dias): array{
+        $stmt = $this->pdo->prepare("
+            SELECT descricao, valor, data_vencimento
+            FROM lancamentos
+            WHERE id_user = :id
+            AND status = 'F'
+            AND data_vencimento BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL :dias DAY)
+            ORDER BY data_vencimento ASC
+        ");
+        $stmt->execute([':id' => $idUser, ':dias' => $dias]);
+        return $stmt->fetchAll();
+    }
+
     public function findLancamentoById(int $id): ?array{
         $stmt = $this->pdo->prepare("
             SELECT l.*, m.nome, m.apto, m.bloco, m.cpf

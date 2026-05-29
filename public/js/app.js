@@ -31,8 +31,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // ── Timeout de inatividade ──────────────────────────────────────────
     if (document.querySelector('.df-topbar')) {    // if para validar se tem sessao ativa
         (function () {
-        const TIMEOUT_MS = 10 * 1000; // 10 segundos (mudar para 10 * 60 * 1000 em produção)
-        const AVISO_MS   = 5 * 1000;  // aviso 5 segundos antes
+        const TIMEOUT_MS = 15 * 60 * 1000; // 15 minutos
+        const AVISO_MS   = 1 * 60 * 1000;  // aviso 5 segundos antes
 
         let timerLogout, timerAviso;
 

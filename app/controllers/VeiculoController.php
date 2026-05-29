@@ -15,21 +15,16 @@ class VeiculoController
         $this->veiculoService = new VeiculoService();
     }
 
-    public function index(): void
-    {
+    public function index(): void{
         AuthGuard::requereLogin();
 
         $privilegio = (int) ($_SESSION['usuario_privilegio'] ?? 1);
-
-        if ($privilegio === self::PRIVILEGIO_PORTEIRO) {
-            $this->redirecionar('/painel');
-        }
 
         $repo      = new MoradorRepository();
         $usuario   = $repo->findById((int) $_SESSION['usuario_id']);
         $moradores = [];
 
-        if ($this->ehSindicoOuAdmin($privilegio)) {
+        if ($this->ehSindicoOuAdminOuPorteiro($privilegio)) {
             $todos     = $this->veiculoService->listarTodos();
             $moradores = $repo->findAll();
         } else {
@@ -39,6 +34,10 @@ class VeiculoController
         [$veiculos, $totalPaginas, $pagina] = $this->paginar($todos);
 
         require_once __DIR__ . '/../../resources/views/veiculo/index.php';
+    }
+
+    private function ehSindicoOuAdminOuPorteiro(int $privilegio): bool{
+        return in_array($privilegio, [2, 3, 4], true);
     }
 
     public function consultar(): void

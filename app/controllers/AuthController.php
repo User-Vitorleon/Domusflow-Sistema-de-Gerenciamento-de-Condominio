@@ -87,15 +87,25 @@ class AuthController
 
     public function enviarRecuperacao(): void{
         AuthGuard::requerePost('/recuperar-senha');
+        require_once __DIR__ . '/../helpers/RateLimiter.php';
 
-        $cpf = preg_replace('/[^0-9]/', '', $_POST['user_cpf'] ?? '');
+        $chave = 'recuperar_senha';
 
+        if (!RateLimiter::verificar($chave)) {
+            $minutos = RateLimiter::minutosRestantes($chave);
+            $_SESSION['erro_recuperacao'] = "Muitas tentativas. Tente novamente em {$minutos} minuto(s).";
+            header('Location: ' . BASE_URL . '/recuperar-senha');
+            exit();
+        }
+
+        $cpf     = preg_replace('/[^0-9]/', '', $_POST['user_cpf'] ?? '');
         $repo    = new MoradorRepository();
         $morador = $repo->findByCpf($cpf);
 
         $mensagemGenerica = 'Se o CPF informado estiver cadastrado e ativo, você receberá um e-mail com a nova senha.';
 
         if (!$morador || $morador['status'] !== 'L') {
+            RateLimiter::registrarFalha($chave);
             $_SESSION['sucesso_recuperacao'] = $mensagemGenerica;
             header('Location: ' . BASE_URL . '/recuperar-senha');
             exit();
@@ -104,6 +114,7 @@ class AuthController
         $service = new MoradorService();
         $service->resetarSenha((int) $morador['id_user']);
 
+        RateLimiter::resetar($chave);
         $_SESSION['sucesso_recuperacao'] = $mensagemGenerica;
         header('Location: ' . BASE_URL . '/recuperar-senha');
         exit();

@@ -41,7 +41,7 @@ $cores = [
             <?php unset($_SESSION['erro_veiculo']); ?>
         <?php endif; ?>
 
-        <?php if (in_array($privilegio, [1, 2, 4])): ?>
+        <?php if (in_array($privilegio, [1, 2, 3, 4])): ?>
             <div class="df-card" style="margin-bottom: 24px;">
                 <h3 class="section-title">Cadastrar Veículo</h3>
 
@@ -136,19 +136,16 @@ $cores = [
                 <div class="table-wrap">
                     <table class="df-table">
                         <thead>
-                            <tr>
                                 <th>Placa</th>
                                 <th>Marca</th>
                                 <th>Modelo</th>
                                 <th>Cor</th>
                                 <th>Principal</th>
-                                <th>Ação</th>
                                 <?php if (in_array($privilegio, [2, 3, 4])): ?>
                                     <th>Morador</th>
                                     <th>Cadastrado por</th>
                                 <?php endif; ?>
-                                <th></th> 
-                            </tr>
+                            <th></th>
                         </thead>
                         <tbody>
                             <?php foreach ($veiculos as $v): ?>
@@ -159,16 +156,16 @@ $cores = [
                                     <td><?= htmlspecialchars($v['marca']) ?></td>
                                     <td><?= htmlspecialchars($v['modelo']) ?></td>
                                     <td><?= htmlspecialchars($v['cor']) ?></td>
-                                    <td>           
-                                        <?php if ($v['principal']): ?>
-                                            <span class="perfil-badge-sindico">⭐Principal</span>
+                                        <td>           
+                                            <?php if ($v['principal']): ?>
+                                                <span class="perfil-badge-sindico">⭐Principal</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <?php if (in_array($privilegio, [2, 3, 4])): ?>
+                                            <td><?= htmlspecialchars($v['nome_morador']) ?></td>
+                                            <td><?= htmlspecialchars($v['cadastrado_por']) ?></td>
                                         <?php endif; ?>
-                                    </td>
-                                    <?php if (in_array($privilegio, [2, 3, 4])): ?>
-                                        <td><?= htmlspecialchars($v['nome_morador']) ?></td>
-                                        <td><?= htmlspecialchars($v['cadastrado_por']) ?></td>
-                                    <?php endif; ?>
-                                    <td>
+                                        <td>
                                         <?php
 
                                         $podeExcluir = in_array($privilegio, [2, 4]) ||

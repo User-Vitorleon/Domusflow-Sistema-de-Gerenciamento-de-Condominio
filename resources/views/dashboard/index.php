@@ -126,7 +126,6 @@ require_once __DIR__ . '/../layout/header.php';
 </main>
 
 <script>
-    // Passa os dados para o dashboard.js (Gráficos)
     window.APP_DASHBOARD = <?= json_encode([
                                 'chartLabels' => $chartLabels,
                                 'chartDados'  => $chartDados
