@@ -3,7 +3,7 @@
 class RateLimiter
 {
     private const MAX_TENTATIVAS = 5;
-    private const JANELA_SEGUNDOS = 15 * 60; // 15 minutos
+    private const JANELA_SEGUNDOS = 10 * 60; // 15 minutos
 
     public static function verificar(string $chave): bool
     {
