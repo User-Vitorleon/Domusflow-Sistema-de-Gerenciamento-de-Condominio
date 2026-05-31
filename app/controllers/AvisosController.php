@@ -14,7 +14,7 @@ class AvisosController
 
     public function index(): void
     {
-        AuthGuard::requereLogin();
+        AuthGuard::requereUsuarioAtivo();
 
         $moradorRepo = new MoradorRepository();
         $usuario     = $moradorRepo->findById((int) $_SESSION['usuario_id']);

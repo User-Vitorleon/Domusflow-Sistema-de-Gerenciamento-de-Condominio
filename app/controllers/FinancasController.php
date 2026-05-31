@@ -54,7 +54,7 @@ public function taxasCad(): void
 
 public function lancamento(): void
     {
-        AuthGuard::requereLogin();
+        AuthGuard::requereUsuarioAtivo();
 
         $idUser     = (int) $_SESSION['usuario_id'];
         $privilegio = (int) $_SESSION['usuario_privilegio'];
@@ -122,7 +122,7 @@ public function lancamento(): void
 
 public function historico(): void
     {
-        AuthGuard::requereLogin();
+        AuthGuard::requereUsuarioAtivo();
 
         $idUser    = (int) $_SESSION['usuario_id'];
         $historico = $this->repo->historico($idUser);
@@ -135,7 +135,7 @@ public function historico(): void
 
     public function gerarFatura(): void
     {
-        AuthGuard::requereLogin();
+        AuthGuard::requereUsuarioAtivo();
         AuthGuard::requerePost('/financeiro/historico');
 
         $idUserAlvo = (int) ($_POST['id_user'] ?? 0);
@@ -217,64 +217,15 @@ public function historico(): void
         $_SESSION['sucesso_fatura'] = 'Pagamento confirmado com sucesso!';
         $this->redirecionar('/financeiro/historico');
     }
-    
-    public function gerarFaturaUnica(): void{
-        AuthGuard::requereUsuarioAtivo();
 
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: ' . BASE_URL . '/financeiro/historico');
+    public function verificarDuplicado(): void{
+        header('Content-Type: application/json');
+
+        $usuario = AuthGuard::requereUsuarioAtivo();
+        if (!in_array((int) ($usuario['privilegio'] ?? 0), [2, 4], true)) {
+            echo json_encode(['erro' => 'Sem permissão.']);
             exit();
         }
-
-        $idLancamento = (int)($_POST['id_lancamento'] ?? 0);
-        $resultado    = $this->repo->gerarFaturaUnica(
-            (int)$_SESSION['usuario_id'],
-            $idLancamento
-        );
-
-        if ($resultado) {
-            $_SESSION['sucesso_fatura'] = 'Fatura gerada com sucesso!';
-        } else {
-            $_SESSION['erro_fatura'] = 'Erro ao gerar fatura.';
-        }
-
-        header('Location: ' . BASE_URL . '/financeiro/historico');
-        exit();
-    }
-
-    public function gerarFaturaTodos(): void
-    {
-        $this->requireSindico();
-        AuthGuard::requerePost('/financeiro/lancamento');
-
-        $moradorRepo = new MoradorRepository();
-        $moradores   = $moradorRepo->findAtivos();
-        $gerados     = 0;
-
-        foreach ($moradores as $morador) {
-            $valorTotal = $this->repo->totalPendente($morador['id_user']);
-            if ($valorTotal <= 0) {
-                continue;
-            }
-            $this->repo->gerarFatura(
-                (int) $_SESSION['usuario_id'],
-                [
-                    'id_user'   => $morador['id_user'],
-                    'data'      => date('Y-m-d'),
-                    'valor'     => $valorTotal,
-                    'descricao' => 'Fatura gerada automaticamente',
-                ]
-            );
-            $gerados++;
-        }
-
-        $_SESSION['sucesso_fatura'] = "Faturas geradas para {$gerados} morador(es)!";
-        $this->redirecionar('/financeiro/lancamento');
-    }
-
-    public function verificarDuplicado(): void
-    {
-        header('Content-Type: application/json');
 
         $modelo    = $_POST['modelo']    ?? '';
         $descricao = $_POST['descricao'] ?? '';

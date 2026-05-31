@@ -16,7 +16,7 @@ class OcorrenciaController
 
 public function index(): void
     {
-        AuthGuard::requereLogin();
+        AuthGuard::requereUsuarioAtivo();
 
         $idUser = (int) $_SESSION['usuario_id'];
         $this->service->marcarNotificacoesLidas($idUser);
@@ -31,7 +31,7 @@ public function index(): void
 
     public function detalhes(): void
     {
-        AuthGuard::requereLogin();
+        AuthGuard::requereUsuarioAtivo();
 
         $id      = (int) ($_GET['id'] ?? 0);
         $usuario = $this->getMoradorLogado();
@@ -53,7 +53,7 @@ public function index(): void
 
     public function abrir(): void
     {
-        AuthGuard::requereLogin();
+        AuthGuard::requereUsuarioAtivo();
         AuthGuard::requerePost('/ocorrencia');
 
         $resultado = $this->service->abrir($_POST, (int) $_SESSION['usuario_id']);
@@ -62,7 +62,7 @@ public function index(): void
 
     public function cancelar(): void
     {
-        AuthGuard::requereLogin();
+        AuthGuard::requereUsuarioAtivo();
         AuthGuard::requerePost('/ocorrencia');
 
         $id        = (int) ($_POST['id_ocorrencia'] ?? 0);
@@ -72,7 +72,7 @@ public function index(): void
 
     public function tramitarMorador(): void
     {
-        AuthGuard::requereLogin();
+        AuthGuard::requereUsuarioAtivo();
         AuthGuard::requerePost('/ocorrencia');
 
         $id        = (int) ($_POST['id_ocorrencia'] ?? 0);
@@ -99,7 +99,7 @@ public function index(): void
 
 public function painel(): void
     {
-        AuthGuard::requereLogin();
+        AuthGuard::requereUsuarioAtivo();
         $this->requireSindico();
 
         $usuario   = $this->getMoradorLogado();
@@ -126,7 +126,7 @@ public function painel(): void
 
     public function tramitar(): void
     {
-        AuthGuard::requereLogin();
+        AuthGuard::requereUsuarioAtivo();
         $this->requireSindico();
         AuthGuard::requerePost('/ocorrencia/painel');
 

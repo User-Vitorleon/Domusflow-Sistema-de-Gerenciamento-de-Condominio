@@ -22,7 +22,7 @@ class ReservaController
 
     public function index(): void
     {
-        AuthGuard::requereLogin();
+        AuthGuard::requereUsuarioAtivo();
 
         $moradorRepo = new MoradorRepository();
         $usuario     = $moradorRepo->findById((int) $_SESSION['usuario_id']);
@@ -37,11 +37,9 @@ class ReservaController
         require_once __DIR__ . '/../../resources/views/reserva/index.php';
     }
 
-    
-
     public function salvar(): void
     {
-        AuthGuard::requereLogin();
+        AuthGuard::requereUsuarioAtivo();
         AuthGuard::requerePost('/reserva');
 
         $resultado = $this->ehSindicoOuAdminSessao()
@@ -58,7 +56,7 @@ class ReservaController
 
     public function decidir(): void{
 
-        AuthGuard::requereLogin();
+        AuthGuard::requereUsuarioAtivo();
         $this->requireSindicoOuAdmin(); 
 
         $idReserva = (int)($_POST['id_reserva'] ?? 0);

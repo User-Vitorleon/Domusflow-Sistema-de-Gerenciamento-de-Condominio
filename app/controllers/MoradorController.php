@@ -99,7 +99,7 @@ class MoradorController
 
 public function formUpdate(): void
     {
-        AuthGuard::requereLogin();
+        AuthGuard::requereUsuarioAtivo();
 
         $repo    = new MoradorRepository();
         $usuario = $repo->findById((int) $_SESSION['usuario_id']);
@@ -136,7 +136,7 @@ public function inativar(): void
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-        AuthGuard::requereLogin();
+        AuthGuard::requereUsuarioAtivo();
 
         $repo = new MoradorRepository();
         $repo->atualizarStatus((int) $_SESSION['usuario_id'], 'B');
@@ -150,7 +150,7 @@ public function inativar(): void
 
     public function deletar(): void
     {
-        AuthGuard::requereLogin();
+        AuthGuard::requereUsuarioAtivo();
 
         $this->service->deletar(['id' => $_SESSION['usuario_id']]);
 

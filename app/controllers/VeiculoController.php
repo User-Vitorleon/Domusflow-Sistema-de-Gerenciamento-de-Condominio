@@ -16,7 +16,7 @@ class VeiculoController
     }
 
     public function index(): void{
-        AuthGuard::requereLogin();
+       AuthGuard::requereUsuarioAtivo();
 
         $privilegio = (int) ($_SESSION['usuario_privilegio'] ?? 1);
 
@@ -42,7 +42,7 @@ class VeiculoController
 
     public function consultar(): void
     {
-        AuthGuard::requereLogin();
+        AuthGuard::requereUsuarioAtivo();
 
         $repo      = new MoradorRepository();
         $usuario   = $repo->findById((int) $_SESSION['usuario_id']);
@@ -57,7 +57,7 @@ class VeiculoController
 
     public function salvar(): void
     {
-        AuthGuard::requereLogin();
+        AuthGuard::requereUsuarioAtivo();
         AuthGuard::requerePost('/veiculo');
 
         $resultado = $this->veiculoService->cadastrar(
@@ -71,7 +71,7 @@ class VeiculoController
 
     public function editar(): void
     {
-        AuthGuard::requereLogin();
+        AuthGuard::requereUsuarioAtivo();
         AuthGuard::requerePost('/veiculo');
 
         $resultado = $this->veiculoService->editar(
@@ -85,7 +85,7 @@ class VeiculoController
 
     public function excluir(): void
     {
-        AuthGuard::requereLogin();
+        AuthGuard::requereUsuarioAtivo();
         AuthGuard::requerePost('/veiculo');
 
         $resultado = $this->veiculoService->excluir(

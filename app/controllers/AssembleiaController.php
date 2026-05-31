@@ -14,7 +14,7 @@ class AssembleiaController
 
     public function index(): void
     {
-        AuthGuard::requereLogin();
+        AuthGuard::requereUsuarioAtivo();
 
         $moradorRepo    = new MoradorRepository();
         $usuario        = $moradorRepo->findById((int) $_SESSION['usuario_id']);
@@ -67,7 +67,7 @@ class AssembleiaController
 
     public function confirmarPresenca(): void
     {
-        AuthGuard::requereLogin();
+        AuthGuard::requereUsuarioAtivo();
         AuthGuard::requerePost('/assembleia');
 
         $presenca = $_POST['presenca'] ?? '';

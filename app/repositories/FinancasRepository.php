@@ -155,22 +155,25 @@ class FinancasRepository
         $where = '';
 
         if ($busca !== '') {
-            $where             .= ' AND (m.nome LIKE :busca OR l.descricao LIKE :busca2 OR l.modelo LIKE :busca3)';
+            $where             .= ' AND (l.descricao LIKE :busca OR l.modelo LIKE :busca2)';
             $params[':busca']   = "%{$busca}%";
             $params[':busca2']  = "%{$busca}%";
-            $params[':busca3']  = "%{$busca}%";
         }
+
         if ($status !== '' && $status !== 'atraso') {
             $where            .= ' AND l.status = :status';
             $params[':status'] = $status;
         }
+
         if ($atraso === '1' || $status === 'atraso') {
             $where .= " AND l.data_vencimento < CURDATE() AND l.status = 'P'";
         }
+
         if ($dtLanc !== '') {
             $where             .= ' AND DATE(l.data_lancamento) = :dt_lanc';
             $params[':dt_lanc'] = $dtLanc;
         }
+        
         if ($dtVenc !== '') {
             $where             .= ' AND DATE(l.data_vencimento) = :dt_venc';
             $params[':dt_venc'] = $dtVenc;
