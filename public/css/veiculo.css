@@ -15,6 +15,35 @@
     overflow-x: auto;
 }
 
+.veiculo-filtros {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(130px, 1fr)) auto;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 18px;
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+}
+
+.veiculo-filtros .df-field {
+    margin-bottom: 0;
+}
+
+.veiculo-filtros-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.veiculo-filtros-actions .btn-primary,
+.veiculo-filtros-actions .btn-ghost {
+    min-height: 40px;
+    white-space: nowrap;
+}
+
 /* tabela padrão do módulo */
 .df-table {
     width: 100%;
@@ -46,6 +75,16 @@
 .df-table td {
     padding: 12px 14px;
     color: var(--text);
+}
+
+.veiculo-table th,
+.veiculo-table td {
+    vertical-align: middle;
+}
+
+.veiculo-table td:last-child {
+    width: 1%;
+    white-space: nowrap;
 }
 
 /* ── Badge principal na tabela ── */
@@ -188,4 +227,26 @@
 
 [data-theme="dark"] .df-table tbody tr:hover {
     background: #2e3240 !important;
+}
+
+@media (max-width: 900px) {
+    .veiculo-filtros {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .veiculo-filtros-actions {
+        grid-column: 1 / -1;
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 560px) {
+    .veiculo-filtros {
+        grid-template-columns: 1fr;
+    }
+
+    .veiculo-filtros-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
 }

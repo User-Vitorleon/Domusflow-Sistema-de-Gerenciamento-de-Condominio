@@ -6,8 +6,8 @@ use MoradorRepository;
 use MoradorService;
 use PHPUnit\Framework\TestCase;
 
-require_once __DIR__ . '/../../app/repositories/MoradorRepository.php';
-require_once __DIR__ . '/../../app/services/MoradorService.php';
+require_once __DIR__ . '/../../../app/repositories/MoradorRepository.php';
+require_once __DIR__ . '/../../../app/services/MoradorService.php';
 
 final class MoradorServiceTest extends TestCase
 {
@@ -78,7 +78,10 @@ final class MoradorServiceTest extends TestCase
     {
         $repo = new MoradorServiceRepositoryFake();
 
-        $resultado = (new MoradorService($repo))->atualizar($this->dadosAtualizacao(['senha' => 'nova-senha']));
+        $resultado = (new MoradorService($repo))->atualizar($this->dadosAtualizacao([
+            'senha' => 'nova-senha',
+            'conf_senha' => 'nova-senha',
+        ]));
 
         $this->assertTrue($resultado['sucesso']);
         $this->assertTrue(password_verify('nova-senha', $repo->dadosAtualizados['senha']));
@@ -105,6 +108,36 @@ final class MoradorServiceTest extends TestCase
         $this->assertSame(33, $repo->idDeletado);
     }
 
+    public function testAtualizarStatusGestaoValidaStatusPermitido(): void
+    {
+        $repo = new MoradorServiceRepositoryFake();
+
+        $resultado = (new MoradorService($repo))->atualizarStatusGestao(8, 'I');
+
+        $this->assertTrue($resultado['sucesso']);
+        $this->assertSame([8, 'I'], $repo->statusAtualizado);
+    }
+
+    public function testAtualizarStatusGestaoPermiteReativar(): void
+    {
+        $repo = new MoradorServiceRepositoryFake();
+
+        $resultado = (new MoradorService($repo))->atualizarStatusGestao(8, 'L');
+
+        $this->assertTrue($resultado['sucesso']);
+        $this->assertSame([8, 'L'], $repo->statusAtualizado);
+    }
+
+    public function testAtualizarStatusGestaoRecusaStatusInvalido(): void
+    {
+        $repo = new MoradorServiceRepositoryFake();
+
+        $resultado = (new MoradorService($repo))->atualizarStatusGestao(8, 'E');
+
+        $this->assertFalse($resultado['sucesso']);
+        $this->assertNull($repo->statusAtualizado);
+    }
+
     public function testAtualizarPrivilegioRetornaResultadoDoRepositorio(): void
     {
         $repo = new MoradorServiceRepositoryFake();
@@ -125,6 +158,7 @@ final class MoradorServiceTest extends TestCase
             'telefone_recado' => null,
             'senha' => '123456',
             'conf_senha' => '123456',
+            'termos' => '1',
         ], $sobrescrever);
     }
 
@@ -139,6 +173,7 @@ final class MoradorServiceTest extends TestCase
             'telefone' => '11999999999',
             'tell_recado' => null,
             'senha' => '',
+            'conf_senha' => '',
         ], $sobrescrever);
     }
 }
@@ -155,6 +190,7 @@ final class MoradorServiceRepositoryFake extends MoradorRepository
     public array $usuarios = [];
     public ?int $idDeletado = null;
     public ?array $privilegioAtualizado = null;
+    public ?array $statusAtualizado = null;
 
     public function __construct()
     {
@@ -164,6 +200,16 @@ final class MoradorServiceRepositoryFake extends MoradorRepository
     {
         $this->cpfConsultado = $cpf;
         return $this->cpfExiste;
+    }
+
+    public function existeEmail(string $email): bool
+    {
+        return false;
+    }
+
+    public function existeEmailParaOutro(string $email, int $idAtual): bool
+    {
+        return false;
     }
 
     public function save(array $data): int|bool
@@ -197,6 +243,12 @@ final class MoradorServiceRepositoryFake extends MoradorRepository
     public function atualizarPrivilegio(int $id, int $privilegio): bool
     {
         $this->privilegioAtualizado = [$id, $privilegio];
+        return true;
+    }
+
+    public function atualizarStatus(int $id, string $status): bool
+    {
+        $this->statusAtualizado = [$id, $status];
         return true;
     }
 }

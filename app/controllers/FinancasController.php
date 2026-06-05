@@ -48,8 +48,39 @@ public function taxasCad(): void
         $this->requireSindico();
         AuthGuard::requerePost('/financeiro/taxas');
 
+        if (!$this->confirmarSenhaUsuario($_POST['admin_senha'] ?? '')) {
+            $_SESSION['erro_taxa'] = 'Senha de confirmação inválida.';
+            $this->redirecionar('/financeiro/taxas');
+        }
+
         $this->repo->excluirTaxa((int) ($_POST['id_taxa'] ?? 0));
         $this->redirecionar('/financeiro/taxas?excluido=1');
+    }
+
+    public function editarTaxa(): void
+    {
+        $this->requireSindico();
+        AuthGuard::requerePost('/financeiro/taxas');
+
+        if (!$this->confirmarSenhaUsuario($_POST['admin_senha'] ?? '')) {
+            $_SESSION['erro_taxa'] = 'Senha de confirmação inválida.';
+            $this->redirecionar('/financeiro/taxas');
+        }
+
+        $resultado = $this->repo->atualizarTaxa([
+            'id_taxa'   => (int)($_POST['id_taxa'] ?? 0),
+            'descricao' => $_POST['descricao'] ?? '',
+            'valor'     => $_POST['valor'] ?? '',
+            'modulo'    => $_POST['modulo'] ?? '',
+            'status'    => $_POST['status'] ?? 'A',
+        ]);
+
+        if (!$resultado) {
+            $_SESSION['erro_taxa'] = 'Erro ao atualizar taxa.';
+            $this->redirecionar('/financeiro/taxas');
+        }
+
+        $this->redirecionar('/financeiro/taxas?atualizado=1');
     }
 
 public function lancamento(): void
@@ -66,16 +97,18 @@ public function lancamento(): void
 
         $total        = $this->repo->countLancamentos(
             $idUser, $privilegio,
-            $filtros['busca'], $filtros['status'], $filtros['dt_lanc'], $filtros['dt_venc'], $filtros['atraso']
+            $filtros['nome'], $filtros['tipo'], $filtros['descricao'], $filtros['status'], $filtros['dt_lanc'], $filtros['dt_venc'], $filtros['atraso']
         );
         $totalPaginas = (int) ceil($total / $porPagina);
 
         $lancamentos = $this->repo->lancamento(
             $idUser, $privilegio, $offset, $porPagina,
-            $filtros['busca'], $filtros['status'], $filtros['dt_lanc'], $filtros['dt_venc'], $filtros['atraso']
+            $filtros['nome'], $filtros['tipo'], $filtros['descricao'], $filtros['status'], $filtros['dt_lanc'], $filtros['dt_venc'], $filtros['atraso']
         );
 
         $todasTaxas  = $this->repo->listarTodasTaxasAtivas();
+        $tiposTaxas  = $this->repo->listarModulosTaxasAtivas();
+        $descricoesTaxas = $this->repo->listarDescricoesTaxasAtivas();
         $moradorRepo = new MoradorRepository();
         $usuario     = $moradorRepo->findById($idUser);
         $moradores   = $moradorRepo->findAtivos();
@@ -254,11 +287,13 @@ public function historico(): void
     private function extrairFiltrosLancamento(): array
     {
         return [
-            'busca'   => $_GET['busca']   ?? '',
-            'status'  => $_GET['status']  ?? '',
-            'dt_lanc' => $_GET['dt_lanc'] ?? '',
-            'dt_venc' => $_GET['dt_venc'] ?? '',
-            'atraso'  => $_GET['atraso']  ?? '',
+            'nome'      => trim($_GET['nome'] ?? ($_GET['busca'] ?? '')),
+            'tipo'      => trim($_GET['tipo'] ?? ''),
+            'descricao' => trim($_GET['descricao'] ?? ''),
+            'status'    => $_GET['status']  ?? '',
+            'dt_lanc'   => $_GET['dt_lanc'] ?? '',
+            'dt_venc'   => $_GET['dt_venc'] ?? '',
+            'atraso'    => $_GET['atraso']  ?? '',
         ];
     }
 
@@ -313,6 +348,17 @@ public function historico(): void
         ) {
             $this->redirecionar('/');
         }
+    }
+
+    private function confirmarSenhaUsuario(string $senha): bool
+    {
+        if ($senha === '') {
+            return false;
+        }
+
+        $repo = new MoradorRepository();
+        $usuario = $repo->findById((int)($_SESSION['usuario_id'] ?? 0));
+        return $usuario && password_verify($senha, $usuario['senha'] ?? '');
     }
 
     private function redirecionar(string $caminho): void

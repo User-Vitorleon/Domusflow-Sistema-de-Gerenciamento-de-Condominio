@@ -73,6 +73,16 @@ class VeiculoService
         return $this->repo->findAll();
     }
 
+    public function listarTodosComFiltros(array $filtros, int $limite, int $offset): array
+    {
+        return $this->repo->findAllComFiltros($filtros, $limite, $offset);
+    }
+
+    public function contarTodosComFiltros(array $filtros): int
+    {
+        return $this->repo->countAllComFiltros($filtros);
+    }
+
     public function listarPorUsuario(int $idUser): array
     {
         return $this->repo->findByUsuario($idUser);

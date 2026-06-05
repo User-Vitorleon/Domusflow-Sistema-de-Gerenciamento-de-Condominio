@@ -19,6 +19,16 @@ class LocalRepository
         return $stmt->fetchAll();
     }
 
+    public function findTodos(): array
+    {
+        $stmt = $this->pdo->query("
+            SELECT id_local, local, capacidade, disp_uso, id_user_cad, created_at
+            FROM locais_festivos
+            ORDER BY local ASC
+        ");
+        return $stmt->fetchAll();
+    }
+
     public function countDisponiveis(): int
     {
         $stmt = $this->pdo->query(
@@ -38,6 +48,23 @@ class LocalRepository
             ':capac'   => $data['capacidade'],
             ':disp'    => $data['disp_uso'],
             ':id_user' => $data['id_user_cad'],
+        ]);
+    }
+
+    public function update(int $id, array $data): bool
+    {
+        $stmt = $this->pdo->prepare("
+            UPDATE locais_festivos
+            SET local = :local,
+                capacidade = :capacidade,
+                disp_uso = :disp_uso
+            WHERE id_local = :id
+        ");
+        return $stmt->execute([
+            ':local'      => $data['local'],
+            ':capacidade' => $data['capacidade'],
+            ':disp_uso'   => $data['disp_uso'],
+            ':id'         => $id,
         ]);
     }
 

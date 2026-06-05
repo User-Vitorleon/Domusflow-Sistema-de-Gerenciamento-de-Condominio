@@ -1,10 +1,12 @@
 <?php
 require_once __DIR__ . '/../repositories/MoradorRepository.php';
 require_once __DIR__ . '/EmailService.php';
+require_once __DIR__ . '/ParametrosService.php';
 
 class MoradorService
 {
     private const PRIVILEGIOS_VALIDOS = [1, 2, 3, 4];
+    private const STATUS_GESTAO_VALIDOS = ['L', 'I', 'B'];
 
     private MoradorRepository $repo;
 
@@ -48,6 +50,11 @@ class MoradorService
             return ['sucesso' => false, 'mensagem' => 'Este e-mail já está cadastrado no sistema.'];
         }
 
+        $privilegio = (int) ($dados['privilegio'] ?? 1);
+        if (!in_array($privilegio, self::PRIVILEGIOS_VALIDOS, true)) {
+            $privilegio = 1;
+        }
+
         $idNovoUsuario = $this->repo->save([
             'nome'            => $dados['nome'],
             'cpf'             => $cpf,
@@ -58,7 +65,7 @@ class MoradorService
             'telefone_recado' => $dados['telefone_recado'] ?? null,
             'senha'           => hashSenha($dados['senha']),
             'status'          => 'P',
-            'privilegio'      => $dados['privilegio'] ?? 1,
+            'privilegio'      => $privilegio,
         ]);
 
         if (!$idNovoUsuario) {
@@ -99,6 +106,13 @@ class MoradorService
 
         if ((int)$solicitante['privilegio'] === 2 && (int)($morador['privilegio'] ?? 1) !== 1) {
             return ['sucesso' => false, 'mensagem' => 'Você não tem permissão para aprovar este perfil.'];
+        }
+
+        if ($acao === 'aceitar' && (int)($morador['privilegio'] ?? 1) === 1) {
+            $parametros = new ParametrosService();
+            if ($this->repo->countMoradoresAtivos() >= $parametros->limiteMoradoresAtivos()) {
+                return ['sucesso' => false, 'mensagem' => 'Limite de moradores ativos atingido. Ajuste os parametros do sistema antes de aprovar novos moradores.'];
+            }
         }
 
         $novoStatus = ($acao === 'aceitar') ? 'L' : 'B';
@@ -156,9 +170,26 @@ class MoradorService
         return ['sucesso' => true];
     }
 
+    public function atualizarStatusGestao(int $id, string $status): array
+    {
+        $status = strtoupper(trim($status));
+
+        if ($id <= 0 || !in_array($status, self::STATUS_GESTAO_VALIDOS, true)) {
+            return ['sucesso' => false, 'mensagem' => 'Status invalido.'];
+        }
+
+        return $this->repo->atualizarStatus($id, $status)
+            ? ['sucesso' => true]
+            : ['sucesso' => false, 'mensagem' => 'Erro ao atualizar status.'];
+    }
+
     public function atualizarPrivilegio(int $id, int $privilegio): bool
     {
         if (!in_array($privilegio, self::PRIVILEGIOS_VALIDOS, true)) {
+            return false;
+        }
+        $morador = $this->repo->findById($id);
+        if (!$morador || (int)($morador['privilegio'] ?? 0) === 4) {
             return false;
         }
         return $this->repo->atualizarPrivilegio($id, $privilegio);

@@ -156,9 +156,9 @@ class MoradorRepository
     {
         $stmt = $this->pdo->prepare(
             "INSERT INTO morador
-                (identificador, nome, apto, bloco, cpf, email, telefone, tell_recado, senha, status)
+                (identificador, nome, apto, bloco, cpf, email, telefone, tell_recado, senha, status, privilegio)
              VALUES
-                (:iden, :nome, :apto, :bloco, :cpf, :email, :cell, :recado, :senha, :status)"
+                (:iden, :nome, :apto, :bloco, :cpf, :email, :cell, :recado, :senha, :status, :privilegio)"
         );
 
         $sucesso = $stmt->execute([
@@ -172,6 +172,7 @@ class MoradorRepository
             ':recado' => $data['telefone_recado'] ?? null,
             ':senha'  => $data['senha'],
             ':status' => 'P',
+            ':privilegio' => (int) ($data['privilegio'] ?? 1),
         ]);
 
         if ($sucesso) {
@@ -205,6 +206,12 @@ class MoradorRepository
             "SELECT COUNT(*) FROM morador WHERE status = :status"
         );
         $stmt->execute([':status' => $status]);
+        return (int)$stmt->fetchColumn();
+    }
+
+    public function countMoradoresAtivos(): int
+    {
+        $stmt = $this->pdo->query("SELECT COUNT(*) FROM morador WHERE status = 'L' AND privilegio = 1");
         return (int)$stmt->fetchColumn();
     }
 
@@ -296,8 +303,37 @@ class MoradorRepository
         ]);
     }
 
-    public function findTodosComFiltros(array $filtros): array{
-        $sql      = "SELECT * FROM morador WHERE 1=1";
+    public function findTodosComFiltros(array $filtros, ?int $limit = null, int $offset = 0): array{
+        $params = $this->montarFiltrosTodos($filtros);
+        $sql    = "SELECT * FROM morador WHERE 1=1" . $params['sql'] . ' ORDER BY nome ASC';
+
+        if ($limit !== null) {
+            $sql .= ' LIMIT :limit OFFSET :offset';
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        foreach ($params['bindings'] as $chave => $valor) {
+            $stmt->bindValue($chave, $valor);
+        }
+        if ($limit !== null) {
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        }
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    public function countTodosComFiltros(array $filtros): int
+    {
+        $params = $this->montarFiltrosTodos($filtros);
+        $stmt   = $this->pdo->prepare("SELECT COUNT(*) FROM morador WHERE 1=1" . $params['sql']);
+        $stmt->execute($params['bindings']);
+        return (int)$stmt->fetchColumn();
+    }
+
+    private function montarFiltrosTodos(array $filtros): array
+    {
+        $sql      = '';
         $bindings = [];
 
         if (!empty($filtros['nome'])) {
@@ -316,11 +352,16 @@ class MoradorRepository
             $sql .= ' AND status = :status';
             $bindings[':status'] = $filtros['status'];
         }
+        if (isset($filtros['perfil']) && $filtros['perfil'] !== '') {
+            $sql .= ' AND privilegio = :perfil';
+            $bindings[':perfil'] = (int) $filtros['perfil'];
+        }
+        if (!empty($filtros['foco'])) {
+            $sql .= ' AND id_user = :foco';
+            $bindings[':foco'] = (int) $filtros['foco'];
+        }
 
-        $sql .= ' ORDER BY nome ASC';
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($bindings);
-        return $stmt->fetchAll();
+        return ['sql' => $sql, 'bindings' => $bindings];
     }
 
     public function atualizarSenha(int $id, string $senhaHash): bool{

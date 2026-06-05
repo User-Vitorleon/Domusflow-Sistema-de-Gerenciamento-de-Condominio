@@ -10,6 +10,7 @@ require_once __DIR__ . '/../repositories/LocalRepository.php';
 class ReservaController
 {
     private const ITENS_POR_PAGINA = 10;
+    private const ITENS_POR_PAGINA_HISTORICO = 10;
 
     private ReservaService $reservaService;
     private LocalService   $localService;
@@ -27,11 +28,16 @@ class ReservaController
         $moradorRepo = new MoradorRepository();
         $usuario     = $moradorRepo->findById((int) $_SESSION['usuario_id']);
         $locais      = $this->reservaService->listarLocaisDisponiveis();
+        $podeGerenciarLocais = $this->ehSindicoOuAdmin($usuario);
+        $locaisCadastrados   = $podeGerenciarLocais ? (new LocalRepository())->findTodos() : [];
+        $visaoReservas       = $this->resolverVisao($podeGerenciarLocais);
 
         $reservasParaAprovar = [];
         $totalPaginas        = 0;
-        if ($this->ehSindicoOuAdmin($usuario)) {
-            extract($this->montarPaginacaoPendentes(), EXTR_OVERWRITE);
+        $pagina              = 1;
+        $filtrosReservas     = $this->extrairFiltrosReservas();
+        if ($podeGerenciarLocais) {
+            extract($this->montarPaginacaoPendentes($filtrosReservas), EXTR_OVERWRITE);
         }
 
         require_once __DIR__ . '/../../resources/views/reserva/index.php';
@@ -47,7 +53,47 @@ class ReservaController
             : $this->reservaService->salvar($_POST, (int) $_SESSION['usuario_id']);
 
         if ($resultado['sucesso']) {
-            $this->redirecionar('/reserva?sucesso=1');
+            $destino = $this->ehSindicoOuAdminSessao() ? '/reserva?visao=locais&sucesso=1' : '/reserva?sucesso=1';
+            $this->redirecionar($destino);
+        }
+
+        $_SESSION['erro_reserva'] = $resultado['mensagem'];
+        $this->redirecionar('/reserva');
+    }
+
+    public function historico(): void
+    {
+        AuthGuard::requereUsuarioAtivo();
+
+        $moradorRepo = new MoradorRepository();
+        $usuario = $moradorRepo->findById((int)$_SESSION['usuario_id']);
+        if (!$usuario || (int)($usuario['privilegio'] ?? 1) !== 1) {
+            $this->redirecionar('/painel');
+        }
+
+        $filtrosHistorico = $this->extrairFiltrosHistorico();
+        $pagina = max(1, (int)($_GET['pagina'] ?? 1));
+        $porPagina = self::ITENS_POR_PAGINA_HISTORICO;
+        $offset = ($pagina - 1) * $porPagina;
+        $repo = new ReservaRepository();
+
+        $totalHistorico = $repo->countHistoricoPorUsuario((int)$_SESSION['usuario_id'], $filtrosHistorico);
+        $totalPaginas = (int)ceil($totalHistorico / $porPagina);
+        $reservasHistorico = $repo->buscarHistoricoPorUsuario((int)$_SESSION['usuario_id'], $filtrosHistorico, $offset, $porPagina);
+
+        require_once __DIR__ . '/../../resources/views/reserva/historico.php';
+    }
+
+    public function editarLocal(): void
+    {
+        AuthGuard::requereUsuarioAtivo();
+        AuthGuard::requerePost('/reserva');
+        $this->requireSindicoOuAdmin();
+
+        $resultado = $this->localService->atualizar($_POST, (int) $_SESSION['usuario_id']);
+
+        if ($resultado['sucesso']) {
+            $this->redirecionar('/reserva?visao=locais&local_atualizado=1');
         }
 
         $_SESSION['erro_reserva'] = $resultado['mensagem'];
@@ -94,22 +140,53 @@ class ReservaController
             $_SESSION['sucesso_reserva'] = 'Reserva negada com sucesso!';
         }
 
-        $this->redirecionar('/reserva');
+        $this->redirecionar('/reserva?visao=solicitacoes');
     }    
 
 
-    private function montarPaginacaoPendentes(): array{
+    private function montarPaginacaoPendentes(array $filtros): array{
         $pagina       = max(1, (int)($_GET['pagina'] ?? 1));
         $porPagina    = self::ITENS_POR_PAGINA;
-        $total        = $this->reservaService->contarPendentesGeral();
+        $repo         = new ReservaRepository();
+        $total        = $repo->countPendentesComFiltros($filtros);
         $totalPaginas = (int)ceil($total / $porPagina);
         $offset       = ($pagina - 1) * $porPagina;
 
         return [
             'pagina'              => $pagina,        
             'totalPaginas'        => $totalPaginas,
-            'reservasParaAprovar' => $this->reservaService->listarPendentesGeral($offset, $porPagina),
+            'reservasParaAprovar' => $repo->buscarPendentesComFiltros($filtros, $offset, $porPagina),
         ];
+    }
+
+    private function extrairFiltrosReservas(): array
+    {
+        return [
+            'nome' => trim($_GET['reserva_nome'] ?? ''),
+            'bloco' => trim($_GET['reserva_bloco'] ?? ''),
+            'apto' => trim($_GET['reserva_apto'] ?? ''),
+            'data_solicitacao' => trim($_GET['reserva_data_solicitacao'] ?? ''),
+            'data_reserva' => trim($_GET['reserva_data_reserva'] ?? ''),
+        ];
+    }
+
+    private function extrairFiltrosHistorico(): array
+    {
+        return [
+            'local' => trim($_GET['local'] ?? ''),
+            'data_solicitacao' => trim($_GET['data_solicitacao'] ?? ''),
+            'data_reserva' => trim($_GET['data_reserva'] ?? ''),
+        ];
+    }
+
+    private function resolverVisao(bool $podeGerenciarLocais): string
+    {
+        if (!$podeGerenciarLocais) {
+            return 'nova';
+        }
+
+        $visao = $_GET['visao'] ?? 'locais';
+        return in_array($visao, ['locais', 'solicitacoes'], true) ? $visao : 'locais';
     }
     private function notificarDecisao(
         array $reserva,

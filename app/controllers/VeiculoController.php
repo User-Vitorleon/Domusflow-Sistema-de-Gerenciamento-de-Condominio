@@ -24,14 +24,19 @@ class VeiculoController
         $usuario   = $repo->findById((int) $_SESSION['usuario_id']);
         $moradores = [];
 
+        $filtrosVeiculos = [];
+        $queryVeiculos   = '';
+
         if ($this->ehSindicoOuAdminOuPorteiro($privilegio)) {
-            $todos     = $this->veiculoService->listarTodos();
+            $filtrosVeiculos = $this->extrairFiltrosVeiculos();
+            [$veiculos, $totalPaginas, $pagina] = $this->paginarTodosVeiculos($filtrosVeiculos);
+            $queryVeiculos = http_build_query(array_filter($filtrosVeiculos, static fn($valor) => $valor !== ''));
+            $queryVeiculos = $queryVeiculos ? $queryVeiculos . '&' : '';
             $moradores = $repo->findAll();
         } else {
             $todos = $this->veiculoService->listarPorUsuario((int) $_SESSION['usuario_id']);
+            [$veiculos, $totalPaginas, $pagina] = $this->paginar($todos);
         }
-
-        [$veiculos, $totalPaginas, $pagina] = $this->paginar($todos);
 
         require_once __DIR__ . '/../../resources/views/veiculo/index.php';
     }
@@ -105,6 +110,32 @@ class VeiculoController
         $offset       = ($pagina - 1) * $porPagina;
 
         return [array_slice($todos, $offset, $porPagina), $totalPaginas, $pagina];
+    }
+
+    private function paginarTodosVeiculos(array $filtros): array
+    {
+        $pagina       = max(1, (int) ($_GET['pagina'] ?? 1));
+        $porPagina    = self::ITENS_POR_PAGINA;
+        $total        = $this->veiculoService->contarTodosComFiltros($filtros);
+        $totalPaginas = max(1, (int) ceil($total / $porPagina));
+        $pagina       = min($pagina, $totalPaginas);
+        $offset       = ($pagina - 1) * $porPagina;
+
+        return [
+            $this->veiculoService->listarTodosComFiltros($filtros, $porPagina, $offset),
+            $totalPaginas,
+            $pagina,
+        ];
+    }
+
+    private function extrairFiltrosVeiculos(): array
+    {
+        return [
+            'nome'  => trim((string) ($_GET['nome'] ?? '')),
+            'placa' => trim((string) ($_GET['placa'] ?? '')),
+            'bloco' => trim((string) ($_GET['bloco'] ?? '')),
+            'apto'  => trim((string) ($_GET['apto'] ?? '')),
+        ];
     }
 
     private function respondercomResultado(array $resultado): void

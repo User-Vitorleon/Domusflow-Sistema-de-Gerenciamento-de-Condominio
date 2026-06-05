@@ -6,6 +6,7 @@ require_once __DIR__ . '/../repositories/MoradorRepository.php';
 class MoradorController
 {
     private const ITENS_POR_PAGINA = 15;
+    private const ITENS_POR_PAGINA_GESTAO = 10;
     private const PRIVILEGIO_ADMIN = 4;
 
     private MoradorService $service;
@@ -111,12 +112,15 @@ public function formUpdate(): void
     {
         AuthGuard::requerePost('/cadastro/update');
 
+        $repo = new MoradorRepository();
+        $usuarioAtual = $repo->findById((int) $_SESSION['usuario_id']);
+
         $resultado = $this->service->atualizar([
             'id'          => $_SESSION['usuario_id'],
             'nome'        => $_POST['user_nome']        ?? '',
             'email'       => $_POST['user_email']       ?? '',
-            'apto'        => $_POST['user_apto']        ?? '',
-            'bloco'       => $_POST['user_bloco']       ?? '',
+            'apto'        => $usuarioAtual['apto']      ?? '',
+            'bloco'       => $usuarioAtual['bloco']     ?? '',
             'telefone'    => $_POST['user_telefone']    ?? '',
             'tell_recado' => $_POST['user_tell_recado'] ?? '',
             'conf_senha'  => $_POST['user_conf_senha']  ?? '',
@@ -165,13 +169,26 @@ public function inativar(): void
         $repo    = new MoradorRepository();
         $usuario = $repo->findById((int) $_SESSION['usuario_id']);
 
+        $pagina    = max(1, (int) ($_GET['pagina'] ?? 1));
+        $porPagina = self::ITENS_POR_PAGINA_GESTAO;
+        $offset    = ($pagina - 1) * $porPagina;
+
+        $statusFiltro = trim($_GET['status'] ?? '');
+        if (!in_array($statusFiltro, ['L', 'P', 'I', 'B', 'E'], true)) {
+            $statusFiltro = '';
+        }
+
         $filtros   = [
             'nome'   => trim($_GET['nome']   ?? ''),
             'apto'   => trim($_GET['apto']   ?? ''),
             'bloco'  => trim($_GET['bloco']  ?? ''),
-            'status' => trim($_GET['status'] ?? ''),
+            'status' => $statusFiltro,
+            'perfil' => trim($_GET['perfil'] ?? ''),
+            'foco'   => (int) ($_GET['foco'] ?? 0),
         ];
-        $moradores = $repo->findTodosComFiltros($filtros);
+        $total        = $repo->countTodosComFiltros($filtros);
+        $totalPaginas = (int) ceil($total / $porPagina);
+        $moradores    = $repo->findTodosComFiltros($filtros, $porPagina, $offset);
 
         require_once __DIR__ . '/../../resources/views/moradores/gestao/index.php';
     }
@@ -181,11 +198,15 @@ public function inativar(): void
         AuthGuard::requerePost('/moradores/gestao');
 
         $idMorador = (int) ($_POST['id_morador'] ?? 0);
+        if (!$this->confirmarSenhaAdmin($_POST['admin_senha'] ?? '')) {
+            $this->redirecionarGestaoComFoco($idMorador, 'senha=1');
+        }
+
         $resultado = ($idMorador > 0)
             ? $this->service->resetarSenha($idMorador)
             : ['sucesso' => false];
 
-        $this->redirecionar('/moradores/gestao?' . ($resultado['sucesso'] ? 'reset=1' : 'erro=1'));
+        $this->redirecionarGestaoComFoco($idMorador, $resultado['sucesso'] ? 'reset=1' : 'erro=1');
     }
 
     public function gestaoSalvar(): void
@@ -197,11 +218,82 @@ public function inativar(): void
         $idMorador  = (int) ($_POST['id_morador']  ?? 0);
         $privilegio = (int) ($_POST['privilegio']  ?? 0);
 
+        $repo = new MoradorRepository();
+        $moradorAlvo = $repo->findById($idMorador);
+        if (!$moradorAlvo || (int) ($moradorAlvo['privilegio'] ?? 0) === self::PRIVILEGIO_ADMIN) {
+            $this->redirecionarGestaoComFoco($idMorador, 'erro=1');
+        }
+
+        if (!$this->confirmarSenhaAdmin($_POST['admin_senha'] ?? '')) {
+            $this->redirecionarGestaoComFoco($idMorador, 'senha=1');
+        }
+
         $sucesso = ($idMorador > 0)
             ? $this->service->atualizarPrivilegio($idMorador, $privilegio)
             : false;
 
-        $this->redirecionar('/moradores/gestao?' . ($sucesso ? 'sucesso=1' : 'erro=1'));
+        $this->redirecionarGestaoComFoco($idMorador, $sucesso ? 'sucesso=1' : 'erro=1');
+    }
+
+    public function gestaoStatus(): void
+    {
+        $this->requireAdmin();
+        AuthGuard::requerePost('/moradores/gestao');
+
+        $idMorador = (int) ($_POST['id_morador'] ?? 0);
+        if ($idMorador === (int) ($_SESSION['usuario_id'] ?? 0)) {
+            $this->redirecionarGestaoComFoco($idMorador, 'erro=1');
+        }
+        if (!$this->confirmarSenhaAdmin($_POST['admin_senha'] ?? '')) {
+            $this->redirecionarGestaoComFoco($idMorador, 'senha=1');
+        }
+
+        $resultado = $this->service->atualizarStatusGestao(
+            $idMorador,
+            $_POST['status'] ?? ''
+        );
+
+        $this->redirecionarGestaoComFoco($idMorador, $resultado['sucesso'] ? 'status_ok=1' : 'erro=1');
+    }
+
+    public function gestaoDeletar(): void
+    {
+        $this->requireAdmin();
+        AuthGuard::requerePost('/moradores/gestao');
+
+        $idMorador = (int) ($_POST['id_morador'] ?? 0);
+        if ($idMorador <= 0 || $idMorador === (int) ($_SESSION['usuario_id'] ?? 0)) {
+            $this->redirecionarGestaoComFoco($idMorador, 'erro=1');
+        }
+        if (!$this->confirmarSenhaAdmin($_POST['admin_senha'] ?? '')) {
+            $this->redirecionarGestaoComFoco($idMorador, 'senha=1');
+        }
+
+        $resultado = $this->service->deletar(['id' => $idMorador]);
+
+        $this->redirecionarGestaoComFoco($idMorador, $resultado['sucesso'] ? 'excluido=1' : 'erro=1');
+    }
+
+    private function redirecionarGestaoComFoco(int $idMorador, string $resultado): void
+    {
+        $query = $resultado;
+        if ($idMorador > 0) {
+            $query .= '&foco=' . $idMorador;
+        }
+
+        $this->redirecionar('/moradores/gestao?' . $query);
+    }
+
+    private function confirmarSenhaAdmin(string $senha): bool
+    {
+        if ($senha === '') {
+            return false;
+        }
+
+        $repo  = new MoradorRepository();
+        $admin = $repo->findById((int) ($_SESSION['usuario_id'] ?? 0));
+
+        return $admin && password_verify($senha, $admin['senha'] ?? '');
     }
 
 private function extrairFiltrosPendentes(): array

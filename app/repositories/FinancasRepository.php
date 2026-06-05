@@ -12,7 +12,7 @@ class FinancasRepository
     public function taxasCad(): array
     {
         $stmt = $this->pdo->query(
-            "SELECT * FROM taxas_padrao WHERE status = 'A' ORDER BY descricao ASC"
+            "SELECT * FROM taxas_padrao ORDER BY descricao ASC"
         );
         return $stmt->fetchAll();
     }
@@ -39,6 +39,25 @@ class FinancasRepository
         return $stmt->execute([':id' => $id]);
     }
 
+    public function atualizarTaxa(array $dados): bool
+    {
+        $stmt = $this->pdo->prepare("
+            UPDATE taxas_padrao
+            SET descricao = :descricao,
+                valor = :valor,
+                modulo = :modulo,
+                status = :status
+            WHERE id_taxa = :id_taxa
+        ");
+        return $stmt->execute([
+            ':descricao' => $dados['descricao'],
+            ':valor'     => $dados['valor'],
+            ':modulo'    => $dados['modulo'],
+            ':status'    => $dados['status'],
+            ':id_taxa'   => $dados['id_taxa'],
+        ]);
+    }
+
     public function taxasPorModulo(string $modulo): array
     {
         $stmt = $this->pdo->prepare(
@@ -56,19 +75,37 @@ class FinancasRepository
         return $stmt->fetchAll();
     }
 
+    public function listarModulosTaxasAtivas(): array
+    {
+        $stmt = $this->pdo->query(
+            "SELECT DISTINCT modulo FROM taxas_padrao WHERE status = 'A' ORDER BY modulo ASC"
+        );
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    public function listarDescricoesTaxasAtivas(): array
+    {
+        $stmt = $this->pdo->query(
+            "SELECT DISTINCT descricao FROM taxas_padrao WHERE status = 'A' ORDER BY descricao ASC"
+        );
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
     public function lancamento(
         int $id,
         int $privilegio,
         int $offset = 0,
         int $limite = 10,
-        string $busca = '',
+        string $nome = '',
+        string $tipo = '',
+        string $descricao = '',
         string $status = '',
         string $dtLanc = '',
         string $dtVenc = '',
         string $atraso = ''
     ): array {
         $params = [];
-        $where  = $this->montarWhereLancamentos($busca, $status, $dtLanc, $dtVenc, $atraso, $params);
+        $where  = $this->montarWhereLancamentos($nome, $tipo, $descricao, $status, $dtLanc, $dtVenc, $atraso, $params);
 
         if ($privilegio === 2 || $privilegio === 4) {
             $sql = "
@@ -103,21 +140,23 @@ class FinancasRepository
 
     public function excluirLancamento(int $id): bool
     {
-        $stmt = $this->pdo->prepare("DELETE FROM lancamentos WHERE id_lancamento = :id");
+        $stmt = $this->pdo->prepare("DELETE FROM lancamentos WHERE id_lancamento = :id AND status != 'G'");
         return $stmt->execute([':id' => $id]);
     }
 
     public function countLancamentos(
         int $id,
         int $privilegio,
-        string $busca = '',
+        string $nome = '',
+        string $tipo = '',
+        string $descricao = '',
         string $status = '',
         string $dtLanc = '',
         string $dtVenc = '',
         string $atraso = ''
     ): int {
         $params = [];
-        $where  = $this->montarWhereLancamentos($busca, $status, $dtLanc, $dtVenc, $atraso, $params);
+        $where  = $this->montarWhereLancamentos($nome, $tipo, $descricao, $status, $dtLanc, $dtVenc, $atraso, $params);
 
         if ($privilegio === 2 || $privilegio === 4) {
             $sql = "
@@ -145,7 +184,9 @@ class FinancasRepository
     }
 
     private function montarWhereLancamentos(
-        string $busca,
+        string $nome,
+        string $tipo,
+        string $descricao,
         string $status,
         string $dtLanc,
         string $dtVenc,
@@ -154,10 +195,19 @@ class FinancasRepository
     ): string {
         $where = '';
 
-        if ($busca !== '') {
-            $where             .= ' AND (l.descricao LIKE :busca OR l.modelo LIKE :busca2)';
-            $params[':busca']   = "%{$busca}%";
-            $params[':busca2']  = "%{$busca}%";
+        if ($nome !== '') {
+            $where            .= ' AND LOWER(m.nome) LIKE LOWER(:nome)';
+            $params[':nome']  = "%{$nome}%";
+        }
+
+        if ($tipo !== '') {
+            $where           .= ' AND LOWER(l.modelo) = LOWER(:tipo)';
+            $params[':tipo'] = $tipo;
+        }
+
+        if ($descricao !== '') {
+            $where                .= ' AND l.descricao = :descricao';
+            $params[':descricao'] = $descricao;
         }
 
         if ($status !== '' && $status !== 'atraso') {

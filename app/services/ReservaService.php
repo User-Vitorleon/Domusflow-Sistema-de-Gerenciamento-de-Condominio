@@ -3,6 +3,7 @@ require_once __DIR__ . '/../repositories/ReservaRepository.php';
 require_once __DIR__ . '/../repositories/LocalRepository.php';
 require_once __DIR__ . '/../repositories/MoradorRepository.php';
 require_once __DIR__ . '/EmailService.php';
+require_once __DIR__ . '/ParametrosService.php';
 
 class ReservaService
 {
@@ -59,7 +60,7 @@ class ReservaService
             ];
         }
 
-        if ($this->reservaRepo->existeReservaPendente($idUser)) {
+        if ((new ParametrosService())->permitirApenasUmaReservaPendente() && $this->reservaRepo->existeReservaPendente($idUser)) {
             return [
                 'sucesso'  => false,
                 'mensagem' => 'Já possui uma reserva pendente. Aguarde a aprovação do síndico antes de fazer uma nova!',

@@ -23,12 +23,18 @@ $routes = [
     'moradores/gestao'                   => ['MoradorController',    'gestao'],
     'moradores/gestao/salvar'            => ['MoradorController',    'gestaoSalvar'],
     'moradores/gestao/resetar-senha'     => ['MoradorController',    'resetarSenha'],
+    'moradores/gestao/status'            => ['MoradorController',    'gestaoStatus'],
+    'moradores/gestao/deletar'           => ['MoradorController',    'gestaoDeletar'],
     
     'dashboard'                      => ['DashboardController',  'index'],
     'painel'                         => ['PainelController',     'index'],
+    'parametros'                     => ['ParametrosController', 'index'],
+    'parametros/salvar'              => ['ParametrosController', 'salvar'],
 
     'reserva'                        => ['ReservaController',    'index'],
+    'reserva/historico'              => ['ReservaController',    'historico'],
     'reserva/salvar'                 => ['ReservaController',    'salvar'],
+    'reserva/local/editar'           => ['ReservaController',    'editarLocal'],
     'reservas/decidir'               => ['ReservaController',    'decidir'],
 
     'veiculo'                        => ['VeiculoController',    'index'],
@@ -41,6 +47,7 @@ $routes = [
 
     'financeiro/taxas'                => ['FinancasController',  'taxasCad'],
     'financeiro/taxas/salvar'         => ['FinancasController',  'salvarTaxas'],
+    'financeiro/taxas/editar'         => ['FinancasController',  'editarTaxa'],
     'financeiro/taxas/excluir'        => ['FinancasController',  'excluirTaxa'],
     'financeiro/lancamento'           => ['FinancasController',  'lancamento'],
     'financeiro/lancamento/salvar'    => ['FinancasController',  'salvarLancamento'],

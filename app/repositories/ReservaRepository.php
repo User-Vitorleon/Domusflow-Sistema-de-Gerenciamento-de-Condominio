@@ -155,6 +155,30 @@ class ReservaRepository
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function buscarPendentesComFiltros(array $filtros, int $offset = 0, int $limite = 10): array
+    {
+        $params = $this->montarFiltrosPendentes($filtros);
+        $sql = "
+            SELECT r.*, l.local, l.capacidade, m.nome AS nome_morador, m.apto, m.bloco
+            FROM reservas r
+            INNER JOIN locais_festivos l ON r.id_local = l.id_local
+            INNER JOIN morador m ON r.id_user = m.id_user
+            WHERE r.status = 'P'
+            {$params['sql']}
+            ORDER BY r.created_at ASC, m.nome ASC, r.data_reserva ASC, r.hora_ini ASC
+            LIMIT :limite OFFSET :offset
+        ";
+
+        $stmt = $this->pdo->prepare($sql);
+        foreach ($params['bindings'] as $chave => $valor) {
+            $stmt->bindValue($chave, $valor);
+        }
+        $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function existeReservaPendente(int $idUser): bool
     {
         $stmt = $this->pdo->prepare(
@@ -164,11 +188,118 @@ class ReservaRepository
         return (int)$stmt->fetchColumn() > 0;
     }
 
+    public function buscarHistoricoPorUsuario(int $idUser, array $filtros, int $offset = 0, int $limite = 10): array
+    {
+        $params = $this->montarFiltrosHistorico($filtros);
+        $sql = "
+            SELECT r.*, l.local
+            FROM reservas r
+            INNER JOIN locais_festivos l ON r.id_local = l.id_local
+            WHERE r.id_user = :id_user
+            {$params['sql']}
+            ORDER BY r.created_at DESC, r.data_reserva DESC, r.hora_ini DESC
+            LIMIT :limite OFFSET :offset
+        ";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':id_user', $idUser, PDO::PARAM_INT);
+        foreach ($params['bindings'] as $chave => $valor) {
+            $stmt->bindValue($chave, $valor);
+        }
+        $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function countHistoricoPorUsuario(int $idUser, array $filtros): int
+    {
+        $params = $this->montarFiltrosHistorico($filtros);
+        $stmt = $this->pdo->prepare("
+            SELECT COUNT(*)
+            FROM reservas r
+            INNER JOIN locais_festivos l ON r.id_local = l.id_local
+            WHERE r.id_user = :id_user
+            {$params['sql']}
+        ");
+        $stmt->bindValue(':id_user', $idUser, PDO::PARAM_INT);
+        foreach ($params['bindings'] as $chave => $valor) {
+            $stmt->bindValue($chave, $valor);
+        }
+        $stmt->execute();
+        return (int)$stmt->fetchColumn();
+    }
+
     public function countPendentesGeral(): int
     {
         $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM reservas WHERE status = 'P'");
         $stmt->execute();
         return (int)$stmt->fetchColumn();
+    }
+
+    public function countPendentesComFiltros(array $filtros): int
+    {
+        $params = $this->montarFiltrosPendentes($filtros);
+        $stmt = $this->pdo->prepare("
+            SELECT COUNT(*)
+            FROM reservas r
+            INNER JOIN locais_festivos l ON r.id_local = l.id_local
+            INNER JOIN morador m ON r.id_user = m.id_user
+            WHERE r.status = 'P'
+            {$params['sql']}
+        ");
+        $stmt->execute($params['bindings']);
+        return (int)$stmt->fetchColumn();
+    }
+
+    private function montarFiltrosPendentes(array $filtros): array
+    {
+        $sql = '';
+        $bindings = [];
+
+        if (!empty($filtros['nome'])) {
+            $sql .= ' AND m.nome LIKE :nome';
+            $bindings[':nome'] = '%' . $filtros['nome'] . '%';
+        }
+        if (!empty($filtros['bloco'])) {
+            $sql .= ' AND m.bloco LIKE :bloco';
+            $bindings[':bloco'] = '%' . $filtros['bloco'] . '%';
+        }
+        if (!empty($filtros['apto'])) {
+            $sql .= ' AND m.apto LIKE :apto';
+            $bindings[':apto'] = '%' . $filtros['apto'] . '%';
+        }
+        if (!empty($filtros['data_solicitacao'])) {
+            $sql .= ' AND DATE(r.created_at) = :data_solicitacao';
+            $bindings[':data_solicitacao'] = $filtros['data_solicitacao'];
+        }
+        if (!empty($filtros['data_reserva'])) {
+            $sql .= ' AND r.data_reserva = :data_reserva';
+            $bindings[':data_reserva'] = $filtros['data_reserva'];
+        }
+
+        return ['sql' => $sql, 'bindings' => $bindings];
+    }
+
+    private function montarFiltrosHistorico(array $filtros): array
+    {
+        $sql = '';
+        $bindings = [];
+
+        if (!empty($filtros['local'])) {
+            $sql .= ' AND l.local LIKE :local';
+            $bindings[':local'] = '%' . $filtros['local'] . '%';
+        }
+        if (!empty($filtros['data_solicitacao'])) {
+            $sql .= ' AND DATE(r.created_at) = :data_solicitacao';
+            $bindings[':data_solicitacao'] = $filtros['data_solicitacao'];
+        }
+        if (!empty($filtros['data_reserva'])) {
+            $sql .= ' AND r.data_reserva = :data_reserva';
+            $bindings[':data_reserva'] = $filtros['data_reserva'];
+        }
+
+        return ['sql' => $sql, 'bindings' => $bindings];
     }
 
     public function atualizarStatus(int $id, string $status): bool

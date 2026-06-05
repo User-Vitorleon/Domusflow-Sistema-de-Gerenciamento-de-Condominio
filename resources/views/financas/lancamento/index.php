@@ -3,6 +3,15 @@ $paginaTitulo = 'Lançamentos';
 $paginaAtiva  = 'financeiro';
 require_once __DIR__ . '/../../layout/header.php';
 $privilegio = $usuario['privilegio'] ?? 1;
+$queryLancamentos = http_build_query(array_filter([
+    'nome'      => $_GET['nome'] ?? ($_GET['busca'] ?? ''),
+    'tipo'      => $_GET['tipo'] ?? '',
+    'descricao' => $_GET['descricao'] ?? '',
+    'status'    => $_GET['status'] ?? '',
+    'dt_lanc'   => $_GET['dt_lanc'] ?? '',
+    'dt_venc'   => $_GET['dt_venc'] ?? '',
+], static fn($valor) => $valor !== ''));
+$baseLancamentos = BASE_URL . '/financeiro/lancamento?' . ($queryLancamentos ? $queryLancamentos . '&' : '');
 ?>
 
 <main class="main-content">
@@ -106,15 +115,37 @@ $privilegio = $usuario['privilegio'] ?? 1;
             <h3 class="section-title" style="margin: 0;">Todos os Lançamentos</h3>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 16px; padding: 14px; background: #F8FAFC; border-radius: var(--radius); border: 1px solid var(--border);">
+        <form method="GET" action="<?= BASE_URL ?>/financeiro/lancamento" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 16px; padding: 14px; background: #F8FAFC; border-radius: var(--radius); border: 1px solid var(--border); align-items: end;">
             <div class="df-field" style="margin: 0;">
-                <label style="font-size: 11px;">Busca geral</label>
-                <input type="text" id="pesquisa" value="<?= htmlspecialchars($_GET['busca'] ?? '') ?>"
-                       placeholder="Nome, tipo, descrição..." oninput="filtrarLancamentos()">
+                <label style="font-size: 11px;">Nome</label>
+                <input type="text" id="pesquisa" name="nome" value="<?= htmlspecialchars($_GET['nome'] ?? ($_GET['busca'] ?? '')) ?>"
+                       placeholder="Nome do morador...">
+            </div>
+            <div class="df-field" style="margin: 0;">
+                <label style="font-size: 11px;">Tipo</label>
+                <select name="tipo">
+                    <option value="">Todos</option>
+                    <?php foreach (($tiposTaxas ?? []) as $tipoTaxa): ?>
+                        <option value="<?= htmlspecialchars($tipoTaxa) ?>" <?= ($_GET['tipo'] ?? '') === $tipoTaxa ? 'selected' : '' ?>>
+                            <?= ucfirst(strtolower($tipoTaxa)) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="df-field" style="margin: 0;">
+                <label style="font-size: 11px;">Descrição</label>
+                <select name="descricao">
+                    <option value="">Todas</option>
+                    <?php foreach (($descricoesTaxas ?? []) as $descTaxa): ?>
+                        <option value="<?= htmlspecialchars($descTaxa) ?>" <?= ($_GET['descricao'] ?? '') === $descTaxa ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($descTaxa) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
             </div>
             <div class="df-field" style="margin: 0;">
                 <label style="font-size: 11px;">Status</label>
-                <select id="filtroStatus" onchange="aplicarFiltros()">
+                <select id="filtroStatus" name="status">
                     <option value="">Todos</option>
                     <option value="P" <?= ($_GET['status'] ?? '') === 'P' ? 'selected' : '' ?>>Pendente</option>
                     <option value="F" <?= ($_GET['status'] ?? '') === 'F' ? 'selected' : '' ?>>Fatura Gerada</option>
@@ -124,17 +155,21 @@ $privilegio = $usuario['privilegio'] ?? 1;
             </div>
             <div class="df-field" style="margin: 0;">
                 <label style="font-size: 11px;">Dt. Lançamento</label>
-                <input type="date" id="filtroDtLanc" value="<?= htmlspecialchars($_GET['dt_lanc'] ?? '') ?>" onchange="aplicarFiltros()">
+                <input type="date" id="filtroDtLanc" name="dt_lanc" value="<?= htmlspecialchars($_GET['dt_lanc'] ?? '') ?>">
             </div>
             <div class="df-field" style="margin: 0;">
                 <label style="font-size: 11px;">Dt. Vencimento</label>
-                <input type="date" id="filtroDtVenc" value="<?= htmlspecialchars($_GET['dt_venc'] ?? '') ?>" onchange="aplicarFiltros()">
+                <input type="date" id="filtroDtVenc" name="dt_venc" value="<?= htmlspecialchars($_GET['dt_venc'] ?? '') ?>">
             </div>
             <div class="df-field" style="margin: 0; justify-content: flex-end;">
                 <label style="font-size: 11px;">&nbsp;</label>
-                <button class="btn-ghost" onclick="limparFiltros()" style="height: 38px;">Limpar filtros</button>
+                <button type="submit" class="btn-primary" style="height: 38px;">Filtrar</button>
             </div>
-        </div>
+            <div class="df-field" style="margin: 0; justify-content: flex-end;">
+                <label style="font-size: 11px;">&nbsp;</label>
+                <a class="btn-ghost" href="<?= BASE_URL ?>/financeiro/lancamento" style="height: 38px;">Limpar filtros</a>
+            </div>
+        </form>
 
         <?php if (empty($lancamentos)): ?>
             <div class="empty-state">
@@ -227,6 +262,7 @@ $privilegio = $usuario['privilegio'] ?? 1;
                                 </td>
                                 <?php if (in_array($privilegio, [2, 4])): ?>
                                 <td style="padding: 10px 12px; text-align: center;">
+                                    <?php if ($l['status'] !== 'G'): ?>
                                     <form action="<?= BASE_URL ?>/financeiro/lancamento/excluir" method="POST"
                                           onsubmit="return confirm('Deseja excluir este lançamento?')" style="display:inline">
                                         <input type="hidden" name="id_lancamento" value="<?= $l['id_lancamento'] ?>">
@@ -234,6 +270,7 @@ $privilegio = $usuario['privilegio'] ?? 1;
                                             <i class='bx bx-trash'></i>
                                         </button>
                                     </form>
+                                    <?php endif; ?>
                                 </td>
                                 <?php endif; ?>
                             </tr>
@@ -246,7 +283,7 @@ $privilegio = $usuario['privilegio'] ?? 1;
                 <nav class="mt-3 d-flex justify-content-center">
                     <ul class="pagination">
                         <li class="page-item <?= $pagina <= 1 ? 'disabled' : '' ?>">
-                            <a class="page-link" href="?pagina=<?= $pagina - 1 ?>&busca=<?= urlencode($_GET['busca'] ?? '') ?>">Anterior</a>
+                            <a class="page-link" href="<?= $pagina > 1 ? $baseLancamentos . 'pagina=' . ($pagina - 1) : '#' ?>">Anterior</a>
                         </li>
                         <?php
                         $range = 2;
@@ -256,11 +293,11 @@ $privilegio = $usuario['privilegio'] ?? 1;
                                 <li class="page-item disabled"><span class="page-link">...</span></li>
                             <?php endif; continue; endif; ?>
                             <li class="page-item <?= $i === $pagina ? 'active' : '' ?>">
-                                <a class="page-link" href="?pagina=<?= $i ?>&busca=<?= urlencode($_GET['busca'] ?? '') ?>"><?= $i ?></a>
+                                <a class="page-link" href="<?= $baseLancamentos ?>pagina=<?= $i ?>"><?= $i ?></a>
                             </li>
                         <?php endfor; ?>
                         <li class="page-item <?= $pagina >= $totalPaginas ? 'disabled' : '' ?>">
-                            <a class="page-link" href="?pagina=<?= $pagina + 1 ?>&busca=<?= urlencode($_GET['busca'] ?? '') ?>">Próximo</a>
+                            <a class="page-link" href="<?= $pagina < $totalPaginas ? $baseLancamentos . 'pagina=' . ($pagina + 1) : '#' ?>">Próximo</a>
                         </li>
                     </ul>
                 </nav>
@@ -308,32 +345,7 @@ function toggleMorador() {
     campo.querySelector('select').required = !checkbox.checked;
 }
 
-
-let timer;
-function filtrarLancamentos() {
-    clearTimeout(timer);
-    timer = setTimeout(() => aplicarFiltros(), 400);
-}
-
-function aplicarFiltros() {
-    const busca   = document.getElementById('pesquisa')?.value ?? '';
-    const status  = document.getElementById('filtroStatus')?.value ?? '';
-    const dtLanc  = document.getElementById('filtroDtLanc')?.value ?? '';
-    const dtVenc  = document.getElementById('filtroDtVenc')?.value ?? '';
-
-    const params = new URLSearchParams();
-    if (busca)   params.set('busca',   busca);
-    if (status)  params.set('status',  status);
-    if (dtLanc)  params.set('dt_lanc', dtLanc);
-    if (dtVenc)  params.set('dt_venc', dtVenc);
-    params.set('pagina', '1');
-
-    window.location.href = '<?= BASE_URL ?>/financeiro/lancamento?' + params.toString();
-}
-
-function limparFiltros() {
-    window.location.href = '<?= BASE_URL ?>/financeiro/lancamento';
-}
+function filtrarLancamentos() {}
 
 <?php if (in_array($privilegio, [2, 4])): ?>
 document.querySelector('form[action*="lancamento/salvar"]').addEventListener('submit', function(e) {
@@ -355,3 +367,4 @@ document.querySelector('form[action*="lancamento/salvar"]').addEventListener('su
 </script>
 
 <?php require_once __DIR__ . '/../../layout/footer.php'; ?>
+

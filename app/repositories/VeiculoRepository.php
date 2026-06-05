@@ -14,6 +14,8 @@ class VeiculoRepository
         $stmt = $this->pdo->query("
             SELECT v.*,
                    dono.nome AS nome_morador,
+                   dono.apto AS apto,
+                   dono.bloco AS bloco,
                    cad.nome  AS cadastrado_por
             FROM veiculos v
             JOIN morador dono ON dono.id_user = v.id_user
@@ -28,6 +30,8 @@ class VeiculoRepository
         $stmt = $this->pdo->prepare("
             SELECT v.*,
                    dono.nome AS nome_morador,
+                   dono.apto AS apto,
+                   dono.bloco AS bloco,
                    cad.nome  AS cadastrado_por
             FROM veiculos v
             JOIN morador dono ON dono.id_user = v.id_user
@@ -37,6 +41,50 @@ class VeiculoRepository
         ");
         $stmt->execute([':id' => $idUser]);
         return $stmt->fetchAll();
+    }
+
+    public function findAllComFiltros(array $filtros, int $limite, int $offset): array
+    {
+        [$where, $params] = $this->montarFiltrosTodos($filtros);
+
+        $stmt = $this->pdo->prepare("
+            SELECT v.*,
+                   dono.nome AS nome_morador,
+                   dono.apto AS apto,
+                   dono.bloco AS bloco,
+                   cad.nome  AS cadastrado_por
+            FROM veiculos v
+            JOIN morador dono ON dono.id_user = v.id_user
+            JOIN morador cad  ON cad.id_user  = v.id_user_cad
+            {$where}
+            ORDER BY v.created_at DESC
+            LIMIT :limite OFFSET :offset
+        ");
+
+        foreach ($params as $chave => $valor) {
+            $stmt->bindValue($chave, $valor);
+        }
+        $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
+    public function countAllComFiltros(array $filtros): int
+    {
+        [$where, $params] = $this->montarFiltrosTodos($filtros);
+
+        $stmt = $this->pdo->prepare("
+            SELECT COUNT(v.id_veiculo)
+            FROM veiculos v
+            JOIN morador dono ON dono.id_user = v.id_user
+            JOIN morador cad  ON cad.id_user  = v.id_user_cad
+            {$where}
+        ");
+        $stmt->execute($params);
+
+        return (int) $stmt->fetchColumn();
     }
 
     public function findByPlaca(string $placa): ?array
@@ -182,5 +230,33 @@ class VeiculoRepository
         $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    private function montarFiltrosTodos(array $filtros): array
+    {
+        $where = [];
+        $params = [];
+
+        if (!empty($filtros['nome'])) {
+            $where[] = 'LOWER(dono.nome) LIKE LOWER(:nome)';
+            $params[':nome'] = '%' . trim($filtros['nome']) . '%';
+        }
+
+        if (!empty($filtros['placa'])) {
+            $where[] = 'v.placa LIKE :placa';
+            $params[':placa'] = '%' . strtoupper(preg_replace('/[^A-Z0-9]/i', '', $filtros['placa'])) . '%';
+        }
+
+        if (!empty($filtros['bloco'])) {
+            $where[] = 'LOWER(dono.bloco) LIKE LOWER(:bloco)';
+            $params[':bloco'] = '%' . trim($filtros['bloco']) . '%';
+        }
+
+        if (!empty($filtros['apto'])) {
+            $where[] = 'LOWER(dono.apto) LIKE LOWER(:apto)';
+            $params[':apto'] = '%' . trim($filtros['apto']) . '%';
+        }
+
+        return [$where ? 'WHERE ' . implode(' AND ', $where) : '', $params];
     }
 }

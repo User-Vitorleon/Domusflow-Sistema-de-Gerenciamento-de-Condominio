@@ -126,6 +126,35 @@ $cores = [
                 <?= in_array($privilegio, [2, 3, 4]) ? 'Todos os Veículos' : 'Meus Veículos' ?>
             </h3>
 
+            <?php if (in_array($privilegio, [2, 3, 4])): ?>
+                <form method="GET" action="<?= BASE_URL ?>/veiculo" class="veiculo-filtros">
+                    <div class="df-field">
+                        <label>Nome</label>
+                        <input type="text" name="nome" placeholder="Morador..."
+                            value="<?= htmlspecialchars($filtrosVeiculos['nome'] ?? '') ?>">
+                    </div>
+                    <div class="df-field">
+                        <label>Placa</label>
+                        <input type="text" name="placa" placeholder="Ex: ABC1234" maxlength="7"
+                            value="<?= htmlspecialchars($filtrosVeiculos['placa'] ?? '') ?>">
+                    </div>
+                    <div class="df-field">
+                        <label>Bloco</label>
+                        <input type="text" name="bloco" placeholder="Ex: A"
+                            value="<?= htmlspecialchars($filtrosVeiculos['bloco'] ?? '') ?>">
+                    </div>
+                    <div class="df-field">
+                        <label>Apto</label>
+                        <input type="text" name="apto" placeholder="Ex: 101"
+                            value="<?= htmlspecialchars($filtrosVeiculos['apto'] ?? '') ?>">
+                    </div>
+                    <div class="veiculo-filtros-actions">
+                        <button type="submit" class="btn-primary">Filtrar</button>
+                        <a href="<?= BASE_URL ?>/veiculo" class="btn-ghost">Limpar</a>
+                    </div>
+                </form>
+            <?php endif; ?>
+
             <?php if (empty($veiculos)): ?>
                 <div class="empty-state">
                     <i class="bx bx-car"></i>
@@ -134,8 +163,9 @@ $cores = [
                 </div>
             <?php else: ?>
                 <div class="table-wrap">
-                    <table class="df-table">
+                    <table class="df-table veiculo-table">
                         <thead>
+                            <tr>
                                 <th>Placa</th>
                                 <th>Marca</th>
                                 <th>Modelo</th>
@@ -143,9 +173,12 @@ $cores = [
                                 <th>Principal</th>
                                 <?php if (in_array($privilegio, [2, 3, 4])): ?>
                                     <th>Morador</th>
+                                    <th>Bloco</th>
+                                    <th>Apto</th>
                                     <th>Cadastrado por</th>
                                 <?php endif; ?>
-                            <th></th>
+                                <th></th>
+                            </tr>
                         </thead>
                         <tbody>
                             <?php foreach ($veiculos as $v): ?>
@@ -163,6 +196,8 @@ $cores = [
                                         </td>
                                         <?php if (in_array($privilegio, [2, 3, 4])): ?>
                                             <td><?= htmlspecialchars($v['nome_morador']) ?></td>
+                                            <td><?= htmlspecialchars($v['bloco'] ?? '-') ?></td>
+                                            <td><?= htmlspecialchars($v['apto'] ?? '-') ?></td>
                                             <td><?= htmlspecialchars($v['cadastrado_por']) ?></td>
                                         <?php endif; ?>
                                         <td>
@@ -188,7 +223,7 @@ $cores = [
 
             <?php if (($totalPaginas ?? 1) > 1): ?>
                 <nav class="df-pagination">
-                    <a href="?pagina=<?= $pagina - 1 ?>"
+                    <a href="?<?= $queryVeiculos ?? '' ?>pagina=<?= $pagina - 1 ?>"
                         class="df-page-btn <?= $pagina <= 1 ? 'disabled' : '' ?>">Anterior</a>
 
                     <?php
@@ -202,11 +237,11 @@ $cores = [
                             <?php endif; ?>
                             <?php continue; ?>
                         <?php endif; ?>
-                        <a href="?pagina=<?= $i ?>"
+                        <a href="?<?= $queryVeiculos ?? '' ?>pagina=<?= $i ?>"
                             class="df-page-btn <?= $i === $pagina ? 'active' : '' ?>"><?= $i ?></a>
                     <?php endfor; ?>
 
-                    <a href="?pagina=<?= $pagina + 1 ?>"
+                    <a href="?<?= $queryVeiculos ?? '' ?>pagina=<?= $pagina + 1 ?>"
                         class="df-page-btn <?= $pagina >= $totalPaginas ? 'disabled' : '' ?>">Próximo</a>
                 </nav>
             <?php endif; ?>
