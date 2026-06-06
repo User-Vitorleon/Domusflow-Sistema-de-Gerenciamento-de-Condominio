@@ -28,7 +28,7 @@ class MoradorRepository
     public function findAtivos(): array
     {
         $stmt = $this->pdo->query(
-            "SELECT * FROM morador WHERE status = 'L' AND privilegio = 1"
+            "SELECT * FROM morador WHERE status = 'L' AND privilegio = 1 ORDER BY nome ASC"
         );
         return $this->descriptografarLista($stmt->fetchAll());
     }
