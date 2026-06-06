@@ -83,10 +83,21 @@ class MoradorController
     {
         AuthGuard::requerePost('/moradores/pendentes');
 
+        if (!$this->confirmarSenhaAdmin($_POST['admin_senha'] ?? '')) {
+            $_SESSION['erro_pendentes'] = 'Senha incorreta. A ação não foi executada.';
+            $this->redirecionar('/moradores/pendentes');
+        }
+
+        $idMorador = $this->idMoradorPorPost();
+
         $resultado = $this->service->liberarOuBloquear(
-            (int) ($_POST['id_morador'] ?? 0),
+            $idMorador,
             $_POST['acao']             ?? '',
-            (int) $_SESSION['usuario_id']
+            (int) $_SESSION['usuario_id'],
+            [
+                'apto'  => $_POST['apto']  ?? '',
+                'bloco' => $_POST['bloco'] ?? '',
+            ]
         );
 
         if (!$resultado['sucesso']) {
@@ -197,7 +208,7 @@ public function inativar(): void
         $this->requireAdmin();
         AuthGuard::requerePost('/moradores/gestao');
 
-        $idMorador = (int) ($_POST['id_morador'] ?? 0);
+        $idMorador = $this->idMoradorPorPost();
         if (!$this->confirmarSenhaAdmin($_POST['admin_senha'] ?? '')) {
             $this->redirecionarGestaoComFoco($idMorador, 'senha=1');
         }
@@ -215,8 +226,10 @@ public function inativar(): void
         AuthGuard::requerePost('/moradores/gestao');
 
 
-        $idMorador  = (int) ($_POST['id_morador']  ?? 0);
+        $idMorador  = $this->idMoradorPorPost();
         $privilegio = (int) ($_POST['privilegio']  ?? 0);
+        $apto       = $_POST['apto']  ?? '';
+        $bloco      = $_POST['bloco'] ?? '';
 
         $repo = new MoradorRepository();
         $moradorAlvo = $repo->findById($idMorador);
@@ -229,7 +242,7 @@ public function inativar(): void
         }
 
         $sucesso = ($idMorador > 0)
-            ? $this->service->atualizarPrivilegio($idMorador, $privilegio)
+            ? $this->service->atualizarPrivilegioEUnidade($idMorador, $privilegio, $apto, $bloco)
             : false;
 
         $this->redirecionarGestaoComFoco($idMorador, $sucesso ? 'sucesso=1' : 'erro=1');
@@ -240,7 +253,7 @@ public function inativar(): void
         $this->requireAdmin();
         AuthGuard::requerePost('/moradores/gestao');
 
-        $idMorador = (int) ($_POST['id_morador'] ?? 0);
+        $idMorador = $this->idMoradorPorPost();
         if ($idMorador === (int) ($_SESSION['usuario_id'] ?? 0)) {
             $this->redirecionarGestaoComFoco($idMorador, 'erro=1');
         }
@@ -261,7 +274,7 @@ public function inativar(): void
         $this->requireAdmin();
         AuthGuard::requerePost('/moradores/gestao');
 
-        $idMorador = (int) ($_POST['id_morador'] ?? 0);
+        $idMorador = $this->idMoradorPorPost();
         if ($idMorador <= 0 || $idMorador === (int) ($_SESSION['usuario_id'] ?? 0)) {
             $this->redirecionarGestaoComFoco($idMorador, 'erro=1');
         }
@@ -294,6 +307,40 @@ public function inativar(): void
         $admin = $repo->findById((int) ($_SESSION['usuario_id'] ?? 0));
 
         return $admin && password_verify($senha, $admin['senha'] ?? '');
+    }
+
+    public function cpf(): void
+    {
+        $this->requireSindico();
+        header('Content-Type: application/json; charset=utf-8');
+
+        $uuid = trim($_GET['uuid'] ?? '');
+        $repo = new MoradorRepository();
+        $morador = $uuid !== '' ? $repo->findByUuid($uuid) : null;
+
+        if (!$morador) {
+            echo json_encode(['sucesso' => false]);
+            exit();
+        }
+
+        $cpf = preg_replace('/\D/', '', (string) $morador['cpf']);
+        echo json_encode([
+            'sucesso' => true,
+            'cpf' => preg_replace('/(\d{3})(\d{3})(\d{3})(\d{2})/', '$1.$2.$3-$4', $cpf),
+        ]);
+        exit();
+    }
+
+    private function idMoradorPorPost(): int
+    {
+        $uuid = trim($_POST['uuid_morador'] ?? '');
+        if ($uuid !== '') {
+            $repo = new MoradorRepository();
+            $morador = $repo->findByUuid($uuid);
+            return (int) ($morador['id_user'] ?? 0);
+        }
+
+        return (int) ($_POST['id_morador'] ?? 0);
     }
 
 private function extrairFiltrosPendentes(): array

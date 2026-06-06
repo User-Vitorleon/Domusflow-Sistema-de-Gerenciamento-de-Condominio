@@ -313,6 +313,41 @@
     white-space: nowrap;
 }
 
+.gestao-unidade-edit {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 118px;
+}
+
+.gestao-unidade-edit label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.morador-unidade-input {
+    width: 46px;
+    min-height: 28px;
+    padding: 4px 6px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--white);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.js-bloco-input {
+    width: 34px;
+    text-transform: uppercase;
+}
+
 .pendentes-page .page-header {
     margin-bottom: 18px;
 }

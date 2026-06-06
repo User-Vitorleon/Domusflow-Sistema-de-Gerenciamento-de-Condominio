@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../helpers/CryptoHelper.php';
+
 class ReservaRepository
 {
     private PDO $pdo;
@@ -90,7 +92,7 @@ class ReservaRepository
             ':hora_fim_mais_2' => $horaFimMais2,
         ]);
 
-        $conflitantes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $conflitantes = $this->descriptografarEmails($stmt->fetchAll(PDO::FETCH_ASSOC));
 
         foreach ($conflitantes as $r) {
             $this->atualizarStatus($r['id_reserva'], 'N');
@@ -344,7 +346,7 @@ class ReservaRepository
         ");
         $stmt->execute([':id' => $id]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result ?: null;
+        return $this->descriptografarEmail($result ?: null);
     }
 
     public function buscarReservasSemana(int $limite = 5): array
@@ -370,5 +372,18 @@ class ReservaRepository
         $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    private function descriptografarEmail(?array $row): ?array
+    {
+        if ($row && array_key_exists('email', $row)) {
+            $row['email'] = CryptoHelper::decrypt($row['email']);
+        }
+        return $row;
+    }
+
+    private function descriptografarEmails(array $rows): array
+    {
+        return array_map(fn ($row) => $this->descriptografarEmail($row), $rows);
     }
 }

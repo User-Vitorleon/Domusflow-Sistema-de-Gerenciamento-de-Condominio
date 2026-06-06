@@ -5,7 +5,7 @@
 -- ============================================================
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
+SET time_zone = "-03:00";
 SET NAMES utf8mb4;
 
 CREATE DATABASE IF NOT EXISTS `domusflow_bd`
@@ -17,22 +17,41 @@ USE `domusflow_bd`;
 -- ── TABELA: morador ─────────────────────────────────────────
 CREATE TABLE `morador` (
   `id_user`      int(11)      NOT NULL AUTO_INCREMENT,
-  `identificador` int(11)     NOT NULL DEFAULT 1,
+  `uuid`         char(36)     NOT NULL,
   `nome`         varchar(100) NOT NULL,
   `apto`         varchar(20)  NOT NULL,
   `bloco`        varchar(5)   NOT NULL,
-  `cpf`          varchar(14)  NOT NULL,
-  `email`        varchar(100) NOT NULL,
-  `telefone`     varchar(15)  NOT NULL,
-  `tell_recado`  varchar(15)  DEFAULT NULL,
-  `sexo`         char(1)      NOT NULL DEFAULT 'M',
+  `cpf`          varchar(255) NOT NULL,
+  `cpf_hash`     char(64)     NOT NULL,
+  `email`        varchar(255) NOT NULL,
+  `email_hash`   char(64)     NOT NULL,
+  `telefone`     varchar(255) NOT NULL,
+  `tell_recado`  varchar(255) DEFAULT NULL,
   `senha`        varchar(255) NOT NULL,
   `status`       char(1)      NOT NULL DEFAULT 'P',
   `privilegio`   tinyint(1)   NOT NULL DEFAULT 1,
   `created_at`   datetime     NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id_user`),
-  UNIQUE KEY `uk_cpf`   (`cpf`),
-  UNIQUE KEY `uk_email` (`email`)
+  UNIQUE KEY `uk_morador_uuid` (`uuid`),
+  UNIQUE KEY `uk_cpf_hash`   (`cpf_hash`),
+  UNIQUE KEY `uk_email_hash` (`email_hash`),
+  KEY `idx_morador_status_unidade` (`status`, `bloco`, `apto`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `auditoria` (
+  `id_auditoria` int(11)      NOT NULL AUTO_INCREMENT,
+  `id_user`      int(11)      DEFAULT NULL,
+  `acao`         varchar(80)  NOT NULL,
+  `entidade`     varchar(80)  NOT NULL,
+  `entidade_id`  int(11)      DEFAULT NULL,
+  `descricao`    varchar(255) DEFAULT NULL,
+  `ip`           varchar(45)  DEFAULT NULL,
+  `created_at`   datetime     NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_auditoria`),
+  KEY `idx_auditoria_user` (`id_user`),
+  KEY `idx_auditoria_entidade` (`entidade`, `entidade_id`),
+  CONSTRAINT `fk_auditoria_user`
+    FOREIGN KEY (`id_user`) REFERENCES `morador` (`id_user`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── TABELA: locais_festivos ──────────────────────────────────

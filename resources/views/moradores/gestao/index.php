@@ -115,13 +115,29 @@ $labelPrivilegio = [1 => 'Morador', 2 => 'Síndico', 3 => 'Porteiro', 4 => 'Admi
                                 $st              = $labelStatus[$m['status']] ?? ['texto' => $m['status'], 'classe' => ''];
                                 $ehUsuarioLogado = (int)$m['id_user'] === (int)($_SESSION['usuario_id'] ?? 0);
                                 $ehAdmin         = (int)($m['privilegio'] ?? 0) === 4;
+                                $formPerfilId    = 'gestao-perfil-form-' . (int) $m['id_user'];
                             ?>
                                 <tr>
                                     <td class="gestao-nowrap">
                                         <strong><?= htmlspecialchars($m['nome']) ?></strong>
                                     </td>
                                     <td class="gestao-nowrap">
-                                        Ap <?= htmlspecialchars($m['apto']) ?> · Bl <?= htmlspecialchars($m['bloco']) ?>
+                                        <?php if ($ehAdmin): ?>
+                                            Ap <?= htmlspecialchars($m['apto']) ?> · Bl <?= htmlspecialchars($m['bloco']) ?>
+                                        <?php else: ?>
+                                            <div class="gestao-unidade-edit">
+                                                <label>Ap
+                                                    <input class="morador-unidade-input js-apto-input" form="<?= $formPerfilId ?>"
+                                                        type="text" name="apto" maxlength="4" inputmode="numeric" pattern="\d+"
+                                                        value="<?= htmlspecialchars($m['apto']) ?>" required>
+                                                </label>
+                                                <label>Bl
+                                                    <input class="morador-unidade-input js-bloco-input" form="<?= $formPerfilId ?>"
+                                                        type="text" name="bloco" maxlength="1" pattern="[A-Za-z]"
+                                                        value="<?= htmlspecialchars($m['bloco']) ?>" required>
+                                                </label>
+                                            </div>
+                                        <?php endif; ?>
                                     </td>
                                     <td>
                                         <span class="<?= $st['classe'] ?>"><?= $st['texto'] ?></span>
@@ -130,9 +146,9 @@ $labelPrivilegio = [1 => 'Morador', 2 => 'Síndico', 3 => 'Porteiro', 4 => 'Admi
                                         <?php if ($ehAdmin): ?>
                                             <span class="perfil-badge-admin"><?= $labelPrivilegio[(int)$m['privilegio']] ?? 'Admin' ?></span>
                                         <?php else: ?>
-                                            <form action="<?= BASE_URL ?>/moradores/gestao/salvar" method="POST"
+                                            <form id="<?= $formPerfilId ?>" action="<?= BASE_URL ?>/moradores/gestao/salvar" method="POST"
                                                 class="gestao-perfil-form">
-                                                <input type="hidden" name="id_morador" value="<?= $m['id_user'] ?>">
+                                                <input type="hidden" name="uuid_morador" value="<?= htmlspecialchars($m['uuid']) ?>">
                                                 <input type="hidden" name="admin_senha" value="">
                                                 <select name="privilegio" class="gestao-perfil-select">
                                                     <?php foreach ($labelPrivilegio as $val => $label): ?>
@@ -153,7 +169,7 @@ $labelPrivilegio = [1 => 'Morador', 2 => 'Síndico', 3 => 'Porteiro', 4 => 'Admi
                                         <div class="gestao-acoes">
                                             <?php if ($m['status'] !== 'E'): ?>
                                                 <form action="<?= BASE_URL ?>/moradores/gestao/resetar-senha" method="POST" class="gestao-action-form">
-                                                    <input type="hidden" name="id_morador" value="<?= $m['id_user'] ?>">
+                                                    <input type="hidden" name="uuid_morador" value="<?= htmlspecialchars($m['uuid']) ?>">
                                                     <input type="hidden" name="admin_senha" value="">
                                                     <button type="button" class="btn-ghost gestao-btn js-confirm-admin"
                                                         data-title="Resetar senha"
@@ -164,7 +180,7 @@ $labelPrivilegio = [1 => 'Morador', 2 => 'Síndico', 3 => 'Porteiro', 4 => 'Admi
                                             <?php endif; ?>
                                             <?php if (!$ehUsuarioLogado && $m['status'] !== 'E'): ?>
                                                 <form action="<?= BASE_URL ?>/moradores/gestao/status" method="POST" class="gestao-action-form">
-                                                    <input type="hidden" name="id_morador" value="<?= $m['id_user'] ?>">
+                                                    <input type="hidden" name="uuid_morador" value="<?= htmlspecialchars($m['uuid']) ?>">
                                                     <input type="hidden" name="status" value="I">
                                                     <input type="hidden" name="admin_senha" value="">
                                                     <button type="button" class="btn-ghost gestao-btn gestao-btn-warning js-confirm-admin"
@@ -175,7 +191,7 @@ $labelPrivilegio = [1 => 'Morador', 2 => 'Síndico', 3 => 'Porteiro', 4 => 'Admi
                                                     </button>
                                                 </form>
                                                 <form action="<?= BASE_URL ?>/moradores/gestao/status" method="POST" class="gestao-action-form">
-                                                    <input type="hidden" name="id_morador" value="<?= $m['id_user'] ?>">
+                                                    <input type="hidden" name="uuid_morador" value="<?= htmlspecialchars($m['uuid']) ?>">
                                                     <input type="hidden" name="status" value="B">
                                                     <input type="hidden" name="admin_senha" value="">
                                                     <button type="button" class="btn-ghost gestao-btn js-confirm-admin"
@@ -187,7 +203,7 @@ $labelPrivilegio = [1 => 'Morador', 2 => 'Síndico', 3 => 'Porteiro', 4 => 'Admi
                                                 </form>
                                                 <?php if (in_array($m['status'], ['I', 'B'], true)): ?>
                                                     <form action="<?= BASE_URL ?>/moradores/gestao/status" method="POST" class="gestao-action-form">
-                                                        <input type="hidden" name="id_morador" value="<?= $m['id_user'] ?>">
+                                                        <input type="hidden" name="uuid_morador" value="<?= htmlspecialchars($m['uuid']) ?>">
                                                         <input type="hidden" name="status" value="L">
                                                         <input type="hidden" name="admin_senha" value="">
                                                         <button type="button" class="btn-success-sm gestao-btn js-confirm-admin"
@@ -198,7 +214,7 @@ $labelPrivilegio = [1 => 'Morador', 2 => 'Síndico', 3 => 'Porteiro', 4 => 'Admi
                                                     </form>
                                                 <?php endif; ?>
                                                 <form action="<?= BASE_URL ?>/moradores/gestao/deletar" method="POST" class="gestao-action-form">
-                                                    <input type="hidden" name="id_morador" value="<?= $m['id_user'] ?>">
+                                                    <input type="hidden" name="uuid_morador" value="<?= htmlspecialchars($m['uuid']) ?>">
                                                     <input type="hidden" name="admin_senha" value="">
                                                     <button type="button" class="btn-danger-sm gestao-btn js-confirm-admin"
                                                         data-title="Apagar morador"

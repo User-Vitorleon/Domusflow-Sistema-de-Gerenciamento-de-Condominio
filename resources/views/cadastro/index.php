@@ -52,14 +52,19 @@ unset($_SESSION['erro_cadastro']);
                 <div class="df-field">
                     <label for="user_apto">Apartamento</label>
                     <input type="text" id="user_apto" name="user_apto"
-                        placeholder="23A" maxlength="4"  value="<?= htmlspecialchars($d['user_apto'] ?? '') ?>" required>
+                        placeholder="101" maxlength="4" inputmode="numeric" pattern="\d+"
+                        value="<?= htmlspecialchars($d['user_apto'] ?? '') ?>" required>
                 </div>
                 <div class="df-field">
                     <label for="user_bloco">Bloco</label>
                     <input type="text" id="user_bloco" name="user_bloco"
-                        placeholder="A" maxlength="3"  value="<?= htmlspecialchars($d['user_bloco'] ?? '') ?>" required>
+                        placeholder="A" maxlength="1" pattern="[A-Za-z]"
+                        value="<?= htmlspecialchars($d['user_bloco'] ?? '') ?>" required>
                 </div>
             </div>
+            <p class="cad-unidade-note" id="cadUnidadeNote" hidden>
+                Unidade genérica aplicada para perfis administrativos.
+            </p>
 
             <p class="cad-section-label">Perfil</p>
                 <div class="df-field">

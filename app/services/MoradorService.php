@@ -37,6 +37,24 @@ class MoradorService
         }
 
         $cpf = preg_replace('/[^0-9]/', '', $dados['cpf']);
+        $privilegio = (int) ($dados['privilegio'] ?? 1);
+        if (!in_array($privilegio, self::PRIVILEGIOS_VALIDOS, true)) {
+            $privilegio = 1;
+        }
+
+        [$apto, $bloco] = self::unidadePorPrivilegio($privilegio, $dados['apto'], $dados['bloco']);
+
+        if (!self::cpfValido($cpf)) {
+            return ['sucesso' => false, 'mensagem' => 'CPF inválido.'];
+        }
+
+        if ($apto === '') {
+            return ['sucesso' => false, 'mensagem' => 'Apartamento deve conter apenas números.'];
+        }
+
+        if ($bloco === '') {
+            return ['sucesso' => false, 'mensagem' => 'Bloco deve conter apenas uma letra.'];
+        }
 
         if ($dados['senha'] !== $dados['conf_senha']) {
             return ['sucesso' => false, 'mensagem' => 'As senhas não conferem.'];
@@ -50,16 +68,15 @@ class MoradorService
             return ['sucesso' => false, 'mensagem' => 'Este e-mail já está cadastrado no sistema.'];
         }
 
-        $privilegio = (int) ($dados['privilegio'] ?? 1);
-        if (!in_array($privilegio, self::PRIVILEGIOS_VALIDOS, true)) {
-            $privilegio = 1;
+        if (self::exigeUnidadeReal($privilegio) && $this->repo->existeMoradorAtivoNaUnidade($apto, $bloco)) {
+            return ['sucesso' => false, 'mensagem' => 'Já existe um morador ativo para este apartamento e bloco.'];
         }
 
         $idNovoUsuario = $this->repo->save([
             'nome'            => $dados['nome'],
             'cpf'             => $cpf,
-            'apto'            => $dados['apto'],
-            'bloco'           => $dados['bloco'],
+            'apto'            => $apto,
+            'bloco'           => $bloco,
             'email'           => $dados['email'],
             'telefone'        => $dados['telefone'],
             'telefone_recado' => $dados['telefone_recado'] ?? null,
@@ -87,9 +104,9 @@ class MoradorService
         return $this->repo->findPendentes($filtro);
     }
 
-    public function liberarOuBloquear(int $id, string $acao, int $idLogado): array
+    public function liberarOuBloquear(int $id, string $acao, int $idLogado, ?array $unidade = null): array
     {
-        if (!in_array($acao, ['aceitar', 'negar'], true)) {
+        if (!in_array($acao, ['aceitar', 'recusar'], true)) {
             return ['sucesso' => false, 'mensagem' => 'Ação inválida.'];
         }
 
@@ -108,26 +125,43 @@ class MoradorService
             return ['sucesso' => false, 'mensagem' => 'Você não tem permissão para aprovar este perfil.'];
         }
 
-        if ($acao === 'aceitar' && (int)($morador['privilegio'] ?? 1) === 1) {
+        $privilegioMorador = (int)($morador['privilegio'] ?? 1);
+
+        if ($acao === 'aceitar' && $privilegioMorador === 1) {
             $parametros = new ParametrosService();
             if ($this->repo->countMoradoresAtivos() >= $parametros->limiteMoradoresAtivos()) {
                 return ['sucesso' => false, 'mensagem' => 'Limite de moradores ativos atingido. Ajuste os parametros do sistema antes de aprovar novos moradores.'];
             }
         }
 
-        $novoStatus = ($acao === 'aceitar') ? 'L' : 'B';
-        $this->repo->atualizarStatus($id, $novoStatus);
+        if ($acao === 'aceitar' && $unidade !== null) {
+            [$apto, $bloco] = self::unidadePorPrivilegio($privilegioMorador, $unidade['apto'] ?? '', $unidade['bloco'] ?? '');
+            $resultadoUnidade = $this->atualizarUnidade($id, $apto, $bloco, $privilegioMorador);
+            if (!$resultadoUnidade['sucesso']) {
+                return $resultadoUnidade;
+            }
+        }
+
+        $morador = $this->repo->findById($id);
+        if ($acao === 'aceitar'
+            && self::exigeUnidadeReal($privilegioMorador)
+            && $this->repo->existeMoradorAtivoNaUnidade($morador['apto'], $morador['bloco'], $id)
+        ) {
+            return ['sucesso' => false, 'mensagem' => 'Já existe um morador ativo para este apartamento e bloco.'];
+        }
 
         $emailService = new EmailService();
         if ($acao === 'aceitar') {
+            $this->repo->atualizarStatus($id, 'L');
             $emailService->contaAprovada($morador['email'], $morador['nome']);
         } else {
+            $this->repo->deletarDados($id);
             $emailService->contaNegada($morador['email'], $morador['nome']);
         }
 
         return [
             'sucesso' => true,
-            'status'  => ($acao === 'aceitar') ? 'liberado' : 'negado',
+            'status'  => ($acao === 'aceitar') ? 'liberado' : 'recusado',
         ];
     }
 
@@ -178,6 +212,15 @@ class MoradorService
             return ['sucesso' => false, 'mensagem' => 'Status invalido.'];
         }
 
+        $morador = $this->repo->findById($id);
+        if ($status === 'L'
+            && $morador
+            && self::exigeUnidadeReal((int)($morador['privilegio'] ?? 1))
+            && $this->repo->existeMoradorAtivoNaUnidade($morador['apto'], $morador['bloco'], $id)
+        ) {
+            return ['sucesso' => false, 'mensagem' => 'Já existe um morador ativo para este apartamento e bloco.'];
+        }
+
         return $this->repo->atualizarStatus($id, $status)
             ? ['sucesso' => true]
             : ['sucesso' => false, 'mensagem' => 'Erro ao atualizar status.'];
@@ -193,6 +236,87 @@ class MoradorService
             return false;
         }
         return $this->repo->atualizarPrivilegio($id, $privilegio);
+    }
+
+    public function atualizarPrivilegioEUnidade(int $id, int $privilegio, string $apto, string $bloco): bool
+    {
+        [$apto, $bloco] = self::unidadePorPrivilegio($privilegio, $apto, $bloco);
+
+        $morador = $this->repo->findById($id);
+        if ($apto === ''
+            || $bloco === ''
+            || ($morador && ($morador['status'] ?? '') === 'L'
+                && self::exigeUnidadeReal($privilegio)
+                && $this->repo->existeMoradorAtivoNaUnidade($apto, $bloco, $id))
+            || !$this->atualizarPrivilegio($id, $privilegio)
+        ) {
+            return false;
+        }
+
+        return $this->atualizarUnidade($id, $apto, $bloco, $privilegio)['sucesso'];
+    }
+
+    public function atualizarUnidade(int $id, string $apto, string $bloco, ?int $privilegio = null): array
+    {
+        if ($privilegio !== null) {
+            [$apto, $bloco] = self::unidadePorPrivilegio($privilegio, $apto, $bloco);
+        } else {
+            $apto = self::normalizarApto($apto);
+            $bloco = self::normalizarBloco($bloco);
+        }
+
+        if ($id <= 0 || $apto === '' || $bloco === '') {
+            return ['sucesso' => false, 'mensagem' => 'Informe apartamento numérico e bloco com uma letra.'];
+        }
+
+        return $this->repo->atualizarUnidade($id, $apto, $bloco)
+            ? ['sucesso' => true]
+            : ['sucesso' => false, 'mensagem' => 'Erro ao atualizar bloco e apartamento.'];
+    }
+
+    private static function normalizarApto(string $apto): string
+    {
+        return preg_replace('/\D/', '', $apto);
+    }
+
+    private static function normalizarBloco(string $bloco): string
+    {
+        $bloco = strtoupper(trim($bloco));
+        return preg_match('/^[A-Z]$/', $bloco) ? $bloco : '';
+    }
+
+    private static function exigeUnidadeReal(int $privilegio): bool
+    {
+        return in_array($privilegio, [1, 2], true);
+    }
+
+    private static function unidadePorPrivilegio(int $privilegio, string $apto, string $bloco): array
+    {
+        if (!self::exigeUnidadeReal($privilegio)) {
+            return ['0', 'G'];
+        }
+
+        return [self::normalizarApto($apto), self::normalizarBloco($bloco)];
+    }
+
+    private static function cpfValido(string $cpf): bool
+    {
+        if (strlen($cpf) !== 11 || preg_match('/^(\d)\1{10}$/', $cpf)) {
+            return false;
+        }
+
+        for ($t = 9; $t < 11; $t++) {
+            $soma = 0;
+            for ($i = 0; $i < $t; $i++) {
+                $soma += (int) $cpf[$i] * (($t + 1) - $i);
+            }
+            $digito = ((10 * $soma) % 11) % 10;
+            if ((int) $cpf[$t] !== $digito) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function resetarSenha(int $idMorador): array{

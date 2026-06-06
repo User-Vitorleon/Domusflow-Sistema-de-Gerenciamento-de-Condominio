@@ -3,8 +3,8 @@ $paginaTitulo = 'Meu Histórico';
 $paginaAtiva  = 'financeiro';
 require_once __DIR__ . '/../../layout/header.php';
 
-$pendentes = array_filter($historico, fn($h) => $h['status'] === 'F');
-$pagas     = array_filter($historico, fn($h) => $h['status'] === 'G');
+$pendentes = array_filter($historico, fn($h) => $h['status'] === 'A');
+$pagas     = array_filter($historico, fn($h) => $h['status'] === 'P');
 $totalPendente = array_sum(array_column($pendentes, 'valor'));
 ?>
 
@@ -69,6 +69,10 @@ $totalPendente = array_sum(array_column($pendentes, 'valor'));
                         <?php foreach ($pendentes as $h):
                             $vencido  = strtotime($h['data_vencimento']) < strtotime('today');
                             $corModelo = strtoupper($h['modelo']) === 'TAXA' ? '#2563EB' : '#DC2626';
+                            $textoStatus = $vencido ? 'Em Atraso' : 'Pendente';
+                            $corBadge = $vencido
+                                ? ['#DC2626', '#FEF2F2', '#FECACA']
+                                : ['#CA8A04', '#FFFBEB', '#FDE68A'];
                         ?>
                             <tr style="border-bottom: 1px solid #F1F5F9;"
                                 data-desc="<?= strtolower($h['descricao']) ?>"
@@ -94,8 +98,8 @@ $totalPendente = array_sum(array_column($pendentes, 'valor'));
                                     </span>
                                 </td>
                                 <td style="padding: 10px 12px;">
-                                    <span style="padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; color: #CA8A04; background: #FFFBEB; border: 1px solid #FDE68A;">
-                                        Pendente
+                                    <span style="padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; color: <?= $corBadge[0] ?>; background: <?= $corBadge[1] ?>; border: 1px solid <?= $corBadge[2] ?>;">
+                                        <?= $textoStatus ?>
                                     </span>
                                 </td>
                                 <td style="padding: 10px 12px; text-align: center;">
@@ -183,7 +187,7 @@ $totalPendente = array_sum(array_column($pendentes, 'valor'));
                                 </td>
                                 <td style="padding: 10px 12px;">
                                     <span style="padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; color: #16A34A; background: #F0FDF4; border: 1px solid #BBF7D0;">
-                                        Fatura Paga
+                                        Pago
                                     </span>
                                 </td>
                                 <td style="padding: 10px 12px; text-align: center;">

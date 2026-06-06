@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.btn-cpf-toggle').forEach((button) => {
-        button.addEventListener('click', () => {
+        button.addEventListener('click', async () => {
             const cell = button.closest('.cpf-cell');
             if (!cell) return;
 
@@ -11,10 +11,31 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!mask || !real || !icon) return;
 
             const mostrarCpf = mask.hidden === false || !mask.hidden;
+            if (mostrarCpf && !real.textContent.trim()) {
+                const uuid = button.dataset.uuid || '';
+                const base = window.BASE_URL || '';
+                const response = await fetch(`${base}/moradores/cpf?uuid=${encodeURIComponent(uuid)}`);
+                const data = await response.json();
+                if (!data.sucesso) return;
+                real.textContent = data.cpf;
+            }
+
             mask.hidden = mostrarCpf;
             real.hidden = !mostrarCpf;
             icon.className = mostrarCpf ? 'bx bx-hide' : 'bx bx-show';
             button.setAttribute('aria-label', mostrarCpf ? 'Ocultar CPF' : 'Mostrar CPF');
+        });
+    });
+
+    document.querySelectorAll('.js-apto-input').forEach((input) => {
+        input.addEventListener('input', () => {
+            input.value = input.value.replace(/\D/g, '').slice(0, 4);
+        });
+    });
+
+    document.querySelectorAll('.js-bloco-input').forEach((input) => {
+        input.addEventListener('input', () => {
+            input.value = input.value.replace(/[^a-zA-Z]/g, '').slice(0, 1).toUpperCase();
         });
     });
 
@@ -39,8 +60,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (button.disabled) return;
 
             pendingAdminForm = button.closest('form');
+            if (button.dataset.actionValue && pendingAdminForm) {
+                const actionInput = pendingAdminForm.querySelector('input[name="acao"]');
+                if (actionInput) actionInput.value = button.dataset.actionValue;
+            }
             adminTitle.textContent = button.dataset.title || 'Confirmar acao';
-            adminMessage.textContent = button.dataset.message || 'Informe sua senha para continuar.';
+            adminMessage.innerHTML = button.dataset.message || 'Informe sua senha para continuar.';
             adminModal.classList.add('is-open');
             adminModal.setAttribute('aria-hidden', 'false');
             adminPassword.focus();

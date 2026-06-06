@@ -220,7 +220,7 @@ public function historico(): void
 
         $lancamento = $this->repo->findLancamentoById($idLancamento);
 
-        if (!$lancamento || !in_array($lancamento['status'], ['F', 'G'])) {
+        if (!$lancamento || !in_array($lancamento['status'], ['A', 'P'])) {
             $this->redirecionar('/financeiro/historico');
         }
 

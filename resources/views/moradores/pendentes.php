@@ -27,7 +27,7 @@ function montarOrdenacao(array $queryAtual, string $campo, string $ordenarAtual,
 
         <?php if (isset($_GET['status'])): ?>
             <div class="df-alert df-alert-<?= $_GET['status'] === 'liberado' ? 'success' : 'warning' ?>">
-                Morador <?= $_GET['status'] === 'liberado' ? 'liberado' : 'negado' ?> com sucesso.
+                Cadastro <?= $_GET['status'] === 'liberado' ? 'liberado' : 'recusado' ?> com sucesso.
             </div>
         <?php endif; ?>
 
@@ -127,6 +127,7 @@ function montarOrdenacao(array $queryAtual, string $campo, string $ordenarAtual,
                         <tbody>
                             <?php foreach ($moradores as $m): ?>
                                 <?php
+                                    $formId = 'pendente-form-' . (int) $m['id_user'];
                                     $cpf = preg_replace('/\D/', '', (string)($m['cpf'] ?? ''));
                                     $cpfMask = strlen($cpf) >= 5
                                         ? substr($cpf, 0, 3) . '.***.***-' . substr($cpf, -2)
@@ -146,14 +147,24 @@ function montarOrdenacao(array $queryAtual, string $campo, string $ordenarAtual,
                                     <td>
                                         <div class="cpf-cell">
                                             <span class="cpf-mask"><?= htmlspecialchars($cpfMask) ?></span>
-                                            <span class="cpf-real" hidden><?= htmlspecialchars($m['cpf']) ?></span>
-                                            <button type="button" class="btn-ghost btn-cpf-toggle" aria-label="Mostrar CPF">
+                                            <span class="cpf-real" hidden></span>
+                                            <button type="button" class="btn-ghost btn-cpf-toggle"
+                                                data-uuid="<?= htmlspecialchars($m['uuid']) ?>"
+                                                aria-label="Mostrar CPF">
                                                 <i class='bx bx-show'></i>
                                             </button>
                                         </div>
                                     </td>
-                                    <td><?= htmlspecialchars($m['bloco']) ?></td>
-                                    <td><?= htmlspecialchars($m['apto']) ?></td>
+                                    <td>
+                                        <input class="morador-unidade-input js-bloco-input" form="<?= $formId ?>"
+                                            type="text" name="bloco" maxlength="1" pattern="[A-Za-z]"
+                                            value="<?= htmlspecialchars($m['bloco']) ?>" required>
+                                    </td>
+                                    <td>
+                                        <input class="morador-unidade-input js-apto-input" form="<?= $formId ?>"
+                                            type="text" name="apto" maxlength="4" inputmode="numeric" pattern="\d+"
+                                            value="<?= htmlspecialchars($m['apto']) ?>" required>
+                                    </td>
                                     <td>
                                         <span class="<?= $perfis[$p][1] ?? 'perfil-badge-morador' ?>">
                                             <?= $perfis[$p][0] ?? 'Morador' ?>
@@ -161,13 +172,19 @@ function montarOrdenacao(array $queryAtual, string $campo, string $ordenarAtual,
                                     </td>
                                     <td><?= !empty($m['created_at']) ? date('d/m/Y', strtotime($m['created_at'])) : '-' ?></td>
                                     <td class="pendentes-acoes-cell">
-                                        <form action="<?= BASE_URL ?>/moradores/liberar" method="POST"
+                                        <form id="<?= $formId ?>" action="<?= BASE_URL ?>/moradores/liberar" method="POST"
                                             class="pendentes-acoes">
-                                            <input type="hidden" name="id_morador" value="<?= $m['id_user'] ?>">
-                                            <button type="submit" name="acao" value="aceitar"
-                                                class="btn-success-sm">Aceitar</button>
-                                            <button type="submit" name="acao" value="negar"
-                                                class="btn-danger-sm">Negar</button>
+                                            <input type="hidden" name="uuid_morador" value="<?= htmlspecialchars($m['uuid']) ?>">
+                                            <input type="hidden" name="acao" value="">
+                                            <input type="hidden" name="admin_senha" value="">
+                                            <button type="button" data-action-value="aceitar"
+                                                class="btn-success-sm js-confirm-admin"
+                                                data-title="Aceitar cadastro"
+                                                data-message="Aceitar <?= htmlspecialchars($m['nome']) ?>? Informe sua senha para confirmar.">Aceitar</button>
+                                            <button type="button" data-action-value="recusar"
+                                                class="btn-danger-sm js-confirm-admin"
+                                                data-title="Recusar cadastro"
+                                                data-message="Recusar o cadastro de <strong><?= htmlspecialchars($m['nome']) ?></strong> irá anonimizar os dados pessoais e liberar o CPF para uma nova solicitação. Informe sua senha para confirmar.">Recusar</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -226,5 +243,24 @@ function montarOrdenacao(array $queryAtual, string $campo, string $ordenarAtual,
         </div>
     </div>
 </main>
+
+<div class="gestao-modal" id="confirmAdminModal" aria-hidden="true">
+    <div class="gestao-modal-backdrop" data-modal-close></div>
+    <div class="gestao-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="confirmAdminTitle">
+        <button type="button" class="gestao-modal-close" data-modal-close aria-label="Fechar">
+            <i class='bx bx-x'></i>
+        </button>
+        <h3 id="confirmAdminTitle">Confirmar ação</h3>
+        <p id="confirmAdminMessage">Informe sua senha para continuar.</p>
+        <div class="df-field gestao-modal-field">
+            <label for="confirmAdminPassword">Senha</label>
+            <input type="password" id="confirmAdminPassword" autocomplete="current-password">
+        </div>
+        <div class="gestao-modal-actions">
+            <button type="button" class="btn-ghost" data-modal-close>Cancelar</button>
+            <button type="button" class="btn-primary" id="confirmAdminSubmit">Confirmar</button>
+        </div>
+    </div>
+</div>
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>

@@ -1,514 +1,439 @@
 <?php
 
+require_once __DIR__ . '/../../config/app.php';
 require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../../app/helpers/CryptoHelper.php';
 
-set_time_limit(120);
+set_time_limit(180);
+
+function gerarUuid(): string
+{
+    $bytes = random_bytes(16);
+    $bytes[6] = chr((ord($bytes[6]) & 0x0f) | 0x40);
+    $bytes[8] = chr((ord($bytes[8]) & 0x3f) | 0x80);
+    return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($bytes), 4));
+}
+
+function gerarCpfValido(array &$usados): string
+{
+    do {
+        $n = [];
+        for ($i = 0; $i < 9; $i++) {
+            $n[] = random_int(0, 9);
+        }
+        for ($t = 9; $t < 11; $t++) {
+            $soma = 0;
+            for ($i = 0; $i < $t; $i++) {
+                $soma += $n[$i] * (($t + 1) - $i);
+            }
+            $n[] = ((10 * $soma) % 11) % 10;
+        }
+        $cpf = implode('', $n);
+    } while (isset($usados[$cpf]));
+
+    $usados[$cpf] = true;
+    return $cpf;
+}
+
+function slug(string $texto): string
+{
+    $ascii = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $texto);
+    return strtolower(trim(preg_replace('/[^a-zA-Z]+/', '.', $ascii), '.'));
+}
+
+function telefoneCelular(int $i): string
+{
+    return sprintf('(11) 9%04d-%04d', 2000 + ($i % 7000), 1000 + (($i * 37) % 9000));
+}
+
+function telefoneFixo(int $i): string
+{
+    return sprintf('(11) 3%03d-%04d', 100 + ($i % 900), 1000 + (($i * 19) % 9000));
+}
+
+function dataRelativa(int $dias, string $hora = '09:00:00'): string
+{
+    return (new DateTime('2026-06-06 ' . $hora))->modify(($dias >= 0 ? '+' : '') . $dias . ' days')->format('Y-m-d H:i:s');
+}
 
 try {
     $pdo = getConnection();
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->exec("SET FOREIGN_KEY_CHECKS = 0");
+    $pdo->exec('SET FOREIGN_KEY_CHECKS = 0');
 
-    $senha_padrao = '123456';
-    $hash         = password_hash($senha_padrao, PASSWORD_BCRYPT);
+    foreach ([
+        'assembleias_presencas', 'assembleias', 'avisos',
+        'ocorrencia_notificacoes', 'ocorrencia_tramites', 'ocorrencias',
+        'lancamentos', 'faturas', 'taxas_padrao',
+        'reservas', 'veiculos', 'locais_festivos',
+        'auditoria', 'morador',
+    ] as $tabela) {
+        $pdo->exec("TRUNCATE TABLE {$tabela}");
+    }
+    $pdo->exec('SET FOREIGN_KEY_CHECKS = 1');
+    $pdo->beginTransaction();
+
+    $senhaPadrao = '123456';
+    $hash = password_hash($senhaPadrao, PASSWORD_BCRYPT);
+    $cpfsUsados = [
+        '00000000000' => true,
+        '99999999999' => true,
+        '11111111111' => true,
+        '22222222222' => true,
+        '43209957835' => true,
+        '98765432100' => true,
+    ];
 
     echo "<pre>";
-    echo "Hash bcrypt gerado com sucesso.\n";
-    echo "Senha padrão: <strong>{$senha_padrao}</strong>\n\n";
+    echo "Seed DomusFlow iniciado.\n";
+    echo "Senha padrao de todos os usuarios: {$senhaPadrao}\n\n";
 
-    $sistema = [
-        [1, 1, 'Admin Root',       '00', '0', '00000000000', 'admin@domusflow.com',    '(11) 00000-0000', null,              'M', $hash, 'L', 4],
-        [2, 1, 'Vitor Leon',       '10', '1', '43209957835', 'sindico@domusflow.com',  '(11) 98522-9900', '(11) 95907-3260', 'M', $hash, 'L', 2],
-        [3, 1, 'Porteiro Padrão',  '00', '0', '11111111111', 'porteiro@domusflow.com', '(11) 00000-0001', null,              'M', $hash, 'L', 3],
-        [4, 1, 'Porteiro Carlos',  '00', '0', '22222222222', 'porteiro2@domusflow.com', '(11) 00000-0002', null,              'M', $hash, 'L', 3],
-    ];
-
-    $stmt = $pdo->prepare("
+    $stmtMorador = $pdo->prepare("
         INSERT INTO morador
-          (id_user, identificador, nome, apto, bloco, cpf, email, telefone, tell_recado, sexo, senha, status, privilegio)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
-    ");
-    foreach ($sistema as $u) {
-        $stmt->execute($u);
-    }
-    echo "✔ Usuários do sistema inseridos: " . count($sistema) . "\n";
-
-    $nomes_m = [
-        'Carlos',
-        'João',
-        'Pedro',
-        'Lucas',
-        'Marcos',
-        'Rafael',
-        'Bruno',
-        'Felipe',
-        'Thiago',
-        'Diego',
-        'André',
-        'Gustavo',
-        'Ricardo',
-        'Leandro',
-        'Fernando',
-        'Rodrigo',
-        'Fabian',
-        'Henrique',
-        'Vinicius',
-        'Eduardo',
-        'Alexandre',
-        'Mateus',
-        'Leonardo',
-        'Caio',
-        'Renato',
-        'Daniel',
-        'Julio',
-        'Sergio',
-        'Paulo',
-        'Nelson',
-        'Roberto',
-        'Felipe',
-        'Guilherme',
-        'Marcelo',
-        'Antônio',
-        'Jorge',
-        'Wagner',
-        'Patrick',
-        'Samuel',
-        'Davi'
-    ];
-
-    $nomes_f = [
-        'Ana',
-        'Maria',
-        'Carla',
-        'Juliana',
-        'Fernanda',
-        'Patricia',
-        'Amanda',
-        'Camila',
-        'Isabela',
-        'Leticia',
-        'Gabriela',
-        'Beatriz',
-        'Larissa',
-        'Natalia',
-        'Priscila',
-        'Tatiana',
-        'Vanessa',
-        'Renata',
-        'Luciana',
-        'Aline',
-        'Bruna',
-        'Debora',
-        'Fabiana',
-        'Livia',
-        'Paula',
-        'Claudia',
-        'Mariana',
-        'Simone',
-        'Viviane',
-        'Helena',
-        'Monica',
-        'Cristiane',
-        'Elaine',
-        'Silvia',
-        'Adriana',
-        'Daniela',
-        'Raquel',
-        'Sabrina',
-        'Tania',
-        'Vera'
-    ];
-
-    $sobrenomes = [
-        'Silva',
-        'Oliveira',
-        'Souza',
-        'Costa',
-        'Pereira',
-        'Rodrigues',
-        'Alves',
-        'Ferreira',
-        'Gomes',
-        'Martins',
-        'Barbosa',
-        'Ribeiro',
-        'Carvalho',
-        'Dias',
-        'Rocha',
-        'Teixeira',
-        'Moreira',
-        'Batista',
-        'Freitas',
-        'Mendes',
-        'Lima',
-        'Cardoso',
-        'Nogueira',
-        'Monteiro',
-        'Correia',
-        'Farias',
-        'Duarte',
-        'Peixoto',
-        'Queiroz',
-        'Moura',
-        'Neves',
-        'Sales',
-        'Campos',
-        'Rezende',
-        'Borges',
-        'Amaral',
-        'Cunha',
-        'Vieira',
-        'Pinto',
-        'Araújo'
-    ];
-
-    $blocos = ['A', 'B', 'C', 'D', 'E'];
-    $status_opts = ['L', 'L', 'L', 'L', 'L', 'L', 'L', 'P', 'P', 'B'];
-
-    $stmt_m = $pdo->prepare("
-        INSERT INTO morador
-          (identificador, nome, apto, bloco, cpf, email, telefone, tell_recado, sexo, senha, status, privilegio)
-        VALUES (1,?,?,?,?,?,?,?,?,?,?,1)
+            (id_user, uuid, nome, apto, bloco, cpf, cpf_hash, email, email_hash, telefone, tell_recado, senha, status, privilegio, created_at)
+        VALUES
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ");
 
-    $nomes_usados  = [];
-    $cpfs_usados   = ['00000000000', '43209957835', '11111111111', '22222222222'];
-    $emails_usados = ['admin@domusflow.com', 'sindico@domusflow.com', 'porteiro@domusflow.com', 'porteiro2@domusflow.com'];
-
-    $inseridos = 0;
-    $id_morador = 5;
-    $tentativas = 0;
-
-    while ($inseridos < 1000 && $tentativas < 5000) {
-        $tentativas++;
-        $sexo = ($inseridos % 2 === 0) ? 'M' : 'F';
-        $lista_nomes = ($sexo === 'M') ? $nomes_m : $nomes_f;
-
-        $nome_idx  = ($inseridos % count($lista_nomes));
-        $sob1_idx  = (intdiv($inseridos, 3)  % count($sobrenomes));
-        $sob2_idx  = (intdiv($inseridos, 7)  % count($sobrenomes));
-
-        $primeiro  = $lista_nomes[$nome_idx];
-        $sob1      = $sobrenomes[$sob1_idx];
-        $sob2      = $sobrenomes[$sob2_idx];
-        $nome      = "{$primeiro} {$sob1} {$sob2}";
-
-        if (in_array($nome, $nomes_usados)) {
-            $nome = "{$primeiro} {$sob1} {$sob2} " . ($inseridos + 1);
-        }
-
-        $bloco = $blocos[$inseridos % 5];
-        $apto  = (($inseridos % 200) + 1);
-        $cpf   = str_pad(mt_rand(10000000000, 99999999999), 11, '0', STR_PAD_LEFT);
-
-        if (in_array($cpf, $cpfs_usados)) continue;
-
-        $email = strtolower(
-            preg_replace('/[^a-z0-9]/', '', iconv('UTF-8', 'ASCII//TRANSLIT', $primeiro)) .
-                strtolower(preg_replace('/[^a-z0-9]/', '', iconv('UTF-8', 'ASCII//TRANSLIT', $sob1))) .
-                ($id_morador) . '@email.com'
-        );
-
-        if (in_array($email, $emails_usados)) continue;
-
-        $tel = '(11) 9' . str_pad(mt_rand(10000000, 99999999), 8, '0', STR_PAD_LEFT);
-        $tel_rec = ($inseridos % 4 === 0)
-            ? '(11) 3' . str_pad(mt_rand(1000000, 9999999), 7, '0', STR_PAD_LEFT)
-            : null;
-
-        $status = $status_opts[$inseridos % 10];
-
-        $stmt_m->execute([$nome, (string)$apto, $bloco, $cpf, $email, $tel, $tel_rec, $sexo, $hash, $status]);
-
-        $nomes_usados[]  = $nome;
-        $cpfs_usados[]   = $cpf;
-        $emails_usados[] = $email;
-        $inseridos++;
-        $id_morador++;
-    }
-
-    echo "✔ Moradores inseridos: {$inseridos}\n";
-
-    $ids_moradores = $pdo->query("SELECT id_user FROM morador WHERE privilegio = 1 ORDER BY id_user")->fetchAll(PDO::FETCH_COLUMN);
-
-    $locais = [
-        [1, 'Churrasqueira',           100, 'S'],
-        [1, 'Salão de Festas Pequeno',  50, 'S'],
-        [1, 'Salão de Festas Grande',  150, 'S'],
-        [1, 'Parquinho de Diversão',    15, 'N'],
-        [1, 'Quadra Poliesportiva',     40, 'S'],
-        [1, 'Espaço Gourmet',           30, 'S'],
+    $usuariosSistema = [
+        [1, 'Admin Root', '0', 'G', '00000000000', 'admin@domusflow.com', '(11) 3000-0000', null, 'L', 4],
+        [2, 'Admin Beatriz Costa', '0', 'G', '99999999999', 'admin.beatriz@domusflow.com', '(11) 3000-0001', null, 'L', 4],
+        [3, 'Vitor Leon', '10', 'A', '43209957835', 'sindico@domusflow.com', '(11) 98522-9900', '(11) 95907-3260', 'L', 2],
+        [4, 'Sindica Mariana Alves', '11', 'B', '98765432100', 'sindica.mariana@domusflow.com', '(11) 98888-1100', null, 'L', 2],
+        [5, 'Porteiro Padrao', '0', 'G', '11111111111', 'porteiro@domusflow.com', '(11) 3000-0002', null, 'L', 3],
+        [6, 'Porteiro Carlos Lima', '0', 'G', '22222222222', 'porteiro.carlos@domusflow.com', '(11) 3000-0003', null, 'L', 3],
     ];
 
-    $stmt_l = $pdo->prepare("INSERT INTO locais_festivos (id_user_cad, local, capacidade, disp_uso) VALUES (?,?,?,?)");
-    foreach ($locais as $l) {
-        $stmt_l->execute($l);
-    }
-    $id_locais = $pdo->query("SELECT id_local FROM locais_festivos ORDER BY id_local")->fetchAll(PDO::FETCH_COLUMN);
-    echo "✔ Locais festivos inseridos: " . count($locais) . "\n";
-
-    $marcas = [
-        'Fiat'       => ['Uno', 'Argo', 'Pulse', 'Strada', 'Toro', 'Cronos'],
-        'Volkswagen' => ['Gol', 'Polo', 'Virtus', 'Nivus', 'T-Cross', 'Tiguan'],
-        'Chevrolet'  => ['Onix', 'Tracker', 'Cruze', 'S10', 'Spin', 'Montana'],
-        'Toyota'     => ['Corolla', 'Yaris', 'Hilux', 'SW4', 'RAV4', 'Prius'],
-        'Honda'      => ['Fit', 'Civic', 'HR-V', 'WR-V', 'City', 'CR-V'],
-        'Hyundai'    => ['HB20', 'Creta', 'Tucson', 'i30', 'Santa Fe', 'Azera'],
-        'Renault'    => ['Kwid', 'Sandero', 'Logan', 'Duster', 'Captur', 'Zoe'],
-        'Jeep'       => ['Renegade', 'Compass', 'Commander', 'Wrangler', 'Cherokee', 'Grand Cherokee'],
-        'Ford'       => ['Ka', 'EcoSport', 'Ranger', 'Bronco', 'Maverick', 'Territory'],
-        'Nissan'     => ['Kicks', 'Versa', 'Frontier', 'Sentra', 'March', 'Leaf'],
-        'Peugeot'    => ['208', '2008', '3008', '5008', 'Partner', 'Expert'],
-        'BMW'        => ['320i', '530i', 'X1', 'X3', 'X5', 'M3'],
-        'Mercedes'   => ['C180', 'C200', 'GLA', 'GLC', 'A200', 'E300'],
-        'Mitsubishi' => ['Outlander', 'Eclipse Cross', 'L200', 'ASX', 'Pajero', 'Space Star'],
-        'Audi'       => ['A3', 'A4', 'Q3', 'Q5', 'Q7', 'TT'],
-    ];
-    $cores = ['Preto', 'Branco', 'Prata', 'Cinza', 'Azul', 'Vermelho', 'Verde', 'Dourado', 'Bege', 'Laranja', 'Vinho', 'Marrom'];
-
-    $marcas_list  = array_keys($marcas);
-    $placas_usadas = [];
-
-    $stmt_v = $pdo->prepare("
-        INSERT INTO veiculos (placa, marca, modelo, cor, principal, id_user, id_user_cad)
-        VALUES (?,?,?,?,?,?,?)
-    ");
-
-    $veiculos_inseridos = 0;
-    $total_ids = count($ids_moradores);
-    $i = 0;
-    while ($veiculos_inseridos < 1000) {
-        $id_user = $ids_moradores[$i % $total_ids];
-        $marca   = $marcas_list[$veiculos_inseridos % count($marcas_list)];
-        $modelos = $marcas[$marca];
-        $modelo  = $modelos[$veiculos_inseridos % count($modelos)];
-        $cor     = $cores[$veiculos_inseridos % count($cores)];
-        $principal = ($veiculos_inseridos % 7 !== 0) ? 1 : 0;
-
-        $tentativas_placa = 0;
-        do {
-            if ($veiculos_inseridos % 2 === 0) {
-                $placa = chr(65 + rand(0, 25)) . chr(65 + rand(0, 25)) . chr(65 + rand(0, 25))
-                    . rand(1, 9)
-                    . chr(65 + rand(0, 25))
-                    . rand(0, 9) . rand(0, 9);
-            } else {
-                $placa = chr(65 + rand(0, 25)) . chr(65 + rand(0, 25)) . chr(65 + rand(0, 25))
-                    . rand(1000, 9999);
-            }
-            $tentativas_placa++;
-        } while (in_array($placa, $placas_usadas) && $tentativas_placa < 100);
-
-        if (in_array($placa, $placas_usadas)) {
-            $i++;
-            continue;
-        }
-
-        $stmt_v->execute([$placa, $marca, $modelo, $cor, $principal, $id_user, 2]);
-        $placas_usadas[] = $placa;
-        $veiculos_inseridos++;
-        $i++;
-    }
-    echo "✔ Veículos inseridos: {$veiculos_inseridos}\n";
-
-    $horas = [
-        ['08:00:00', '12:00:00'],
-        ['12:00:00', '17:00:00'],
-        ['17:00:00', '21:00:00'],
-        ['18:00:00', '22:00:00'],
-        ['19:00:00', '23:00:00'],
-        ['20:00:00', '23:59:00'],
-    ];
-    $status_res = ['A', 'A', 'A', 'P', 'P', 'N'];
-
-    $stmt_r = $pdo->prepare("
-        INSERT INTO reservas
-          (id_local, id_user, data_reserva, hora_ini, hora_fim, status,
-           id_user_aprov, nome_user_aprov, data_aprov, hora_aprov)
-        VALUES (?,?,?,?,?,?,?,?,?,?)
-    ");
-
-    $base_date = new DateTime('2026-01-01');
-    for ($r = 0; $r < 1000; $r++) {
-        $id_local  = $id_locais[$r % count($id_locais)];
-        $id_user   = $ids_moradores[$r % $total_ids];
-        $data_res  = (clone $base_date)->modify("+{$r} day")->format('Y-m-d');
-        $hora_pair = $horas[$r % count($horas)];
-        $status_r  = $status_res[$r % count($status_res)];
-
-        $aprov_id   = null;
-        $aprov_nome = null;
-        $aprov_data = null;
-        $aprov_hora = null;
-
-        if ($status_r === 'A') {
-            $aprov_id   = 2;
-            $aprov_nome = 'Vitor Leon';
-            $aprov_data = (clone $base_date)->modify("+{$r} day")->modify('-1 day')->format('Y-m-d');
-            $aprov_hora = '10:00:00';
-        }
-
-        $stmt_r->execute([
-            $id_local,
-            $id_user,
-            $data_res,
-            $hora_pair[0],
-            $hora_pair[1],
-            $status_r,
-            $aprov_id,
-            $aprov_nome,
-            $aprov_data,
-            $aprov_hora
+    foreach ($usuariosSistema as $u) {
+        $stmtMorador->execute([
+            $u[0], gerarUuid(), $u[1], $u[2], $u[3],
+            CryptoHelper::encrypt($u[4]), CryptoHelper::hashCpf($u[4]),
+            CryptoHelper::encrypt($u[5]), CryptoHelper::hashEmail($u[5]),
+            CryptoHelper::encrypt($u[6]), CryptoHelper::encrypt($u[7]),
+            $hash, $u[8], $u[9], dataRelativa(-180 + $u[0]),
         ]);
     }
-    echo "✔ Reservas inseridas: 1000\n";
+
+    $nomesMasculinos = [
+        'Carlos', 'Joao', 'Pedro', 'Lucas', 'Marcos', 'Rafael', 'Bruno', 'Felipe', 'Thiago', 'Diego',
+        'André', 'Gustavo', 'Ricardo', 'Leandro', 'Fernando', 'Rodrigo', 'Fabian', 'Henrique', 'Vinicius', 'Eduardo',
+        'Alexandre', 'Mateus', 'Leonardo', 'Caio', 'Renato', 'Daniel', 'Julio', 'Sergio', 'Paulo', 'Nelson',
+        'Roberto', 'Guilherme', 'Marcelo', 'Antônio', 'Jorge', 'Wagner', 'Patrick', 'Samuel', 'Davi', 'Victor',
+    ];
+    $nomesFemininos = [
+        'Ana', 'Maria', 'Carla', 'Juliana', 'Fernanda', 'Patricia', 'Amanda', 'Camila', 'Isabela', 'Leticia',
+        'Gabriela', 'Beatriz', 'Larissa', 'Natalia', 'Priscila', 'Tatiana', 'Vanessa', 'Renata', 'Luciana', 'Aline',
+        'Bruna', 'Debora', 'Fabiana', 'Livia', 'Paula', 'Claudia', 'Mariana', 'Simone', 'Viviane', 'Helena',
+        'Monica', 'Cristiane', 'Elaine', 'Silvia', 'Adriana', 'Daniela', 'Raquel', 'Sabrina', 'Tania', 'Vera',
+    ];
+    $sobrenomes = [
+        'Silva', 'Oliveira', 'Souza', 'Costa', 'Pereira', 'Rodrigues', 'Alves', 'Ferreira', 'Gomes', 'Martins',
+        'Barbosa', 'Ribeiro', 'Carvalho', 'Dias', 'Rocha', 'Teixeira', 'Moreira', 'Batista', 'Freitas', 'Mendes',
+        'Lima', 'Cardoso', 'Nogueira', 'Monteiro', 'Correia', 'Farias', 'Duarte', 'Peixoto', 'Queiroz', 'Moura',
+        'Neves', 'Sales', 'Campos', 'Rezende', 'Borges', 'Amaral', 'Cunha', 'Vieira', 'Pinto', 'Araújo',
+    ];
+    $blocos = ['A', 'B', 'C', 'D', 'E'];
+    $statusDistribuicao = array_merge(
+        array_fill(0, 800, 'L'),
+        array_fill(0, 80, 'P'),
+        array_fill(0, 70, 'I'),
+        array_fill(0, 50, 'B')
+    );
+
+    $idsMoradores = [];
+    $idsAtivos = [];
+    $idsPendentes = [];
+    $idsInativos = [];
+    $idsBloqueados = [];
+    $emailsUsados = [];
+    $id = 7;
+    $nomeIndex = 0;
+
+    for ($i = 0; $i < 1000; $i++, $id++) {
+        $lista = ($i % 2 === 0) ? $nomesMasculinos : $nomesFemininos;
+        $primeiro = $lista[$i % count($lista)];
+        $sob1 = $sobrenomes[intdiv($nomeIndex, count($sobrenomes)) % count($sobrenomes)];
+        $sob2 = $sobrenomes[$nomeIndex % count($sobrenomes)];
+        $nomeIndex++;
+        if ($sob1 === $sob2) {
+            $sob2 = $sobrenomes[($nomeIndex + 7) % count($sobrenomes)];
+        }
+        $nome = "{$primeiro} {$sob1} {$sob2}";
+        $status = $statusDistribuicao[$i];
+
+        if ($status === 'L') {
+            $apto = (string)($i + 1);
+            $bloco = $blocos[$i % count($blocos)];
+        } else {
+            $apto = (string)(($i % 180) + 1);
+            $bloco = $blocos[$i % count($blocos)];
+        }
+
+        $emailBase = slug($nome);
+        $email = $emailBase . '@moradores.domusflow.test';
+        while (isset($emailsUsados[$email])) {
+            $sobExtra = $sobrenomes[($nomeIndex + count($emailsUsados)) % count($sobrenomes)];
+            $email = slug($primeiro . ' ' . $sob1 . ' ' . $sob2 . ' ' . $sobExtra) . '@moradores.domusflow.test';
+        }
+        $emailsUsados[$email] = true;
+
+        $cpf = gerarCpfValido($cpfsUsados);
+        $telefone = telefoneCelular($i);
+        $telefoneRecado = ($i % 5 === 0) ? telefoneFixo($i) : null;
+
+        $stmtMorador->execute([
+            $id,
+            gerarUuid(),
+            $nome,
+            $apto,
+            $bloco,
+            CryptoHelper::encrypt($cpf),
+            CryptoHelper::hashCpf($cpf),
+            CryptoHelper::encrypt($email),
+            CryptoHelper::hashEmail($email),
+            CryptoHelper::encrypt($telefone),
+            CryptoHelper::encrypt($telefoneRecado),
+            $hash,
+            $status,
+            1,
+            dataRelativa(-160 + ($i % 150)),
+        ]);
+
+        $idsMoradores[] = $id;
+        if ($status === 'L') $idsAtivos[] = $id;
+        if ($status === 'P') $idsPendentes[] = $id;
+        if ($status === 'I') $idsInativos[] = $id;
+        if ($status === 'B') $idsBloqueados[] = $id;
+    }
+
+    echo "Usuarios do sistema: 6\n";
+    echo "Moradores: 1000 (ativos: " . count($idsAtivos) . ", pendentes: " . count($idsPendentes) . ", inativos: " . count($idsInativos) . ", bloqueados: " . count($idsBloqueados) . ")\n";
+
+    $locais = [
+        ['Salão de Festas Principal', 160, 'S'],
+        ['Salão de Festas Pequeno', 70, 'S'],
+        ['Churrasqueira Gourmet', 45, 'S'],
+        ['Espaço Kids', 25, 'S'],
+        ['Quadra Poliesportiva', 40, 'S'],
+        ['Espaço Coworking', 20, 'S'],
+        ['Academia', 30, 'S'],
+        ['Piscina Adulto', 60, 'N'],
+        ['Piscina Infantil', 25, 'N'],
+        ['Sala de Jogos', 35, 'S'],
+    ];
+    $stmtLocal = $pdo->prepare("INSERT INTO locais_festivos (id_user_cad, local, capacidade, disp_uso) VALUES (?,?,?,?)");
+    foreach ($locais as $l) {
+        $stmtLocal->execute([1, $l[0], $l[1], $l[2]]);
+    }
+    $idsLocais = $pdo->query("SELECT id_local FROM locais_festivos ORDER BY id_local")->fetchAll(PDO::FETCH_COLUMN);
 
     $taxas = [
-        ['Taxa de Condomínio',        350.00, 'A', 'Vitor Leon', '2026-01-01', 'TAXA'],
-        ['Taxa de Limpeza',            25.00, 'A', 'Vitor Leon', '2026-01-01', 'TAXA'],
-        ['Taxa de Manutenção',         45.00, 'A', 'Vitor Leon', '2026-01-01', 'TAXA'],
-        ['Limpeza da Piscina',          5.99, 'A', 'Vitor Leon', '2026-01-01', 'TAXA'],
-        ['Taxa da Quadra',             55.00, 'A', 'Vitor Leon', '2026-01-01', 'TAXA'],
-        ['Playground',                  2.69, 'A', 'Vitor Leon', '2026-01-01', 'TAXA'],
-        ['Taxa do Porteiro',            5.60, 'A', 'Vitor Leon', '2026-01-01', 'MULTA'],
-        ['Multa por Barulho',          80.00, 'A', 'Vitor Leon', '2026-01-01', 'MULTA'],
-        ['Multa por Inadimplência',   150.00, 'A', 'Vitor Leon', '2026-01-01', 'MULTA'],
-        ['Taxa para Pintura',          15.99, 'I', 'Vitor Leon', '2026-01-01', 'MULTA'],
+        ['Condomínio mensal', 420.00, 'A', 'Vitor Leon', '2026-01-01', 'TAXA'],
+        ['Fundo de reserva', 65.00, 'A', 'Vitor Leon', '2026-01-01', 'TAXA'],
+        ['Manutenção dos elevadores', 38.50, 'A', 'Vitor Leon', '2026-01-01', 'TAXA'],
+        ['Limpeza das áreas comuns', 28.00, 'A', 'Vitor Leon', '2026-01-01', 'TAXA'],
+        ['Pintura da garagem', 55.90, 'I', 'Vitor Leon', '2026-01-01', 'TAXA'],
+        ['Multa por atraso', 85.00, 'A', 'Vitor Leon', '2026-01-01', 'MULTA'],
+        ['Multa por barulho', 150.00, 'A', 'Vitor Leon', '2026-01-01', 'MULTA'],
+        ['Multa por uso indevido da vaga', 120.00, 'A', 'Vitor Leon', '2026-01-01', 'MULTA'],
+        ['Multa por dano em área comum', 220.00, 'A', 'Vitor Leon', '2026-01-01', 'MULTA'],
+        ['Multa por descarte irregular', 95.00, 'A', 'Vitor Leon', '2026-01-01', 'MULTA'],
     ];
+    $stmtTaxa = $pdo->prepare("INSERT INTO taxas_padrao (descricao, valor, status, usuario_cad, data_cad, modulo) VALUES (?,?,?,?,?,?)");
+    foreach ($taxas as $t) $stmtTaxa->execute($t);
 
-    $stmt_t = $pdo->prepare("INSERT INTO taxas_padrao (descricao, valor, status, usuario_cad, data_cad, modulo) VALUES (?,?,?,?,?,?)");
-    foreach ($taxas as $t) {
-        $stmt_t->execute($t);
-    }
-    echo "✔ Taxas padrão inseridas: " . count($taxas) . "\n";
-
-    $pdo->exec("SET FOREIGN_KEY_CHECKS = 1");
-
-
-    $categorias_oc = [
-        'MANUTENÇÃO',
-        'BARULHO / PERTURBAÇÃO',
-        'SEGURANÇA',
-        'LIMPEZA',
-        'ÁREA COMUM',
-        'OUTROS',
+    $stmtVeiculo = $pdo->prepare("INSERT INTO veiculos (placa, marca, modelo, cor, principal, id_user, id_user_cad, created_at) VALUES (?,?,?,?,?,?,?,?)");
+    $marcas = [
+        ['Fiat', 'Argo'], ['Volkswagen', 'Polo'], ['Chevrolet', 'Onix'], ['Toyota', 'Corolla'],
+        ['Honda', 'Civic'], ['Hyundai', 'HB20'], ['Renault', 'Duster'], ['Jeep', 'Compass'],
+        ['Ford', 'Ranger'], ['Nissan', 'Kicks'], ['Peugeot', '208'], ['Mitsubishi', 'Eclipse Cross'],
     ];
-
-    $titulos_oc = [
-        'MANUTENÇÃO'            => ['VAZAMENTO NO CORREDOR DO 3º ANDAR', 'LÂMPADA QUEIMADA NA ESCADA', 'PORTA DO ELEVADOR COM DEFEITO', 'INFILTRAÇÃO NO TETO DA GARAGEM', 'INTERFONE COM DEFEITO'],
-        'BARULHO / PERTURBAÇÃO' => ['BARULHO EXCESSIVO APÓS 22H', 'MÚSICA ALTA NO APARTAMENTO 204', 'OBRAS SEM AVISO PRÉVIO', 'BRIGA NO CORREDOR', 'ANIMAL LATINDO DE MADRUGADA'],
-        'SEGURANÇA'             => ['CÂMERA DO HALL DESLIGADA', 'PORTÃO DA GARAGEM NÃO FECHA', 'PESSOA ESTRANHA NAS DEPENDÊNCIAS', 'ILUMINAÇÃO EXTERNA APAGADA', 'FECHADURA DA PORTA DE SERVIÇO QUEBRADA'],
-        'LIMPEZA'               => ['LIXO ACUMULADO NO CORREDOR', 'MATO ALTO NO JARDIM', 'PISCINA COM ÁGUA VERDE', 'BANHEIRO DA ACADEMIA SUJO', 'ODOR NO HALL DO ELEVADOR'],
-        'ÁREA COMUM'            => ['EQUIPAMENTO DA ACADEMIA QUEBRADO', 'CHURRASQUEIRA COM PROBLEMA', 'BANCO DO JARDIM QUEBRADO', 'TORNEIRA DO SALÃO VAZANDO', 'TELÃO DO SALÃO SEM FUNCIONAR'],
-        'OUTROS'                => ['CAIXA DE CORREIO DANIFICADA', 'BICICLETA ABANDONADA NO CORREDOR', 'RECLAMAÇÃO SOBRE ESTACIONAMENTO', 'PROBLEMA COM ENTREGA DE ENCOMENDA', 'OUTRO ASSUNTO DIVERSO'],
-    ];
-
-    $status_oc  = ['A', 'A', 'E', 'R', 'C'];
-    $base_oc    = new DateTime('2026-01-15');
-
-    $stmt_oc = $pdo->prepare("
-    INSERT INTO ocorrencias (id_user, categoria, titulo, descricao, status, created_at)
-    VALUES (?,?,?,?,?,?)
-");
-
-    $oc_ids = [];
-    for ($o = 0; $o < 50; $o++) {
-        $id_user   = $ids_moradores[$o % $total_ids];
-        $cat       = $categorias_oc[$o % count($categorias_oc)];
-        $titulo    = $titulos_oc[$cat][$o % count($titulos_oc[$cat])];
-        $descricao = 'OCORRÊNCIA REGISTRADA PELO MORADOR: ' . $titulo . '. FAVOR VERIFICAR E TOMAR AS DEVIDAS PROVIDÊNCIAS.';
-        $status    = $status_oc[$o % count($status_oc)];
-        $created   = (clone $base_oc)->modify("+{$o} day")->format('Y-m-d H:i:s');
-
-        $stmt_oc->execute([$id_user, $cat, $titulo, $descricao, $status, $created]);
-        $oc_ids[] = $pdo->lastInsertId();
-    }
-    echo "✔ Ocorrências inseridas: " . count($oc_ids) . "\n";
-
-    $stmt_tr = $pdo->prepare("
-    INSERT INTO ocorrencia_tramites (id_ocorrencia, id_user_cad, nome_user_cad, status_novo, descricao, created_at)
-    VALUES (?,?,?,?,?,?)
-");
-
-    $stmt_oc_status = $pdo->query("SELECT id_ocorrencia, status, created_at FROM ocorrencias ORDER BY id_ocorrencia");
-    $todas_oc = $stmt_oc_status->fetchAll(PDO::FETCH_ASSOC);
-
-    $tramites_inseridos = 0;
-    foreach ($todas_oc as $oc) {
-        $id_oc      = $oc['id_ocorrencia'];
-        $status_oc  = $oc['status'];
-        $data_base  = new DateTime($oc['created_at']);
-
-        if ($status_oc === 'E') {
-            $stmt_tr->execute([
-                $id_oc,
-                2,
-                'Vitor Leon',
-                'E',
-                'OCORRÊNCIA RECEBIDA E EM ANÁLISE. PROVIDÊNCIAS SENDO TOMADAS.',
-                (clone $data_base)->modify('+1 day')->format('Y-m-d H:i:s')
-            ]);
-            $tramites_inseridos++;
-        }
-
-        if ($status_oc === 'R') {
-            $stmt_tr->execute([
-                $id_oc,
-                2,
-                'Vitor Leon',
-                'E',
-                'OCORRÊNCIA RECEBIDA. INICIANDO TRATATIVA COM A EQUIPE DE MANUTENÇÃO.',
-                (clone $data_base)->modify('+1 day')->format('Y-m-d H:i:s')
-            ]);
-            $stmt_tr->execute([
-                $id_oc,
-                2,
-                'Vitor Leon',
-                'R',
-                'PROBLEMA SOLUCIONADO. SERVIÇO CONCLUÍDO PELA EQUIPE RESPONSÁVEL.',
-                (clone $data_base)->modify('+3 days')->format('Y-m-d H:i:s')
-            ]);
-            $tramites_inseridos += 2;
-        }
-
-        if ($status_oc === 'C') {
-            $stmt_tr->execute([
-                $id_oc,
-                $ids_moradores[0],
-                'Morador',
-                'C',
-                'OCORRÊNCIA CANCELADA PELO SOLICITANTE.',
-                (clone $data_base)->modify('+1 day')->format('Y-m-d H:i:s')
-            ]);
-            $tramites_inseridos++;
+    $cores = ['Preto', 'Branco', 'Prata', 'Cinza', 'Azul', 'Vermelho', 'Verde', 'Bege'];
+    $placas = [];
+    $veiculos = 0;
+    foreach ($idsAtivos as $idx => $moradorId) {
+        $qtd = ($idx % 4 === 0) ? 0 : (($idx % 5 === 0) ? 2 : 1);
+        for ($v = 0; $v < $qtd; $v++) {
+            $placa = sprintf('%s%s%s%d%s%d%d',
+                chr(65 + (($veiculos + 3) % 26)),
+                chr(65 + (($veiculos + 9) % 26)),
+                chr(65 + (($veiculos + 15) % 26)),
+                ($veiculos % 9) + 1,
+                chr(65 + (($veiculos + 21) % 26)),
+                intdiv($veiculos, 10) % 10,
+                $veiculos % 10
+            );
+            if (isset($placas[$placa])) continue;
+            $placas[$placa] = true;
+            [$marca, $modelo] = $marcas[$veiculos % count($marcas)];
+            $stmtVeiculo->execute([$placa, $marca, $modelo, $cores[$veiculos % count($cores)], $v === 0 ? 1 : 0, $moradorId, 5, dataRelativa(-120 + ($veiculos % 180))]);
+            $veiculos++;
         }
     }
-    echo "✔ Tramitações inseridas: {$tramites_inseridos}\n";
 
-    $stmt_noti = $pdo->prepare("
-    INSERT INTO ocorrencia_notificacoes (id_ocorrencia, id_user, lida, created_at)
-    VALUES (?,?,0,?)
-");
-
-    $stmt_com_tramite = $pdo->query("
-    SELECT DISTINCT o.id_ocorrencia, o.id_user, MIN(t.created_at) as data_tramite
-    FROM ocorrencias o
-    INNER JOIN ocorrencia_tramites t ON t.id_ocorrencia = o.id_ocorrencia
-    GROUP BY o.id_ocorrencia, o.id_user
-");
-
-    $notis = $stmt_com_tramite->fetchAll(PDO::FETCH_ASSOC);
-    $notis_inseridas = 0;
-    foreach ($notis as $n) {
-        $stmt_noti->execute([$n['id_ocorrencia'], $n['id_user'], $n['data_tramite']]);
-        $notis_inseridas++;
+    $stmtReserva = $pdo->prepare("
+        INSERT INTO reservas
+            (id_local, id_user, data_reserva, hora_ini, hora_fim, status, id_user_aprov, nome_user_aprov, data_aprov, hora_aprov, created_at)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?)
+    ");
+    $horarios = [
+        ['08:00:00', '12:00:00'], ['12:00:00', '17:00:00'], ['17:00:00', '21:00:00'],
+        ['18:00:00', '22:00:00'], ['19:00:00', '23:00:00'],
+    ];
+    $statusReservas = ['A', 'A', 'A', 'P', 'P', 'N'];
+    for ($i = 0; $i < 1000; $i++) {
+        $status = $statusReservas[$i % count($statusReservas)];
+        $diasReserva = -180 + ($i % 420);
+        $created = dataRelativa($diasReserva - 12, '14:00:00');
+        $aprovado = in_array($status, ['A', 'N'], true);
+        $stmtReserva->execute([
+            $idsLocais[$i % count($idsLocais)],
+            $idsAtivos[$i % count($idsAtivos)],
+            (new DateTime('2026-06-06'))->modify(($diasReserva >= 0 ? '+' : '') . $diasReserva . ' days')->format('Y-m-d'),
+            $horarios[$i % count($horarios)][0],
+            $horarios[$i % count($horarios)][1],
+            $status,
+            $aprovado ? (($i % 2 === 0) ? 3 : 4) : null,
+            $aprovado ? (($i % 2 === 0) ? 'Vitor Leon' : 'Sindica Mariana Alves') : null,
+            $aprovado ? substr(dataRelativa($diasReserva - 10), 0, 10) : null,
+            $aprovado ? '10:30:00' : null,
+            $created,
+        ]);
     }
-    echo "✔ Notificações inseridas: {$notis_inseridas}\n";
 
-    echo "\n<strong style='color:green'>✔ Seed concluído com sucesso!</strong>\n";
-    echo "Senha padrão de todos os usuários: <strong>{$senha_padrao}</strong>\n";
-    echo "<p style='color:red; font-weight:bold; margin-top:16px'>⚠️  APAGUE este arquivo agora!</p>";
+    $stmtFatura = $pdo->prepare("INSERT INTO faturas (id_user, data, valor_total, descricao, id_user_cad, created_at) VALUES (?,?,?,?,?,?)");
+    $stmtLanc = $pdo->prepare("
+        INSERT INTO lancamentos (modelo, valor, descricao, id_user, data_vencimento, status, data_lancamento, id_user_cad, id_fatura)
+        VALUES (?,?,?,?,?,?,?,?,?)
+    ");
+    $descricoesTaxa = array_values(array_filter($taxas, fn($t) => $t[5] === 'TAXA'));
+    $descricoesMulta = array_values(array_filter($taxas, fn($t) => $t[5] === 'MULTA'));
+    $totalLancamentos = 0;
+    for ($mes = -8; $mes <= 4; $mes++) {
+        $dataVenc = (new DateTime('2026-06-10'))->modify(($mes >= 0 ? '+' : '') . $mes . ' months')->format('Y-m-d');
+        foreach (array_slice($idsAtivos, 0, 180) as $idx => $moradorId) {
+            $taxa = $descricoesTaxa[$idx % count($descricoesTaxa)];
+            $status = $mes < -1 ? 'P' : 'A';
+            $idFatura = null;
+            if ($status === 'P') {
+                $stmtFatura->execute([$moradorId, $dataVenc, $taxa[1], 'Fatura paga - ' . $taxa[0], 1, $dataVenc]);
+                $idFatura = (int)$pdo->lastInsertId();
+            }
+            $stmtLanc->execute([$taxa[5], $taxa[1], $taxa[0], $moradorId, $dataVenc, $status, substr(dataRelativa(-30), 0, 10), 1, $idFatura]);
+            $totalLancamentos++;
+        }
+    }
+    for ($i = 0; $i < 160; $i++) {
+        $multa = $descricoesMulta[$i % count($descricoesMulta)];
+        $moradorId = $idsAtivos[($i * 3) % count($idsAtivos)];
+        $dataVenc = (new DateTime('2026-06-15'))->modify(($i % 60 - 30) . ' days')->format('Y-m-d');
+        $status = ($i % 5 === 0) ? 'P' : 'A';
+        $idFatura = null;
+        if ($status === 'P') {
+            $stmtFatura->execute([$moradorId, $dataVenc, $multa[1], 'Fatura paga - ' . $multa[0], 1, $dataVenc]);
+            $idFatura = (int)$pdo->lastInsertId();
+        }
+        $stmtLanc->execute([$multa[5], $multa[1], $multa[0], $moradorId, $dataVenc, $status, substr(dataRelativa(-20), 0, 10), 1, $idFatura]);
+        $totalLancamentos++;
+    }
+
+    $stmtOc = $pdo->prepare("INSERT INTO ocorrencias (id_user, categoria, titulo, descricao, status, created_at) VALUES (?,?,?,?,?,?)");
+    $stmtTr = $pdo->prepare("INSERT INTO ocorrencia_tramites (id_ocorrencia, id_user_cad, nome_user_cad, status_novo, descricao, created_at) VALUES (?,?,?,?,?,?)");
+    $stmtNot = $pdo->prepare("INSERT INTO ocorrencia_notificacoes (id_ocorrencia, id_user, lida, created_at) VALUES (?,?,?,?)");
+    $categorias = ['MANUTENCAO', 'BARULHO / PERTURBACAO', 'SEGURANCA', 'LIMPEZA', 'AREA COMUM', 'OUTROS'];
+    $titulos = ['Vazamento no corredor', 'Barulho apos horario permitido', 'Portao da garagem com falha', 'Lixo acumulado', 'Equipamento quebrado', 'Entrega extraviada'];
+    $statusOc = ['A', 'E', 'R', 'C'];
+    for ($i = 0; $i < 300; $i++) {
+        $status = $statusOc[$i % count($statusOc)];
+        $stmtOc->execute([
+            $idsAtivos[$i % count($idsAtivos)],
+            $categorias[$i % count($categorias)],
+            $titulos[$i % count($titulos)],
+            'Ocorrencia registrada pelo morador para acompanhamento da administracao.',
+            $status,
+            dataRelativa(-120 + ($i % 160)),
+        ]);
+        $idOc = (int)$pdo->lastInsertId();
+        if (in_array($status, ['E', 'R'], true)) {
+            $stmtTr->execute([$idOc, 3, 'Vitor Leon', 'E', 'Ocorrencia recebida e em analise pela equipe responsavel.', dataRelativa(-100 + ($i % 120))]);
+        }
+        if ($status === 'R') {
+            $stmtTr->execute([$idOc, 3, 'Vitor Leon', 'R', 'Problema solucionado e ocorrencia encerrada.', dataRelativa(-90 + ($i % 120))]);
+        }
+        if ($status === 'C') {
+            $stmtTr->execute([$idOc, $idsAtivos[$i % count($idsAtivos)], 'Morador', 'C', 'Ocorrencia cancelada pelo solicitante.', dataRelativa(-95 + ($i % 120))]);
+        }
+        if ($status !== 'A') {
+            $stmtNot->execute([$idOc, $idsAtivos[$i % count($idsAtivos)], $i % 2, dataRelativa(-90 + ($i % 120))]);
+        }
+    }
+
+    $stmtAviso = $pdo->prepare("INSERT INTO avisos (titulo, mensagem, id_user_cad, status, created_at) VALUES (?,?,?,?,?)");
+    for ($i = 1; $i <= 36; $i++) {
+        $stmtAviso->execute([
+            'Comunicado condominial',
+            'Aviso sobre rotina, manutencao ou uso das areas comuns do condominio.',
+            ($i % 2 === 0) ? 3 : 4,
+            ($i % 9 === 0) ? 'I' : 'A',
+            dataRelativa(-90 + $i),
+        ]);
+    }
+
+    $stmtAss = $pdo->prepare("INSERT INTO assembleias (titulo, data, hora, local, pauta, id_user_cad, status, created_at) VALUES (?,?,?,?,?,?,?,?)");
+    $stmtPres = $pdo->prepare("INSERT INTO assembleias_presencas (id_assembleia, id_user, presenca, created_at) VALUES (?,?,?,?)");
+    for ($i = 0; $i < 8; $i++) {
+        $data = (new DateTime('2026-06-06'))->modify(($i - 4) . ' months')->format('Y-m-d');
+        $stmtAss->execute([
+            'Assembleia condominial',
+            $data,
+            '19:30:00',
+            'Salao de Festas Principal',
+            'Prestacao de contas, melhorias e assuntos gerais.',
+            3,
+            ($i === 1) ? 'I' : 'A',
+            $data . ' 10:00:00',
+        ]);
+        $idAss = (int)$pdo->lastInsertId();
+        foreach (array_slice($idsAtivos, 0, 240) as $idx => $moradorId) {
+            $presenca = ($idx % 5 === 0) ? 'N' : (($idx % 3 === 0) ? 'P' : 'S');
+            $stmtPres->execute([$idAss, $moradorId, $presenca, $data . ' 20:00:00']);
+        }
+    }
+
+    $stmtAudit = $pdo->prepare("INSERT INTO auditoria (id_user, acao, entidade, entidade_id, descricao, ip, created_at) VALUES (?,?,?,?,?,?,?)");
+    $acoes = ['VISUALIZAR_CPF', 'ALTERAR_STATUS', 'ALTERAR_PRIVILEGIO', 'ACEITAR_CADASTRO', 'RECUSAR_CADASTRO', 'ALTERAR_UNIDADE'];
+    for ($i = 0; $i < 150; $i++) {
+        $stmtAudit->execute([
+            ($i % 2 === 0) ? 1 : 3,
+            $acoes[$i % count($acoes)],
+            'morador',
+            $idsMoradores[$i % count($idsMoradores)],
+            'Registro de auditoria gerado pelo seed para demonstracao LGPD.',
+            '127.0.0.1',
+            dataRelativa(-60 + ($i % 50)),
+        ]);
+    }
+
+    $pdo->commit();
+
+    echo "Locais: " . count($idsLocais) . "\n";
+    echo "Veiculos: {$veiculos}\n";
+    echo "Reservas: 1000\n";
+    echo "Lancamentos financeiros: {$totalLancamentos}\n";
+    echo "Ocorrencias: 300\n";
+    echo "Avisos: 36\n";
+    echo "Assembleias: 8\n";
+    echo "Auditoria: 150\n";
+    echo "\nSeed concluido com sucesso.\n";
+    echo "Admin: 00000000000 / 123456\n";
+    echo "Porteiro: 11111111111 / 123456\n";
     echo "</pre>";
-} catch (Exception $e) {
-    echo "<pre style='color:red'>Erro: " . $e->getMessage() . "</pre>";
+} catch (Throwable $e) {
+    if (isset($pdo) && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+    if (isset($pdo)) {
+        $pdo->exec('SET FOREIGN_KEY_CHECKS = 1');
+    }
+    echo "<pre style='color:red'>Erro no seed: " . htmlspecialchars($e->getMessage()) . "</pre>";
 }

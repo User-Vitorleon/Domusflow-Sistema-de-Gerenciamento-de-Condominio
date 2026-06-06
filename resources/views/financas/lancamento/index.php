@@ -149,9 +149,9 @@ $baseLancamentos = BASE_URL . '/financeiro/lancamento?' . ($queryLancamentos ? $
                 <label>Status</label>
                 <select id="filtroStatus" name="status">
                     <option value="">Todos</option>
-                    <option value="P" <?= ($_GET['status'] ?? '') === 'P' ? 'selected' : '' ?>>Pendente</option>
-                    <option value="F" <?= ($_GET['status'] ?? '') === 'F' ? 'selected' : '' ?>>Fatura Gerada</option>
-                    <option value="G" <?= ($_GET['status'] ?? '') === 'G' ? 'selected' : '' ?>>Pago</option>
+                    <option value="A" <?= ($_GET['status'] ?? '') === 'A' ? 'selected' : '' ?>>Fatura Gerada</option>
+                    <option value="P" <?= ($_GET['status'] ?? '') === 'P' ? 'selected' : '' ?>>Pago</option>
+                    <option value="C" <?= ($_GET['status'] ?? '') === 'C' ? 'selected' : '' ?>>Cancelado</option>
                     <option value="atraso" <?= ($_GET['status'] ?? '') === 'atraso' ? 'selected' : '' ?>>Em Atraso</option>
                 </select>
             </div>
@@ -203,19 +203,19 @@ $baseLancamentos = BASE_URL . '/financeiro/lancamento?' . ($queryLancamentos ? $
                     </thead>
                     <tbody id="tabelaLancamentos">
                         <?php foreach ($lancamentos as $l):
+                            $vencido = strtotime($l['data_vencimento']) < strtotime('today') && $l['status'] === 'A';
                             $corStatus = match($l['status']) {
-                                'P' => ['#CA8A04', '#FFFBEB', '#FDE68A'],
-                                'F' => ['#16A34A', '#F0FDF4', '#BBF7D0'],
-                                'G' => ['#2563EB', '#EFF6FF', '#BFDBFE'],
+                                'A' => $vencido ? ['#DC2626', '#FEF2F2', '#FECACA'] : ['#CA8A04', '#FFFBEB', '#FDE68A'],
+                                'P' => ['#16A34A', '#F0FDF4', '#BBF7D0'],
+                                'C' => ['#6B7280', '#F9FAFB', '#E5E7EB'],
                                 default => ['#6B7280', '#F9FAFB', '#E5E7EB']
                             };
                             $textoStatus = match($l['status']) {
-                                'P' => 'Pendente',
-                                'F' => 'Fatura Gerada',
-                                'G' => 'Pago',
+                                'A' => $vencido ? 'Em Atraso' : 'Fatura Gerada',
+                                'P' => 'Pago',
+                                'C' => 'Cancelado',
                                 default => $l['status']
                             };
-                            $vencido = strtotime($l['data_vencimento']) < strtotime('today') && $l['status'] === 'P';
                             $corModelo = strtoupper($l['modelo']) === 'TAXA' ? '#2563EB' : '#DC2626';
                             $dtLanc = $l['data_lancamento'] ?? null;
                         ?>
@@ -263,7 +263,7 @@ $baseLancamentos = BASE_URL . '/financeiro/lancamento?' . ($queryLancamentos ? $
                                 </td>
                                 <?php if (in_array($privilegio, [2, 4])): ?>
                                 <td class="text-center">
-                                    <?php if ($l['status'] !== 'G'): ?>
+                                    <?php if ($l['status'] === 'A'): ?>
                                     <form action="<?= BASE_URL ?>/financeiro/lancamento/excluir" method="POST"
                                           class="fin-delete-form js-confirm-delete-lancamento">
                                         <input type="hidden" name="id_lancamento" value="<?= $l['id_lancamento'] ?>">

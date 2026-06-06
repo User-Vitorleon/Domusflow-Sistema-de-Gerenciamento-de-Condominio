@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../helpers/CryptoHelper.php';
+
 class MoradorRepository
 {
     private PDO $pdo;
@@ -13,7 +15,14 @@ class MoradorRepository
     {
         $stmt = $this->pdo->prepare("SELECT * FROM morador WHERE id_user = :id LIMIT 1");
         $stmt->execute([':id' => $id]);
-        return $stmt->fetch() ?: null;
+        return $this->descriptografarMorador($stmt->fetch() ?: null);
+    }
+
+    public function findByUuid(string $uuid): ?array
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM morador WHERE uuid = :uuid LIMIT 1");
+        $stmt->execute([':uuid' => $uuid]);
+        return $this->descriptografarMorador($stmt->fetch() ?: null);
     }
 
     public function findAtivos(): array
@@ -21,57 +30,76 @@ class MoradorRepository
         $stmt = $this->pdo->query(
             "SELECT * FROM morador WHERE status = 'L' AND privilegio = 1"
         );
-        return $stmt->fetchAll();
+        return $this->descriptografarLista($stmt->fetchAll());
     }
 
     public function findTodos(): array
     {
         $stmt = $this->pdo->query("SELECT * FROM morador WHERE status != 'B' ORDER BY nome ASC");
-        return $stmt->fetchAll();
+        return $this->descriptografarLista($stmt->fetchAll());
     }
 
     public function findByCpf(string $cpf): ?array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM morador WHERE cpf = :cpf LIMIT 1");
-        $stmt->execute([':cpf' => $cpf]);
-        return $stmt->fetch() ?: null;
+        $stmt = $this->pdo->prepare("SELECT * FROM morador WHERE cpf_hash = :cpf_hash LIMIT 1");
+        $stmt->execute([':cpf_hash' => CryptoHelper::hashCpf($cpf)]);
+        return $this->descriptografarMorador($stmt->fetch() ?: null);
     }
 
     public function existeCpf(string $cpf): bool
     {
-        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM morador WHERE cpf = :cpf");
-        $stmt->execute([':cpf' => $cpf]);
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM morador WHERE cpf_hash = :cpf_hash");
+        $stmt->execute([':cpf_hash' => CryptoHelper::hashCpf($cpf)]);
         return (int)$stmt->fetchColumn() > 0;
     }
 
     public function existeEmail(string $email): bool
     {
-        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM morador WHERE email = :email");
-        $stmt->execute([':email' => $email]);
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM morador WHERE email_hash = :email_hash");
+        $stmt->execute([':email_hash' => CryptoHelper::hashEmail($email)]);
         return (int)$stmt->fetchColumn() > 0;
     }
 
     public function existeEmailParaOutro(string $email, int $idAtual): bool{
-        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM morador WHERE email = :email AND id_user != :id");
-        $stmt->execute([':email' => $email, ':id' => $idAtual]);
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM morador WHERE email_hash = :email_hash AND id_user != :id");
+        $stmt->execute([':email_hash' => CryptoHelper::hashEmail($email), ':id' => $idAtual]);
         return (int)$stmt->fetchColumn() > 0;
+    }
+
+    public function existeMoradorAtivoNaUnidade(string $apto, string $bloco, int $ignorarId = 0): bool
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT COUNT(*)
+            FROM morador
+            WHERE status = 'L'
+              AND privilegio IN (1, 2)
+              AND apto = :apto
+              AND bloco = :bloco
+              AND id_user != :ignorar_id
+        ");
+        $stmt->execute([
+            ':apto'       => $apto,
+            ':bloco'      => $bloco,
+            ':ignorar_id' => $ignorarId,
+        ]);
+        return (int) $stmt->fetchColumn() > 0;
     }
 
     public function findPendentes(): array
     {
         $stmt = $this->pdo->query("
-            SELECT id_user, nome, apto, bloco, cpf, created_at
+            SELECT id_user, uuid, nome, apto, bloco, cpf, created_at
             FROM morador
             WHERE status = 'P'
             ORDER BY nome ASC
         ");
-        return $stmt->fetchAll();
+        return $this->descriptografarLista($stmt->fetchAll());
     }
 
     public function findPendentesComFiltros(array $filtros, int $limit, int $offset): array
     {
         $sql = "
-            SELECT id_user, nome, apto, bloco, cpf, created_at, privilegio
+            SELECT id_user, uuid, nome, apto, bloco, cpf, created_at, privilegio
             FROM morador
             WHERE status = 'P'
         ";
@@ -81,7 +109,7 @@ class MoradorRepository
 
         $colunasPermitidas = [
             'nome'  => 'nome',
-            'cpf'   => 'cpf',
+            'cpf'   => 'nome',
             'bloco' => 'bloco',
         ];
 
@@ -98,7 +126,7 @@ class MoradorRepository
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 
         $stmt->execute();
-        return $stmt->fetchAll();
+        return $this->descriptografarLista($stmt->fetchAll());
     }
 
     public function countPendentesComFiltros(array $filtros): int
@@ -136,8 +164,11 @@ class MoradorRepository
             $bindings[':apto'] = '%' . $filtros['apto'] . '%';
         }
         if (!empty($filtros['cpf'])) {
-            $sql .= ' AND cpf LIKE :cpf';
-            $bindings[':cpf'] = '%' . $filtros['cpf'] . '%';
+            $cpf = preg_replace('/\D/', '', $filtros['cpf']);
+            $sql .= strlen($cpf) === 11 ? ' AND cpf_hash = :cpf_hash' : ' AND 1 = 0';
+            if (strlen($cpf) === 11) {
+                $bindings[':cpf_hash'] = CryptoHelper::hashCpf($cpf);
+            }
         }
         if (!empty($filtros['data_solicitacao'])) {
             $sql .= ' AND DATE(created_at) = :data_solicitacao';
@@ -156,20 +187,22 @@ class MoradorRepository
     {
         $stmt = $this->pdo->prepare(
             "INSERT INTO morador
-                (identificador, nome, apto, bloco, cpf, email, telefone, tell_recado, senha, status, privilegio)
+                (uuid, nome, apto, bloco, cpf, cpf_hash, email, email_hash, telefone, tell_recado, senha, status, privilegio)
              VALUES
-                (:iden, :nome, :apto, :bloco, :cpf, :email, :cell, :recado, :senha, :status, :privilegio)"
+                (:uuid, :nome, :apto, :bloco, :cpf, :cpf_hash, :email, :email_hash, :cell, :recado, :senha, :status, :privilegio)"
         );
 
         $sucesso = $stmt->execute([
-            ':iden'   => 1,
+            ':uuid'   => self::gerarUuid(),
             ':nome'   => $data['nome'],
             ':apto'   => $data['apto'],
             ':bloco'  => $data['bloco'],
-            ':cpf'    => $data['cpf'],
-            ':email'  => $data['email'],
-            ':cell'   => $data['telefone'],
-            ':recado' => $data['telefone_recado'] ?? null,
+            ':cpf'    => CryptoHelper::encrypt($data['cpf']),
+            ':cpf_hash' => CryptoHelper::hashCpf($data['cpf']),
+            ':email'  => CryptoHelper::encrypt($data['email']),
+            ':email_hash' => CryptoHelper::hashEmail($data['email']),
+            ':cell'   => CryptoHelper::encrypt($data['telefone']),
+            ':recado' => CryptoHelper::encrypt($data['telefone_recado'] ?? null),
             ':senha'  => $data['senha'],
             ':status' => 'P',
             ':privilegio' => (int) ($data['privilegio'] ?? 1),
@@ -218,29 +251,30 @@ class MoradorRepository
     public function findAll(): array
     {
         $stmt = $this->pdo->query("SELECT * FROM morador ORDER BY nome ASC");
-        return $stmt->fetchAll();
+        return $this->descriptografarLista($stmt->fetchAll());
     }
 
     public function atualizarDados(array $update): bool
     {
         $params = [
             ':nome'        => $update['nome'],
-            ':email'       => $update['email'],
+            ':email'       => CryptoHelper::encrypt($update['email']),
+            ':email_hash'  => CryptoHelper::hashEmail($update['email']),
             ':apto'        => $update['apto'],
             ':bloco'       => $update['bloco'],
-            ':telefone'    => $update['telefone'],
-            ':tell_recado' => $update['tell_recado'],
+            ':telefone'    => CryptoHelper::encrypt($update['telefone']),
+            ':tell_recado' => CryptoHelper::encrypt($update['tell_recado']),
             ':id'          => $update['id'],
         ];
 
         if (empty($update['senha'])) {
             $sql = "UPDATE morador
-                    SET nome = :nome, email = :email, apto = :apto, bloco = :bloco,
+                    SET nome = :nome, email = :email, email_hash = :email_hash, apto = :apto, bloco = :bloco,
                         telefone = :telefone, tell_recado = :tell_recado
                     WHERE id_user = :id";
         } else {
             $sql = "UPDATE morador
-                    SET nome = :nome, email = :email, apto = :apto, bloco = :bloco,
+                    SET nome = :nome, email = :email, email_hash = :email_hash, apto = :apto, bloco = :bloco,
                         telefone = :telefone, tell_recado = :tell_recado, senha = :senha
                     WHERE id_user = :id";
             $params[':senha'] = $update['senha'];
@@ -255,20 +289,36 @@ class MoradorRepository
         $stmt = $this->pdo->prepare(
             "UPDATE morador SET
                 nome        = :nome,
+                cpf         = :cpf,
+                cpf_hash    = :cpf_hash,
                 email       = :email,
+                email_hash  = :email_hash,
                 apto        = '***',
                 bloco       = '***',
-                telefone    = '***',
-                tell_recado = '***',
+                telefone    = :telefone,
+                tell_recado = :tell_recado,
                 senha       = '***',
                 status      = 'E'
              WHERE id_user = :id"
         );
         return $stmt->execute([
             ':nome'  => '***' . $id,
-            ':email' => '***' . $id . '@deletado.com',
+            ':cpf'   => CryptoHelper::encrypt('***' . $id),
+            ':cpf_hash' => CryptoHelper::hashLookup('cpf-deletado-' . $id),
+            ':email' => CryptoHelper::encrypt('***' . $id . '@deletado.com'),
+            ':email_hash' => CryptoHelper::hashLookup('email-deletado-' . $id),
+            ':telefone' => CryptoHelper::encrypt('***'),
+            ':tell_recado' => CryptoHelper::encrypt('***'),
             ':id'    => $id,
         ]);
+    }
+
+    private static function gerarUuid(): string
+    {
+        $bytes = random_bytes(16);
+        $bytes[6] = chr((ord($bytes[6]) & 0x0f) | 0x40);
+        $bytes[8] = chr((ord($bytes[8]) & 0x3f) | 0x80);
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($bytes), 4));
     }
 
     public function contarPorStatus(): array
@@ -303,6 +353,18 @@ class MoradorRepository
         ]);
     }
 
+    public function atualizarUnidade(int $id, string $apto, string $bloco): bool
+    {
+        $stmt = $this->pdo->prepare(
+            "UPDATE morador SET apto = :apto, bloco = :bloco WHERE id_user = :id"
+        );
+        return $stmt->execute([
+            ':apto'  => $apto,
+            ':bloco' => $bloco,
+            ':id'    => $id,
+        ]);
+    }
+
     public function findTodosComFiltros(array $filtros, ?int $limit = null, int $offset = 0): array{
         $params = $this->montarFiltrosTodos($filtros);
         $sql    = "SELECT * FROM morador WHERE 1=1" . $params['sql'] . ' ORDER BY nome ASC';
@@ -320,7 +382,7 @@ class MoradorRepository
             $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         }
         $stmt->execute();
-        return $stmt->fetchAll();
+        return $this->descriptografarLista($stmt->fetchAll());
     }
 
     public function countTodosComFiltros(array $filtros): int
@@ -367,6 +429,26 @@ class MoradorRepository
     public function atualizarSenha(int $id, string $senhaHash): bool{
         $stmt = $this->pdo->prepare("UPDATE morador SET senha = :senha WHERE id_user = :id");
         return $stmt->execute([':senha' => $senhaHash, ':id' => $id]);
+    }
+
+    private function descriptografarMorador(?array $morador): ?array
+    {
+        if (!$morador) {
+            return null;
+        }
+
+        foreach (['cpf', 'email', 'telefone', 'tell_recado'] as $campo) {
+            if (array_key_exists($campo, $morador)) {
+                $morador[$campo] = CryptoHelper::decrypt($morador[$campo]);
+            }
+        }
+
+        return $morador;
+    }
+
+    private function descriptografarLista(array $moradores): array
+    {
+        return array_map(fn ($morador) => $this->descriptografarMorador($morador), $moradores);
     }
 
 }

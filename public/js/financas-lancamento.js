@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.js-confirm-delete-lancamento').forEach((form) => {
         form.addEventListener('submit', (event) => {
-            if (!confirm('Deseja excluir este lancamento?')) {
+            if (!confirm('Deseja cancelar este lancamento?')) {
                 event.preventDefault();
             }
         });

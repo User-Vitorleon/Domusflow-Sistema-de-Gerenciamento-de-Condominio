@@ -18,6 +18,7 @@ $routes = [
     'cadastro/update/salvar'             => ['MoradorController',    'updateSalvar'],
     'moradores/pendentes'                => ['MoradorController',    'pendentes'],
     'moradores/liberar'                  => ['MoradorController',    'liberar'],
+    'moradores/cpf'                      => ['MoradorController',    'cpf'],
     'moradores/inativar'                 => ['MoradorController',    'inativar'],
     'moradores/deletar'                  => ['MoradorController',    'deletar'],
     'moradores/gestao'                   => ['MoradorController',    'gestao'],

@@ -98,6 +98,12 @@ body {
     gap: 12px;
 }
 
+.cad-unidade-note {
+    margin: -4px 0 14px;
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
 /* 10. CAMPOS — fontes maiores, padding compacto */
 .cad-form .df-field {
     margin-bottom: 0;

@@ -11,7 +11,7 @@
 <div class="boleto-actions">
     <a href="<?= BASE_URL ?>/financeiro/historico" class="btn-voltar">← Voltar</a>
     <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
-    <?php if ($lancamento['status'] === 'F'): ?>
+    <?php if ($lancamento['status'] === 'A'): ?>
         <form action="<?= BASE_URL ?>/financeiro/pagar" method="POST"
               onsubmit="return confirm('Confirma o pagamento deste boleto?')">
             <input type="hidden" name="id_lancamento" value="<?= $lancamento['id_lancamento'] ?>">

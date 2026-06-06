@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../helpers/CryptoHelper.php';
+
 class FinancasRepository
 {
     private PDO $pdo;
@@ -140,7 +142,7 @@ class FinancasRepository
 
     public function excluirLancamento(int $id): bool
     {
-        $stmt = $this->pdo->prepare("DELETE FROM lancamentos WHERE id_lancamento = :id AND status != 'G'");
+        $stmt = $this->pdo->prepare("UPDATE lancamentos SET status = 'C' WHERE id_lancamento = :id AND status != 'P'");
         return $stmt->execute([':id' => $id]);
     }
 
@@ -216,7 +218,7 @@ class FinancasRepository
         }
 
         if ($atraso === '1' || $status === 'atraso') {
-            $where .= " AND l.data_vencimento < CURDATE() AND l.status = 'P'";
+            $where .= " AND l.data_vencimento < CURDATE() AND l.status = 'A'";
         }
 
         if ($dtLanc !== '') {
@@ -238,7 +240,7 @@ class FinancasRepository
             INSERT INTO lancamentos
                 (modelo, valor, descricao, id_user, data_vencimento, status, data_lancamento, id_user_cad)
             VALUES
-                (:modelo, :valor, :descricao, :id_user, :data_venc, 'F', :data_lanc, :id_user_cad)
+                (:modelo, :valor, :descricao, :id_user, :data_venc, 'A', :data_lanc, :id_user_cad)
         ");
         return $stmt->execute([
             ':modelo'      => $dados['modelo'],
@@ -259,7 +261,7 @@ class FinancasRepository
             WHERE modelo    = :modelo
               AND descricao = :descricao
               AND id_user   = :id_user
-              AND status    = 'P'
+              AND status    = 'A'
               AND MONTH(data_vencimento) = MONTH(:data_venc1)
               AND YEAR(data_vencimento)  = YEAR(:data_venc2)
         ");
@@ -276,7 +278,7 @@ class FinancasRepository
     public function historico(int $id): array
     {
         $stmt = $this->pdo->prepare(
-            "SELECT * FROM lancamentos WHERE id_user = :id AND status IN ('F', 'G')"
+            "SELECT * FROM lancamentos WHERE id_user = :id AND status IN ('A', 'P')"
         );
         $stmt->execute([':id' => $id]);
         return $stmt->fetchAll();
@@ -304,8 +306,8 @@ class FinancasRepository
 
         $stmt2 = $this->pdo->prepare("
             UPDATE lancamentos
-            SET id_fatura = :id_fatura, status = 'F'
-            WHERE id_user = :id_user AND status = 'P'
+            SET id_fatura = :id_fatura
+            WHERE id_user = :id_user AND status = 'A'
         ");
         $stmt2->execute([
             ':id_fatura' => $idFatura,
@@ -342,8 +344,8 @@ class FinancasRepository
     $idFatura = (int)$this->pdo->lastInsertId();
 
     $stmt2 = $this->pdo->prepare("
-        UPDATE lancamentos SET id_fatura = :id_fatura, status = 'F'
-        WHERE id_lancamento = :id_lancamento AND status = 'P'
+        UPDATE lancamentos SET id_fatura = :id_fatura
+        WHERE id_lancamento = :id_lancamento AND status = 'A'
     ");
     $stmt2->execute([
         ':id_fatura'     => $idFatura,
@@ -359,7 +361,7 @@ class FinancasRepository
             SELECT COALESCE(SUM(valor), 0)
             FROM lancamentos
             WHERE id_user = :id_user
-              AND status = 'P'
+              AND status = 'A'
         ");
         $stmt->execute([':id_user' => $idUser]);
         return (float)$stmt->fetchColumn();
@@ -368,9 +370,9 @@ class FinancasRepository
     public function marcarComoPago(int $idLancamento): bool{
         $stmt = $this->pdo->prepare("
             UPDATE lancamentos
-            SET status = 'G'
+            SET status = 'P'
             WHERE id_lancamento = :id
-            AND status = 'F'
+            AND status = 'A'
         ");
         return $stmt->execute([':id' => $idLancamento]);
     }
@@ -380,7 +382,7 @@ class FinancasRepository
             SELECT descricao, valor, data_vencimento
             FROM lancamentos
             WHERE id_user = :id
-            AND status = 'F'
+            AND status = 'A'
             AND data_vencimento BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL :dias DAY)
             ORDER BY data_vencimento ASC
         ");
@@ -397,14 +399,18 @@ class FinancasRepository
             LIMIT 1
         ");
         $stmt->execute([':id' => $id]);
-        return $stmt->fetch() ?: null;
+        $lancamento = $stmt->fetch() ?: null;
+        if ($lancamento && array_key_exists('cpf', $lancamento)) {
+            $lancamento['cpf'] = CryptoHelper::decrypt($lancamento['cpf']);
+        }
+        return $lancamento;
     }
 
     public function totalGeralPendente(): float{
         $stmt = $this->pdo->query("
             SELECT COALESCE(SUM(valor), 0)
             FROM lancamentos
-            WHERE status = 'P' AND id_fatura IS NULL
+            WHERE status = 'A'
         ");
         return (float)$stmt->fetchColumn();
     }
@@ -413,7 +419,7 @@ class FinancasRepository
         $stmt = $this->pdo->query("
             SELECT COUNT(id_lancamento)
             FROM lancamentos
-            WHERE status = 'P' AND id_fatura IS NULL
+            WHERE status = 'A'
         ");
         return (int)$stmt->fetchColumn();
     }
@@ -427,7 +433,7 @@ class FinancasRepository
         $stmt = $this->pdo->query("
             SELECT COUNT(DISTINCT id_user)
             FROM lancamentos
-            WHERE status = 'P' AND id_fatura IS NULL
+            WHERE status = 'A'
         ");
         return (int)$stmt->fetchColumn();
     }
