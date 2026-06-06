@@ -255,6 +255,62 @@
 .gestao-acoes-cell {
     width: 240px;
     min-width: 240px;
+    padding: 10px 14px;
+}
+
+.gestao-filtros-card {
+    margin-bottom: 20px;
+}
+
+.gestao-filtro-field {
+    margin: 0;
+}
+
+.gestao-filtros-actions {
+    padding-bottom: 1px;
+}
+
+.gestao-table-wrap {
+    overflow-x: auto;
+}
+
+.gestao-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.gestao-table th,
+.gestao-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+}
+
+.gestao-table th,
+.gestao-nowrap {
+    white-space: nowrap;
+}
+
+.gestao-perfil-form {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.gestao-perfil-select {
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.gestao-perfil-save {
+    padding: 4px 12px;
+    font-size: 12px;
+    white-space: nowrap;
 }
 
 .pendentes-page .page-header {
@@ -276,6 +332,19 @@
 .pendentes-lista {
     padding: 0;
     overflow: hidden;
+    width: 100%;
+}
+
+.pendentes-table-wrap {
+    overflow-x: auto;
+    width: 100%;
+}
+
+.pendentes-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    table-layout: auto;
 }
 
 .pendentes-table th,
@@ -285,6 +354,21 @@
     text-align: left;
     vertical-align: middle;
     white-space: nowrap;
+}
+
+.pendentes-table th:first-child,
+.pendentes-table td:first-child {
+    width: 34%;
+}
+
+.pendentes-table th:nth-child(2),
+.pendentes-table td:nth-child(2) {
+    width: 18%;
+}
+
+.pendentes-table th:last-child,
+.pendentes-table td:last-child {
+    width: 160px;
 }
 
 .pendentes-table thead th {
@@ -597,8 +681,17 @@
     }
 
     .pendentes-acoes-cell {
-        width: 92px;
-        min-width: 92px;
+        width: 150px;
+        min-width: 150px;
+    }
+
+    .pendentes-table {
+        min-width: 760px;
+    }
+
+    .pendentes-table th,
+    .pendentes-table td {
+        padding: 10px 12px;
     }
 }
 

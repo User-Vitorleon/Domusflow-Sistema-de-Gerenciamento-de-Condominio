@@ -49,15 +49,17 @@ $cores = [
                 <?php if ($privilegio == 1): ?>
                     <div class="veiculo-counter">
                         <div class="veiculo-counter-bar">
-                            <div class="veiculo-counter-dot <?= count($veiculos) >= 1 ? 'usado' : '' ?>"></div>
-                            <div class="veiculo-counter-dot <?= count($veiculos) >= 2 ? 'usado' : '' ?>"></div>
+                            <?php for ($i = 1; $i <= $limiteVeiculosMorador; $i++): ?>
+                                <div class="veiculo-counter-dot <?= $totalVeiculosMorador >= $i ? 'usado' : '' ?>"></div>
+                            <?php endfor; ?>
                         </div>
-                        <?= count($veiculos) ?>/2 veículos cadastrados
+                        <?= $totalVeiculosMorador ?>/<?= $limiteVeiculosMorador ?> veículos cadastrados
                     </div>
                 <?php endif; ?>
 
                 <form action="<?= BASE_URL ?>/veiculo/salvar" method="POST"
-                    data-total="<?= count($veiculos) ?>"
+                    data-total="<?= $privilegio == 1 ? $totalVeiculosMorador : count($veiculos) ?>"
+                    data-limite="<?= $limiteVeiculosMorador ?>"
                     data-prev="<?= $privilegio ?>">
 
                     <div class="df-grid-2">
@@ -148,6 +150,11 @@ $cores = [
                         <input type="text" name="apto" placeholder="Ex: 101"
                             value="<?= htmlspecialchars($filtrosVeiculos['apto'] ?? '') ?>">
                     </div>
+                    <div class="df-field">
+                        <label>Data cadastro</label>
+                        <input type="date" name="data_cadastro"
+                            value="<?= htmlspecialchars($filtrosVeiculos['data_cadastro'] ?? '') ?>">
+                    </div>
                     <div class="veiculo-filtros-actions">
                         <button type="submit" class="btn-primary">Filtrar</button>
                         <a href="<?= BASE_URL ?>/veiculo" class="btn-ghost">Limpar</a>
@@ -167,52 +174,71 @@ $cores = [
                         <thead>
                             <tr>
                                 <th>Placa</th>
-                                <th>Marca</th>
-                                <th>Modelo</th>
+                                <th>Veículo</th>
                                 <th>Cor</th>
-                                <th>Principal</th>
                                 <?php if (in_array($privilegio, [2, 3, 4])): ?>
                                     <th>Morador</th>
-                                    <th>Bloco</th>
-                                    <th>Apto</th>
-                                    <th>Cadastrado por</th>
+                                    <th>Unidade</th>
+                                    <th>Cadastro</th>
+                                <?php else: ?>
+                                    <th>Status</th>
+                                    <th>Data cadastro</th>
                                 <?php endif; ?>
-                                <th></th>
+                                <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php foreach ($veiculos as $v): ?>
                                 <tr>
+                                    <td><strong><?= htmlspecialchars($v['placa']) ?></strong></td>
                                     <td>
-                                        <strong><?= htmlspecialchars($v['placa']) ?></strong>
+                                        <strong><?= htmlspecialchars($v['marca']) ?></strong>
+                                        <small class="veiculo-subinfo"><?= htmlspecialchars($v['modelo']) ?></small>
                                     </td>
-                                    <td><?= htmlspecialchars($v['marca']) ?></td>
-                                    <td><?= htmlspecialchars($v['modelo']) ?></td>
                                     <td><?= htmlspecialchars($v['cor']) ?></td>
-                                        <td>           
+                                    <?php if (in_array($privilegio, [2, 3, 4])): ?>
+                                        <td>
+                                            <?= htmlspecialchars($v['nome_morador']) ?>
                                             <?php if ($v['principal']): ?>
-                                                <span class="perfil-badge-sindico">⭐Principal</span>
+                                                <small class="veiculo-subinfo veiculo-principal-label">Principal</small>
                                             <?php endif; ?>
                                         </td>
-                                        <?php if (in_array($privilegio, [2, 3, 4])): ?>
-                                            <td><?= htmlspecialchars($v['nome_morador']) ?></td>
-                                            <td><?= htmlspecialchars($v['bloco'] ?? '-') ?></td>
-                                            <td><?= htmlspecialchars($v['apto'] ?? '-') ?></td>
-                                            <td><?= htmlspecialchars($v['cadastrado_por']) ?></td>
-                                        <?php endif; ?>
+                                        <td>Bl <?= htmlspecialchars($v['bloco'] ?? '-') ?> &middot; Ap <?= htmlspecialchars($v['apto'] ?? '-') ?></td>
                                         <td>
+                                            <?= !empty($v['created_at']) ? date('d/m/Y', strtotime($v['created_at'])) : '-' ?>
+                                            <small class="veiculo-subinfo">por <?= htmlspecialchars($v['cadastrado_por']) ?></small>
+                                        </td>
+                                    <?php else: ?>
+                                        <td>
+                                            <?php if ($v['principal']): ?>
+                                                <span class="perfil-badge-sindico">Principal</span>
+                                            <?php else: ?>
+                                                <span class="veiculo-muted">-</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td><?= !empty($v['created_at']) ? date('d/m/Y', strtotime($v['created_at'])) : '-' ?></td>
+                                    <?php endif; ?>
+                                    <td>
                                         <?php
-
-                                        $podeExcluir = in_array($privilegio, [2, 4]) ||
-                                            ($privilegio == 1 && $v['id_user'] == $usuario['id_user']);
-                                        ?>
-                                        <?php if ($podeExcluir): ?>
-                                            <form action="<?= BASE_URL ?>/veiculo/excluir" method="POST"
-                                                onsubmit="return confirm('Excluir o veículo <?= htmlspecialchars($v['placa']) ?>?')">
-                                                <input type="hidden" name="id_veiculo" value="<?= $v['id_veiculo'] ?>">
-                                                <button type="submit" class="btn-danger-sm">Excluir</button>
-                                            </form>
-                                        <?php endif; ?>
+$podeExcluir = in_array($privilegio, [2, 4]) ||
+    ($privilegio == 1 && $v['id_user'] == $usuario['id_user']);
+$podeAlterarPrincipal = $podeExcluir;
+?>
+                                        <div class="veiculo-row-actions">
+                                            <?php if ($podeAlterarPrincipal && !$v['principal']): ?>
+                                                <form action="<?= BASE_URL ?>/veiculo/principal" method="POST">
+                                                    <input type="hidden" name="id_veiculo" value="<?= $v['id_veiculo'] ?>">
+                                                    <button type="submit" class="btn-ghost veiculo-action-btn">Principal</button>
+                                                </form>
+                                            <?php endif; ?>
+                                            <?php if ($podeExcluir): ?>
+                                                <form action="<?= BASE_URL ?>/veiculo/excluir" method="POST"
+                                                    onsubmit="return confirm('Excluir o veículo <?= htmlspecialchars($v['placa']) ?>?')">
+                                                    <input type="hidden" name="id_veiculo" value="<?= $v['id_veiculo'] ?>">
+                                                    <button type="submit" class="btn-danger-sm veiculo-action-btn">Excluir</button>
+                                                </form>
+                                            <?php endif; ?>
+                                        </div>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -251,3 +277,4 @@ $cores = [
 </main>
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>
+

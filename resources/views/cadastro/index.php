@@ -94,13 +94,13 @@ unset($_SESSION['erro_cadastro']);
                 </div>
             </div>
 
-            <div class="df-field" style="margin-top: 8px;">
-                <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: 13px;">
+            <div class="df-field cad-termos-field">
+                <label class="cad-termos-label">
                     <input type="checkbox" name="termos" id="termos" required
-                        style="width: 16px; height: 16px; margin-top: 2px; accent-color: var(--primary); flex-shrink: 0;">
+                        class="cad-termos-check">
                     <span>
                         Li e aceito os
-                        <a href="#" onclick="abrirTermos(); return false;" style="color: var(--primary); font-weight: 600;">
+                        <a href="#" class="cad-termos-link" data-termos-open>
                             Termos de Uso e Política de Privacidade
                         </a>
                         do DomusFlow.
@@ -164,54 +164,38 @@ unset($_SESSION['erro_cadastro']);
 
 </main>
 
-<div id="modalTermos" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
-    <div style="background:#fff; border-radius:16px; padding:32px; max-width:560px; width:90%; max-height:80vh; overflow-y:auto; position:relative;">
-        <button onclick="fecharTermos()" style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:22px; cursor:pointer; color:#6B7280;">✕</button>
+<div id="modalTermos" class="cad-termos-modal" aria-hidden="true">
+    <div class="cad-termos-dialog">
+        <button type="button" class="cad-termos-close" data-termos-close>✕</button>
 
-        <h3 style="margin-bottom:16px; font-size:18px; font-weight:700;">Termos de Uso — DomusFlow</h3>
+        <h3>Termos de Uso — DomusFlow</h3>
 
-        <div style="font-size:13px; color:#374151; line-height:1.7;">
-            <p style="margin-bottom:12px;"><strong>1. Aceitação dos Termos</strong><br>
+        <div class="cad-termos-content">
+            <p><strong>1. Aceitação dos Termos</strong><br>
             Ao se cadastrar no DomusFlow, você concorda com os presentes termos de uso e política de privacidade.</p>
 
-            <p style="margin-bottom:12px;"><strong>2. Uso do Sistema</strong><br>
+            <p><strong>2. Uso do Sistema</strong><br>
             O sistema é de uso exclusivo dos moradores, funcionários e gestores do condomínio. É proibido o uso indevido das funcionalidades disponíveis.</p>
 
-            <p style="margin-bottom:12px;"><strong>3. Dados Pessoais</strong><br>
+            <p><strong>3. Dados Pessoais</strong><br>
             Os dados cadastrados serão utilizados exclusivamente para a gestão condominial, em conformidade com a LGPD (Lei Geral de Proteção de Dados).</p>
 
-            <p style="margin-bottom:12px;"><strong>4. Responsabilidades</strong><br>
+            <p><strong>4. Responsabilidades</strong><br>
             O usuário é responsável pelas informações fornecidas e pela segurança de seu acesso. Não compartilhe sua senha com terceiros.</p>
 
-            <p style="margin-bottom:12px;"><strong>5. Aprovação de Cadastro</strong><br>
+            <p><strong>5. Aprovação de Cadastro</strong><br>
             O cadastro está sujeito à aprovação do síndico. O sistema se reserva o direito de recusar acessos que não atendam aos critérios do condomínio.</p>
 
             <p><strong>6. Alterações</strong><br>
             Estes termos podem ser atualizados a qualquer momento. O uso contínuo do sistema implica na aceitação das alterações.</p>
         </div>
 
-        <div style="margin-top:20px; display:flex; gap:10px; justify-content:flex-end;">
-            <button onclick="fecharTermos()" class="btn-ghost">Fechar</button>
-            <button onclick="aceitarTermos()" class="btn-primary">Aceitar e Fechar</button>
+        <div class="cad-termos-actions">
+            <button type="button" class="btn-ghost" data-termos-close>Fechar</button>
+            <button type="button" class="btn-primary" data-termos-accept>Aceitar e Fechar</button>
         </div>
     </div>
 </div>
 
-<script>
-function abrirTermos() {
-    document.getElementById('modalTermos').style.display = 'flex';
-}
-function fecharTermos() {
-    document.getElementById('modalTermos').style.display = 'none';
-}
-function aceitarTermos() {
-    document.getElementById('termos').checked = true;
-    fecharTermos();
-}
-
-document.getElementById('modalTermos').addEventListener('click', function(e) {
-    if (e.target === this) fecharTermos();
-});
-</script>
-
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>
+

@@ -1,10 +1,10 @@
 <?php
 require_once __DIR__ . '/../repositories/VeiculoRepository.php';
 require_once __DIR__ . '/../repositories/MoradorRepository.php';
+require_once __DIR__ . '/ParametrosService.php';
 
 class VeiculoService
 {
-    private const LIMITE_VEICULOS_MORADOR = 2;
     private const TAMANHO_MINIMO_PLACA    = 7;
 
     private VeiculoRepository $repo;
@@ -35,10 +35,11 @@ class VeiculoService
 
         if (($dono['privilegio'] ?? 1) == 1) {
             $total = $this->repo->countByUser($idDono);
-            if ($total >= self::LIMITE_VEICULOS_MORADOR) {
+            $limite = (new ParametrosService())->limiteVeiculosPorMorador();
+            if ($total >= $limite) {
                 return [
                     'sucesso'  => false,
-                    'mensagem' => 'Limite de ' . self::LIMITE_VEICULOS_MORADOR . ' veículos por morador atingido.',
+                    'mensagem' => 'Limite de ' . $limite . ' veiculos por morador atingido.',
                 ];
             }
         }
@@ -46,7 +47,7 @@ class VeiculoService
         $marca  = ucwords(strtolower(trim($dados['marca'])));
         $modelo = ucwords(strtolower(trim($dados['modelo'])));
 
-        $principal = !empty($dados['principal']) ? 1 : 0;
+        $principal = (!empty($dados['principal']) || $this->repo->countByUser($idDono) === 0) ? 1 : 0;
         if ($principal) {
             $this->repo->desmarcarPrincipal($idDono);
         }
@@ -88,6 +89,11 @@ class VeiculoService
         return $this->repo->findByUsuario($idUser);
     }
 
+    public function contarPorUsuario(int $idUser): int
+    {
+        return $this->repo->countByUser($idUser);
+    }
+
     public function consultarPorPlaca(string $placa): array
     {
         $placa   = $this->normalizarPlaca($placa);
@@ -124,9 +130,19 @@ class VeiculoService
         return ['sucesso' => true];
     }
 
-    public function definirPrincipal(int $idVeiculo, int $idUser): array
+    public function definirPrincipal(int $idVeiculo, int $privilegio, int $idUserLogado): array
     {
-        $this->repo->desmarcarPrincipal($idUser);
+        $veiculo = $this->repo->findById($idVeiculo);
+        if (!$veiculo) {
+            return ['sucesso' => false, 'mensagem' => 'Veiculo nao encontrado.'];
+        }
+
+        $podeAlterar = in_array($privilegio, [2, 4], true) || (int)$veiculo['id_user'] === $idUserLogado;
+        if (!$podeAlterar) {
+            return ['sucesso' => false, 'mensagem' => 'Voce nao tem permissao para alterar o veiculo principal.'];
+        }
+
+        $this->repo->desmarcarPrincipal((int)$veiculo['id_user']);
         $this->repo->marcarPrincipal($idVeiculo);
         return ['sucesso' => true];
     }
@@ -134,7 +150,7 @@ class VeiculoService
     public function excluir(int $id, int $privilegio, int $idUserLogado): array
     {
         if (in_array($privilegio, [2, 4])) {
-            $this->repo->delete($id);
+            $this->excluirEReorganizarPrincipal($id);
             return ['sucesso' => true];
         }
 
@@ -149,7 +165,7 @@ class VeiculoService
                     'mensagem' => 'Você não tem permissão para excluir este veículo.',
                 ];
             }
-            $this->repo->delete($id);
+            $this->excluirEReorganizarPrincipal($id);
             return ['sucesso' => true];
         }
 
@@ -163,4 +179,27 @@ class VeiculoService
     {
         return strtoupper(preg_replace('/[^A-Z0-9]/i', '', $placa));
     }
+
+    private function excluirEReorganizarPrincipal(int $id): void
+    {
+        $veiculo = $this->repo->findById($id);
+        if (!$veiculo) {
+            return;
+        }
+
+        $idDono = (int)$veiculo['id_user'];
+        $eraPrincipal = !empty($veiculo['principal']);
+
+        $this->repo->delete($id);
+
+        if (!$eraPrincipal) {
+            return;
+        }
+
+        $restantes = $this->repo->findByUsuario($idDono);
+        if (!empty($restantes)) {
+            $this->repo->marcarPrincipal((int)$restantes[0]['id_veiculo']);
+        }
+    }
 }
+

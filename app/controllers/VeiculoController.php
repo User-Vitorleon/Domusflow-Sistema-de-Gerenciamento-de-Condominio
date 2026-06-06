@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../middleware/AuthGuard.php';
 require_once __DIR__ . '/../services/VeiculoService.php';
+require_once __DIR__ . '/../services/ParametrosService.php';
 require_once __DIR__ . '/../repositories/MoradorRepository.php';
 
 class VeiculoController
@@ -23,6 +24,8 @@ class VeiculoController
         $repo      = new MoradorRepository();
         $usuario   = $repo->findById((int) $_SESSION['usuario_id']);
         $moradores = [];
+        $limiteVeiculosMorador = (new ParametrosService())->limiteVeiculosPorMorador();
+        $totalVeiculosMorador  = 0;
 
         $filtrosVeiculos = [];
         $queryVeiculos   = '';
@@ -34,6 +37,7 @@ class VeiculoController
             $queryVeiculos = $queryVeiculos ? $queryVeiculos . '&' : '';
             $moradores = $repo->findAll();
         } else {
+            $totalVeiculosMorador = $this->veiculoService->contarPorUsuario((int) $_SESSION['usuario_id']);
             $todos = $this->veiculoService->listarPorUsuario((int) $_SESSION['usuario_id']);
             [$veiculos, $totalPaginas, $pagina] = $this->paginar($todos);
         }
@@ -102,6 +106,20 @@ class VeiculoController
         $this->respondercomResultado($resultado);
     }
 
+    public function principal(): void
+    {
+        AuthGuard::requereUsuarioAtivo();
+        AuthGuard::requerePost('/veiculo');
+
+        $resultado = $this->veiculoService->definirPrincipal(
+            (int) ($_POST['id_veiculo'] ?? 0),
+            (int) ($_SESSION['usuario_privilegio'] ?? 1),
+            (int) $_SESSION['usuario_id']
+        );
+
+        $this->respondercomResultado($resultado);
+    }
+
     private function paginar(array $todos): array
     {
         $pagina       = max(1, (int) ($_GET['pagina'] ?? 1));
@@ -135,6 +153,7 @@ class VeiculoController
             'placa' => trim((string) ($_GET['placa'] ?? '')),
             'bloco' => trim((string) ($_GET['bloco'] ?? '')),
             'apto'  => trim((string) ($_GET['apto'] ?? '')),
+            'data_cadastro' => trim((string) ($_GET['data_cadastro'] ?? '')),
         ];
     }
 

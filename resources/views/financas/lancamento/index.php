@@ -1,6 +1,8 @@
 <?php
 $paginaTitulo = 'Lançamentos';
 $paginaAtiva  = 'financeiro';
+$cssTela      = 'financas.css';
+$jsExtra      = 'financas-lancamento.js';
 require_once __DIR__ . '/../../layout/header.php';
 $privilegio = $usuario['privilegio'] ?? 1;
 $queryLancamentos = http_build_query(array_filter([
@@ -15,7 +17,9 @@ $baseLancamentos = BASE_URL . '/financeiro/lancamento?' . ($queryLancamentos ? $
 ?>
 
 <main class="main-content">
-<div style="max-width: 1100px; margin: 0 auto;">
+<div class="fin-page" data-fin-lancamento-page
+    data-taxas="<?= htmlspecialchars(json_encode($todasTaxas), ENT_QUOTES, 'UTF-8') ?>"
+    data-verificar-url="<?= in_array($privilegio, [2, 4]) ? BASE_URL . '/financeiro/lancamento/verificar' : '' ?>">
 
     <div class="page-header">
         <h2>Lançamentos Financeiros</h2>
@@ -43,14 +47,14 @@ $baseLancamentos = BASE_URL . '/financeiro/lancamento?' . ($queryLancamentos ? $
 
     <?php if (in_array($privilegio, [2, 4])): ?>
 
-    <div class="df-card" style="margin-bottom: 24px;">
+    <div class="df-card fin-card-spaced">
         <h3 class="section-title">Registrar Lançamento</h3>
         <form action="<?= BASE_URL ?>/financeiro/lancamento/salvar" method="POST">
 
             <div class="df-grid-2">
                 <div class="df-field">
                     <label>Tipo de Cobrança</label>
-                    <select name="modelo" id="tipo" required onchange="filtrarTaxas()">
+                    <select name="modelo" id="tipo" required>
                         <option value="">Selecione...</option>
                         <option value="taxa">Taxa</option>
                         <option value="multa">Multa</option>
@@ -58,7 +62,7 @@ $baseLancamentos = BASE_URL . '/financeiro/lancamento?' . ($queryLancamentos ? $
                 </div>
                 <div class="df-field">
                     <label>Descrição</label>
-                    <select name="descricao" id="descricao" required onchange="preencherValor()">
+                    <select name="descricao" id="descricao" required>
                         <option value="">Selecione o tipo primeiro...</option>
                     </select>
                 </div>
@@ -90,20 +94,18 @@ $baseLancamentos = BASE_URL . '/financeiro/lancamento?' . ($queryLancamentos ? $
                 <input type="hidden" name="data_lanc" value="<?= date('Y-m-d') ?>">
             </div>
 
-            <div style="margin-top: 12px; padding: 12px 16px; background: #F8FAFC; border-radius: var(--radius); border: 1px solid var(--border);">
-                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 14px; font-weight: 500;">
-                    <input type="checkbox" name="todos_moradores" id="todos_moradores" value="1"
-                           onchange="toggleMorador()"
-                           style="width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer;">
+            <div class="fin-bulk-option">
+                <label>
+                    <input type="checkbox" name="todos_moradores" id="todos_moradores" value="1">
                     <span>
-                        <i class='bx bx-group' style="color: var(--primary);"></i>
+                        <i class='bx bx-group'></i>
                         Lançar para <strong>todos os moradores ativos</strong>
                     </span>
                 </label>
             </div>
 
             <div class="df-actions">
-                <button type="reset" class="btn-ghost" onclick="resetForm()">Limpar</button>
+                <button type="reset" class="btn-ghost">Limpar</button>
                 <button type="submit" class="btn-primary">Registrar</button>
             </div>
         </form>
@@ -111,18 +113,18 @@ $baseLancamentos = BASE_URL . '/financeiro/lancamento?' . ($queryLancamentos ? $
     <?php endif; ?>
 
     <div class="df-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
-            <h3 class="section-title" style="margin: 0;">Todos os Lançamentos</h3>
+        <div class="fin-section-header">
+            <h3 class="section-title">Todos os Lançamentos</h3>
         </div>
 
-        <form method="GET" action="<?= BASE_URL ?>/financeiro/lancamento" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 16px; padding: 14px; background: #F8FAFC; border-radius: var(--radius); border: 1px solid var(--border); align-items: end;">
-            <div class="df-field" style="margin: 0;">
-                <label style="font-size: 11px;">Nome</label>
+        <form method="GET" action="<?= BASE_URL ?>/financeiro/lancamento" class="fin-filter-form">
+            <div class="df-field">
+                <label>Nome</label>
                 <input type="text" id="pesquisa" name="nome" value="<?= htmlspecialchars($_GET['nome'] ?? ($_GET['busca'] ?? '')) ?>"
                        placeholder="Nome do morador...">
             </div>
-            <div class="df-field" style="margin: 0;">
-                <label style="font-size: 11px;">Tipo</label>
+            <div class="df-field">
+                <label>Tipo</label>
                 <select name="tipo">
                     <option value="">Todos</option>
                     <?php foreach (($tiposTaxas ?? []) as $tipoTaxa): ?>
@@ -132,8 +134,8 @@ $baseLancamentos = BASE_URL . '/financeiro/lancamento?' . ($queryLancamentos ? $
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="df-field" style="margin: 0;">
-                <label style="font-size: 11px;">Descrição</label>
+            <div class="df-field">
+                <label>Descrição</label>
                 <select name="descricao">
                     <option value="">Todas</option>
                     <?php foreach (($descricoesTaxas ?? []) as $descTaxa): ?>
@@ -143,8 +145,8 @@ $baseLancamentos = BASE_URL . '/financeiro/lancamento?' . ($queryLancamentos ? $
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="df-field" style="margin: 0;">
-                <label style="font-size: 11px;">Status</label>
+            <div class="df-field">
+                <label>Status</label>
                 <select id="filtroStatus" name="status">
                     <option value="">Todos</option>
                     <option value="P" <?= ($_GET['status'] ?? '') === 'P' ? 'selected' : '' ?>>Pendente</option>
@@ -153,21 +155,21 @@ $baseLancamentos = BASE_URL . '/financeiro/lancamento?' . ($queryLancamentos ? $
                     <option value="atraso" <?= ($_GET['status'] ?? '') === 'atraso' ? 'selected' : '' ?>>Em Atraso</option>
                 </select>
             </div>
-            <div class="df-field" style="margin: 0;">
-                <label style="font-size: 11px;">Dt. Lançamento</label>
+            <div class="df-field">
+                <label>Dt. Lançamento</label>
                 <input type="date" id="filtroDtLanc" name="dt_lanc" value="<?= htmlspecialchars($_GET['dt_lanc'] ?? '') ?>">
             </div>
-            <div class="df-field" style="margin: 0;">
-                <label style="font-size: 11px;">Dt. Vencimento</label>
+            <div class="df-field">
+                <label>Dt. Vencimento</label>
                 <input type="date" id="filtroDtVenc" name="dt_venc" value="<?= htmlspecialchars($_GET['dt_venc'] ?? '') ?>">
             </div>
-            <div class="df-field" style="margin: 0; justify-content: flex-end;">
-                <label style="font-size: 11px;">&nbsp;</label>
-                <button type="submit" class="btn-primary" style="height: 38px;">Filtrar</button>
+            <div class="df-field">
+                <label>&nbsp;</label>
+                <button type="submit" class="btn-primary">Filtrar</button>
             </div>
-            <div class="df-field" style="margin: 0; justify-content: flex-end;">
-                <label style="font-size: 11px;">&nbsp;</label>
-                <a class="btn-ghost" href="<?= BASE_URL ?>/financeiro/lancamento" style="height: 38px;">Limpar filtros</a>
+            <div class="df-field">
+                <label>&nbsp;</label>
+                <a class="btn-ghost" href="<?= BASE_URL ?>/financeiro/lancamento">Limpar filtros</a>
             </div>
         </form>
 
@@ -178,24 +180,24 @@ $baseLancamentos = BASE_URL . '/financeiro/lancamento?' . ($queryLancamentos ? $
                 <p>Os lançamentos aparecerão aqui.</p>
             </div>
         <?php else: ?>
-            <div style="overflow-x: auto;">
-                <table class="df-table" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <div class="fin-lanc-table-wrap">
+                <table class="df-table fin-lanc-table">
                     <thead>
-                        <tr style="background: #F8FAFC;">
-                            <th style="padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap;">#</th>
+                        <tr>
+                            <th class="nowrap">#</th>
                             <?php if (in_array($privilegio, [2, 4])): ?>
-                            <th style="padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border);">Nome</th>
-                            <th style="padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border);">Bloco</th>
-                            <th style="padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border);">Apto</th>
+                            <th>Nome</th>
+                            <th>Bloco</th>
+                            <th>Apto</th>
                             <?php endif; ?>
-                            <th style="padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border);">Tipo</th>
-                            <th style="padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border);">Descrição</th>
-                            <th style="padding: 10px 12px; text-align: right; border-bottom: 1px solid var(--border);">Valor</th>
-                            <th style="padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap;">Dt. Lançamento</th>
-                            <th style="padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap;">Vencimento</th>
-                            <th style="padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border);">Status</th>
+                            <th>Tipo</th>
+                            <th>Descrição</th>
+                            <th class="text-right">Valor</th>
+                            <th class="nowrap">Dt. Lançamento</th>
+                            <th class="nowrap">Vencimento</th>
+                            <th>Status</th>
                             <?php if (in_array($privilegio, [2, 4])): ?>
-                            <th style="padding: 10px 12px; text-align: center; border-bottom: 1px solid var(--border);">Ação</th>
+                            <th class="text-center">Ação</th>
                             <?php endif; ?>
                         </tr>
                     </thead>
@@ -217,8 +219,7 @@ $baseLancamentos = BASE_URL . '/financeiro/lancamento?' . ($queryLancamentos ? $
                             $corModelo = strtoupper($l['modelo']) === 'TAXA' ? '#2563EB' : '#DC2626';
                             $dtLanc = $l['data_lancamento'] ?? null;
                         ?>
-                            <tr style="border-bottom: 1px solid #F1F5F9; transition: background 0.15s;"
-                                onmouseover="this.style.background='#F8FAFC'" onmouseout="this.style.background=''"
+                            <tr
                                 data-nome="<?= strtolower($l['nome_morador'] ?? '') ?>"
                                 data-tipo="<?= strtolower($l['modelo']) ?>"
                                 data-desc="<?= strtolower($l['descricao']) ?>"
@@ -226,31 +227,31 @@ $baseLancamentos = BASE_URL . '/financeiro/lancamento?' . ($queryLancamentos ? $
                                 data-vencido="<?= $vencido ? '1' : '0' ?>"
                                 data-dt-lanc="<?= $dtLanc ?? '' ?>"
                                 data-dt-venc="<?= $l['data_vencimento'] ?>">
-                                <td style="padding: 10px 12px; color: var(--text-muted);">#<?= $l['id_lancamento'] ?></td>
+                                <td class="muted">#<?= $l['id_lancamento'] ?></td>
                                 <?php if (in_array($privilegio, [2, 4])): ?>
-                                <td style="padding: 10px 12px; font-weight: 500;"><?= htmlspecialchars($l['nome_morador'] ?? 'N/A') ?></td>
-                                <td style="padding: 10px 12px;"><?= htmlspecialchars($l['bloco'] ?? '-') ?></td>
-                                <td style="padding: 10px 12px;"><?= htmlspecialchars($l['apto'] ?? '-') ?></td>
+                                <td class="medium"><?= htmlspecialchars($l['nome_morador'] ?? 'N/A') ?></td>
+                                <td><?= htmlspecialchars($l['bloco'] ?? '-') ?></td>
+                                <td><?= htmlspecialchars($l['apto'] ?? '-') ?></td>
                                 <?php endif; ?>
-                                <td style="padding: 10px 12px;">
+                                <td>
                                     <span style="color: <?= $corModelo ?>; font-weight: 600; font-size: 12px;">
                                         <?= ucfirst(strtolower($l['modelo'])) ?>
                                     </span>
                                 </td>
-                                <td style="padding: 10px 12px;"><?= htmlspecialchars($l['descricao']) ?></td>
-                                <td style="padding: 10px 12px; text-align: right; font-weight: 600;">
+                                <td><?= htmlspecialchars($l['descricao']) ?></td>
+                                <td class="text-right semibold">
                                     R$ <?= number_format($l['valor'], 2, ',', '.') ?>
                                 </td>
-                                <td style="padding: 10px 12px; white-space: nowrap; color: var(--text-muted);">
+                                <td class="nowrap muted">
                                     <?= $dtLanc ? date('d/m/Y', strtotime($dtLanc)) : '-' ?>
                                 </td>
-                                <td style="padding: 10px 12px; white-space: nowrap;">
+                                <td class="nowrap">
                                     <span style="color: <?= $vencido ? '#EF4444' : 'inherit' ?>; font-weight: <?= $vencido ? '600' : '400' ?>;">
                                         <?= date('d/m/Y', strtotime($l['data_vencimento'])) ?>
                                         <?= $vencido ? ' ⚠' : '' ?>
                                     </span>
                                 </td>
-                                <td style="padding: 10px 12px;">
+                                <td>
                                     <span style="
                                         padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 600;
                                         color: <?= $corStatus[0] ?>;
@@ -261,12 +262,12 @@ $baseLancamentos = BASE_URL . '/financeiro/lancamento?' . ($queryLancamentos ? $
                                     </span>
                                 </td>
                                 <?php if (in_array($privilegio, [2, 4])): ?>
-                                <td style="padding: 10px 12px; text-align: center;">
+                                <td class="text-center">
                                     <?php if ($l['status'] !== 'G'): ?>
                                     <form action="<?= BASE_URL ?>/financeiro/lancamento/excluir" method="POST"
-                                          onsubmit="return confirm('Deseja excluir este lançamento?')" style="display:inline">
+                                          class="fin-delete-form js-confirm-delete-lancamento">
                                         <input type="hidden" name="id_lancamento" value="<?= $l['id_lancamento'] ?>">
-                                        <button type="submit" class="btn-danger-sm" style="padding: 3px 8px;">
+                                        <button type="submit" class="btn-danger-sm">
                                             <i class='bx bx-trash'></i>
                                         </button>
                                     </form>
@@ -308,63 +309,7 @@ $baseLancamentos = BASE_URL . '/financeiro/lancamento?' . ($queryLancamentos ? $
 </div>
 </main>
 
-<script>
-const todasTaxas = <?= json_encode($todasTaxas) ?>;
-
-function filtrarTaxas() {
-    const tipo = document.getElementById('tipo').value;
-    const select = document.getElementById('descricao');
-    const valorInput = document.getElementById('valor');
-    select.innerHTML = '<option value="">Selecione...</option>';
-    valorInput.value = '';
-    if (!tipo) return;
-    const filtradas = todasTaxas.filter(t => t.modulo.toLowerCase() === tipo);
-    if (filtradas.length === 0) { select.innerHTML = '<option value="">Nenhum cadastrado</option>'; return; }
-    filtradas.forEach(t => {
-        const opt = document.createElement('option');
-        opt.value = t.descricao; opt.textContent = t.descricao; opt.dataset.valor = t.valor;
-        select.appendChild(opt);
-    });
-}
-
-function preencherValor() {
-    const select = document.getElementById('descricao');
-    const opt = select.options[select.selectedIndex];
-    document.getElementById('valor').value = opt.dataset.valor ?? '';
-}
-
-function resetForm() {
-    document.getElementById('descricao').innerHTML = '<option value="">Selecione o tipo primeiro...</option>';
-    document.getElementById('valor').value = '';
-}
-
-function toggleMorador() {
-    const checkbox = document.getElementById('todos_moradores');
-    const campo = document.getElementById('campo_morador');
-    campo.style.display = checkbox.checked ? 'none' : 'block';
-    campo.querySelector('select').required = !checkbox.checked;
-}
-
-function filtrarLancamentos() {}
-
-<?php if (in_array($privilegio, [2, 4])): ?>
-document.querySelector('form[action*="lancamento/salvar"]').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const form = this;
-    fetch('<?= BASE_URL ?>/financeiro/lancamento/verificar', { method: 'POST', body: new FormData(form) })
-    .then(r => r.json())
-    .then(res => {
-        if (res.duplicado) {
-            let msg = 'Já existe um lançamento com esses parâmetros em aberto neste mês.';
-            if (res.quantidade) msg += ` (${res.quantidade} morador(es) afetado(s))`;
-            msg += '\n\nDeseja continuar mesmo assim?';
-            if (confirm(msg)) form.submit();
-        } else { form.submit(); }
-    })
-    .catch(() => form.submit());
-});
-<?php endif; ?>
-</script>
-
 <?php require_once __DIR__ . '/../../layout/footer.php'; ?>
+
+
 

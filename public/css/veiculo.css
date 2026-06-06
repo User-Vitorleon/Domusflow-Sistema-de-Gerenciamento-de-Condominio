@@ -13,11 +13,12 @@
 /* scroll horizontal na tabela em telas pequenas */
 .table-wrap {
     overflow-x: auto;
+    width: 100%;
 }
 
 .veiculo-filtros {
     display: grid;
-    grid-template-columns: repeat(4, minmax(130px, 1fr)) auto;
+    grid-template-columns: repeat(5, minmax(120px, 1fr)) auto;
     gap: 12px;
     align-items: end;
     margin-bottom: 18px;
@@ -82,9 +83,67 @@
     vertical-align: middle;
 }
 
+.veiculo-table {
+    min-width: 0;
+    table-layout: fixed;
+    font-size: 13px;
+}
+
+.veiculo-table th,
+.veiculo-table td {
+    padding: 10px 9px;
+    word-break: normal;
+}
+
 .veiculo-table td:last-child {
-    width: 1%;
+    width: 136px;
+    min-width: 136px;
     white-space: nowrap;
+}
+
+.veiculo-subinfo {
+    display: block;
+    margin-top: 3px;
+    color: var(--text-muted);
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+.veiculo-principal-label {
+    display: inline-flex;
+    width: fit-content;
+    padding: 2px 8px;
+    border: 1px solid #DDD6FE;
+    border-radius: 999px;
+    background: #F5F3FF;
+    color: #7C3AED;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.veiculo-row-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    flex-wrap: nowrap;
+}
+
+.veiculo-action-btn {
+    min-height: 30px;
+    padding: 5px 7px;
+    font-size: 12px;
+}
+
+.veiculo-muted {
+    color: var(--text-muted);
+}
+
+.veiculo-principal-aviso {
+    display: block;
+    margin-top: 4px;
+    color: #b45309;
+    font-size: 12px;
 }
 
 /* ── Badge principal na tabela ── */
@@ -248,5 +307,43 @@
     .veiculo-filtros-actions {
         flex-direction: column;
         align-items: stretch;
+    }
+
+    .veiculo-table {
+        min-width: 760px;
+        table-layout: auto;
+    }
+}
+
+@media (min-width: 901px) {
+    .veiculo-table th:nth-child(1),
+    .veiculo-table td:nth-child(1) {
+        width: 90px;
+    }
+
+    .veiculo-table th:nth-child(2),
+    .veiculo-table td:nth-child(2) {
+        width: 140px;
+    }
+
+    .veiculo-table th:nth-child(3),
+    .veiculo-table td:nth-child(3) {
+        width: 82px;
+    }
+
+    .veiculo-table th:nth-child(4),
+    .veiculo-table td:nth-child(4) {
+        width: 140px;
+    }
+
+    .veiculo-table th:nth-child(5),
+    .veiculo-table td:nth-child(5) {
+        width: 95px;
+        white-space: nowrap;
+    }
+
+    .veiculo-table th:nth-child(6),
+    .veiculo-table td:nth-child(6) {
+        width: 120px;
     }
 }

@@ -20,7 +20,7 @@ class VeiculoRepository
             FROM veiculos v
             JOIN morador dono ON dono.id_user = v.id_user
             JOIN morador cad  ON cad.id_user  = v.id_user_cad
-            ORDER BY v.created_at DESC
+            ORDER BY v.created_at DESC, dono.nome ASC
         ");
         return $stmt->fetchAll();
     }
@@ -37,7 +37,7 @@ class VeiculoRepository
             JOIN morador dono ON dono.id_user = v.id_user
             JOIN morador cad  ON cad.id_user  = v.id_user_cad
             WHERE v.id_user = :id
-            ORDER BY v.principal DESC, v.created_at DESC
+            ORDER BY v.created_at DESC, dono.nome ASC
         ");
         $stmt->execute([':id' => $idUser]);
         return $stmt->fetchAll();
@@ -57,7 +57,7 @@ class VeiculoRepository
             JOIN morador dono ON dono.id_user = v.id_user
             JOIN morador cad  ON cad.id_user  = v.id_user_cad
             {$where}
-            ORDER BY v.created_at DESC
+            ORDER BY v.created_at DESC, dono.nome ASC
             LIMIT :limite OFFSET :offset
         ");
 
@@ -255,6 +255,11 @@ class VeiculoRepository
         if (!empty($filtros['apto'])) {
             $where[] = 'LOWER(dono.apto) LIKE LOWER(:apto)';
             $params[':apto'] = '%' . trim($filtros['apto']) . '%';
+        }
+
+        if (!empty($filtros['data_cadastro'])) {
+            $where[] = 'DATE(v.created_at) = :data_cadastro';
+            $params[':data_cadastro'] = trim($filtros['data_cadastro']);
         }
 
         return [$where ? 'WHERE ' . implode(' AND ', $where) : '', $params];

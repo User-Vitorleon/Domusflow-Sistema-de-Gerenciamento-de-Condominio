@@ -24,11 +24,20 @@ class ParametrosController
     public function salvar(): void
     {
         AuthGuard::requerePost('/parametros');
-        $this->requereAdmin();
+        $usuario = $this->requereAdmin();
 
-        $resultado = $this->service->salvar($_POST);
+        if (!$this->confirmarSenhaAdmin($usuario, $_POST['admin_senha'] ?? '')) {
+            $_SESSION['erro_parametros'] = 'Senha do admin incorreta. O parametro nao foi salvo.';
+            header('Location: ' . BASE_URL . '/parametros');
+            exit();
+        }
+
+        $resultado = $this->service->salvarParametro(
+            (string)($_POST['parametro'] ?? ''),
+            $_POST['valor'] ?? null
+        );
         if ($resultado['sucesso']) {
-            $_SESSION['sucesso_parametros'] = 'Parametros salvos com sucesso.';
+            $_SESSION['sucesso_parametros'] = 'Parametro salvo com sucesso.';
         } else {
             $_SESSION['erro_parametros'] = $resultado['mensagem'];
         }
@@ -45,5 +54,15 @@ class ParametrosController
             exit();
         }
         return $usuario;
+    }
+
+    private function confirmarSenhaAdmin(array $usuario, string $senha): bool
+    {
+        if ($senha === '') {
+            return false;
+        }
+
+        $admin = (new MoradorRepository())->findById((int)($usuario['id_user'] ?? $_SESSION['usuario_id'] ?? 0));
+        return $admin && password_verify($senha, $admin['senha'] ?? '');
     }
 }

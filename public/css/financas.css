@@ -1,0 +1,290 @@
+.fin-page {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.fin-card-spaced {
+    margin-bottom: 24px;
+}
+
+.fin-bulk-option {
+    margin-top: 12px;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: #F8FAFC;
+}
+
+.fin-bulk-option label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.fin-bulk-option input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+
+.fin-bulk-option i {
+    color: var(--primary);
+}
+
+.fin-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.fin-section-header .section-title {
+    margin: 0;
+}
+
+.fin-filter-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    align-items: end;
+    margin-bottom: 16px;
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: #F8FAFC;
+}
+
+.fin-filter-form .df-field {
+    margin: 0;
+}
+
+.fin-filter-form label {
+    font-size: 11px;
+}
+
+.fin-filter-form .btn-primary,
+.fin-filter-form .btn-ghost {
+    height: 38px;
+}
+
+.fin-lanc-table-wrap {
+    overflow-x: auto;
+}
+
+.fin-lanc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.fin-lanc-table thead tr {
+    background: #F8FAFC;
+}
+
+.fin-lanc-table th,
+.fin-lanc-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+}
+
+.fin-lanc-table tbody tr {
+    border-bottom: 1px solid #F1F5F9;
+    transition: background .15s;
+}
+
+.fin-lanc-table .text-center {
+    text-align: center;
+}
+
+.fin-lanc-table .text-right {
+    text-align: right;
+}
+
+.fin-lanc-table .nowrap {
+    white-space: nowrap;
+}
+
+.fin-lanc-table .muted {
+    color: var(--text-muted);
+}
+
+.fin-lanc-table .semibold {
+    font-weight: 600;
+}
+
+.fin-lanc-table .medium {
+    font-weight: 500;
+}
+
+.fin-delete-form {
+    display: inline;
+}
+
+.fin-delete-form .btn-danger-sm {
+    padding: 3px 8px;
+}
+
+.fin-field-small {
+    max-width: 260px;
+}
+
+.fin-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.fin-card-header .section-title {
+    margin: 0;
+}
+
+.fin-count {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.fin-table-wrap {
+    overflow-x: auto;
+}
+
+.fin-taxas-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.fin-taxas-table thead tr {
+    background: #F8FAFC;
+}
+
+.fin-taxas-table th,
+.fin-taxas-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.fin-taxas-table th {
+    text-align: left;
+}
+
+.fin-taxas-table th:last-child,
+.fin-taxas-table td:last-child {
+    text-align: center;
+}
+
+.fin-cell-description {
+    min-width: 220px;
+}
+
+.fin-cell-type,
+.fin-cell-status {
+    min-width: 130px;
+}
+
+.fin-cell-value {
+    min-width: 120px;
+}
+
+.fin-cell-muted {
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.fin-edit-control {
+    width: 100%;
+    padding: 7px 9px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: var(--white);
+    color: var(--text);
+}
+
+.fin-row-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.fin-row-actions .btn-primary,
+.fin-row-actions .btn-danger-sm {
+    min-height: 32px;
+    padding: 6px 10px;
+    font-size: 12px;
+}
+
+.fin-confirm-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.fin-confirm-modal.is-open {
+    display: flex;
+}
+
+.fin-confirm-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, .45);
+}
+
+.fin-confirm-dialog {
+    position: relative;
+    width: min(420px, 100%);
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: var(--shadow-lg);
+    padding: 22px;
+}
+
+.fin-confirm-dialog h3 {
+    margin: 0 0 8px;
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--text);
+}
+
+.fin-confirm-dialog p {
+    margin: 0 0 16px;
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.fin-confirm-close {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    border: 0;
+    background: transparent;
+    font-size: 24px;
+    line-height: 1;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+.fin-confirm-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+[data-theme="dark"] .fin-confirm-dialog {
+    background: #1f222c;
+}

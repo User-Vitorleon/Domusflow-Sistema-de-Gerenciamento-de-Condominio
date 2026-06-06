@@ -20,6 +20,35 @@
         .querySelectorAll('.cad-eye')
         .forEach((btn) => togglePasswordVisibility(btn, '.df-field'));
 
+    const termosModal = document.getElementById('modalTermos');
+    const termosCheck = document.getElementById('termos');
+    const abrirTermos = () => {
+        termosModal?.classList.add('is-open');
+        termosModal?.setAttribute('aria-hidden', 'false');
+    };
+    const fecharTermos = () => {
+        termosModal?.classList.remove('is-open');
+        termosModal?.setAttribute('aria-hidden', 'true');
+    };
+
+    document.querySelectorAll('[data-termos-open]').forEach((link) => {
+        link.addEventListener('click', (event) => {
+            event.preventDefault();
+            abrirTermos();
+        });
+    });
+    document.querySelectorAll('[data-termos-close]').forEach((button) => {
+        button.addEventListener('click', fecharTermos);
+    });
+    document.querySelectorAll('[data-termos-accept]').forEach((button) => {
+        button.addEventListener('click', () => {
+            if (termosCheck) termosCheck.checked = true;
+            fecharTermos();
+        });
+    });
+    termosModal?.addEventListener('click', (event) => {
+        if (event.target === termosModal) fecharTermos();
+    });
 
     const form = document.querySelector('form[action*="cadastro/salvar"]');
     if (!form) {

@@ -41,6 +41,7 @@ $routes = [
     'veiculo/salvar'                 => ['VeiculoController',    'salvar'],
     'veiculo/editar'                 => ['VeiculoController',    'editar'],
     'veiculo/excluir'                => ['VeiculoController',    'excluir'],
+    'veiculo/principal'              => ['VeiculoController',    'principal'],
     'veiculo/consultar'              => ['VeiculoController',    'consultar'],
 
     'api/feriados'                   => ['FeriadoController',    'index'],

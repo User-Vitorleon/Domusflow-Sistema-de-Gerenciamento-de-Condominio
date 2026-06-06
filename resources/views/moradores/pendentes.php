@@ -2,6 +2,7 @@
 $paginaTitulo = 'Novos Usuários';
 $paginaAtiva  = 'moradores';
 $cssTela      = 'moradores.css';
+$jsExtra      = 'moradores.js';
 require_once __DIR__ . '/../layout/header.php';
 
 $queryAtual   = $_GET;
@@ -101,8 +102,8 @@ function montarOrdenacao(array $queryAtual, string $campo, string $ordenarAtual,
                     <p>Nenhuma solicitação pendente no momento.</p>
                 </div>
             <?php else: ?>
-                <div style="overflow-x: auto;">
-                    <table class="df-table pendentes-table" style="width:100%; border-collapse:collapse; font-size:13px;">
+                <div class="pendentes-table-wrap">
+                    <table class="df-table pendentes-table">
                         <thead>
                             <tr>
                                 <th>
@@ -145,8 +146,8 @@ function montarOrdenacao(array $queryAtual, string $campo, string $ordenarAtual,
                                     <td>
                                         <div class="cpf-cell">
                                             <span class="cpf-mask"><?= htmlspecialchars($cpfMask) ?></span>
-                                            <span class="cpf-real" style="display:none;"><?= htmlspecialchars($m['cpf']) ?></span>
-                                            <button type="button" class="btn-ghost btn-cpf-toggle" onclick="toggleCpf(this)" aria-label="Mostrar CPF">
+                                            <span class="cpf-real" hidden><?= htmlspecialchars($m['cpf']) ?></span>
+                                            <button type="button" class="btn-ghost btn-cpf-toggle" aria-label="Mostrar CPF">
                                                 <i class='bx bx-show'></i>
                                             </button>
                                         </div>
@@ -225,26 +226,5 @@ function montarOrdenacao(array $queryAtual, string $campo, string $ordenarAtual,
         </div>
     </div>
 </main>
-
-<script>
-function toggleCpf(btn) {
-    const td = btn.closest('.cpf-cell');
-    const mask = td.querySelector('.cpf-mask');
-    const real = td.querySelector('.cpf-real');
-    const icon = btn.querySelector('i');
-
-    if (mask.style.display === 'none') {
-        mask.style.display = '';
-        real.style.display = 'none';
-        icon.className = 'bx bx-show';
-        btn.setAttribute('aria-label', 'Mostrar CPF');
-    } else {
-        mask.style.display = 'none';
-        real.style.display = '';
-        icon.className = 'bx bx-hide';
-        btn.setAttribute('aria-label', 'Ocultar CPF');
-    }
-}
-</script>
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>

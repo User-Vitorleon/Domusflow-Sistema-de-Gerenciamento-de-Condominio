@@ -2,6 +2,7 @@
 $paginaTitulo = 'Gestão de Moradores';
 $paginaAtiva  = 'gestao-moradores';
 $cssTela      = 'moradores.css';
+$jsExtra      = 'moradores.js';
 require_once __DIR__ . '/../../layout/header.php';
 
 $labelStatus = [
@@ -35,31 +36,31 @@ $labelPrivilegio = [1 => 'Morador', 2 => 'Síndico', 3 => 'Porteiro', 4 => 'Admi
             <div class="df-alert df-alert-error">Ocorreu um erro. Tente novamente.</div>
         <?php endif; ?>
 
-        <div class="df-card" style="margin-bottom: 20px;">
+        <div class="df-card gestao-filtros-card">
             <form method="GET" action="<?= BASE_URL ?>/moradores/gestao" class="row g-3 align-items-end">
                 <div class="col-md-2">
-                    <div class="df-field" style="margin:0;">
+                    <div class="df-field gestao-filtro-field">
                         <label>Nome</label>
                         <input type="text" name="nome"
                             value="<?= htmlspecialchars($_GET['nome'] ?? '') ?>" placeholder="Buscar por nome...">
                     </div>
                 </div>
                 <div class="col-md-1">
-                    <div class="df-field" style="margin:0;">
+                    <div class="df-field gestao-filtro-field">
                         <label>Apto</label>
                         <input type="text" name="apto"
                             value="<?= htmlspecialchars($_GET['apto'] ?? '') ?>" placeholder="Ex: 101">
                     </div>
                 </div>
                 <div class="col-md-2">
-                    <div class="df-field" style="margin:0;">
+                    <div class="df-field gestao-filtro-field">
                         <label>Bloco</label>
                         <input type="text" name="bloco"
                             value="<?= htmlspecialchars($_GET['bloco'] ?? '') ?>" placeholder="Ex: A">
                     </div>
                 </div>
                 <div class="col-md-2">
-                    <div class="df-field" style="margin:0;">
+                    <div class="df-field gestao-filtro-field">
                         <label>Status</label>
                         <select name="status">
                             <option value="">Todos</option>
@@ -72,7 +73,7 @@ $labelPrivilegio = [1 => 'Morador', 2 => 'Síndico', 3 => 'Porteiro', 4 => 'Admi
                     </div>
                 </div>
                 <div class="col-md-2">
-                    <div class="df-field" style="margin:0;">
+                    <div class="df-field gestao-filtro-field">
                         <label>Tipo de usuário</label>
                         <select name="perfil">
                             <option value="">Todos</option>
@@ -84,7 +85,7 @@ $labelPrivilegio = [1 => 'Morador', 2 => 'Síndico', 3 => 'Porteiro', 4 => 'Admi
                         </select>
                     </div>
                 </div>
-                <div class="col-md-3 d-flex gap-2 align-items-end" style="padding-bottom: 1px;">
+                <div class="col-md-3 d-flex gap-2 align-items-end gestao-filtros-actions">
                     <button type="submit" class="btn-primary">Filtrar</button>
                     <a href="<?= BASE_URL ?>/moradores/gestao" class="btn-ghost">Limpar</a>
                 </div>
@@ -98,15 +99,15 @@ $labelPrivilegio = [1 => 'Morador', 2 => 'Síndico', 3 => 'Porteiro', 4 => 'Admi
                     <h5>Nenhum morador encontrado</h5>
                 </div>
             <?php else: ?>
-                <div style="overflow-x: auto;">
-                    <table class="df-table" style="width:100%; border-collapse:collapse; font-size:13px;">
+                <div class="gestao-table-wrap">
+                    <table class="df-table gestao-table">
                         <thead>
                             <tr>
-                                <th style="padding:10px 14px; text-align:left; border-bottom:1px solid var(--border); white-space:nowrap;">Nome</th>
-                                <th style="padding:10px 14px; text-align:left; border-bottom:1px solid var(--border); white-space:nowrap;">Apto / Bloco</th>
-                                <th style="padding:10px 14px; text-align:left; border-bottom:1px solid var(--border); white-space:nowrap;">Status</th>
-                                <th style="padding:10px 14px; text-align:left; border-bottom:1px solid var(--border); white-space:nowrap;">Perfil</th>
-                                <th style="padding:10px 14px; text-align:left; border-bottom:1px solid var(--border); white-space:nowrap;">Ações</th>
+                                <th>Nome</th>
+                                <th>Apto / Bloco</th>
+                                <th>Status</th>
+                                <th>Perfil</th>
+                                <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -115,33 +116,32 @@ $labelPrivilegio = [1 => 'Morador', 2 => 'Síndico', 3 => 'Porteiro', 4 => 'Admi
                                 $ehUsuarioLogado = (int)$m['id_user'] === (int)($_SESSION['usuario_id'] ?? 0);
                                 $ehAdmin         = (int)($m['privilegio'] ?? 0) === 4;
                             ?>
-                                <tr style="border-bottom:1px solid var(--border);">
-                                    <td style="padding:10px 14px; white-space:nowrap;">
+                                <tr>
+                                    <td class="gestao-nowrap">
                                         <strong><?= htmlspecialchars($m['nome']) ?></strong>
                                     </td>
-                                    <td style="padding:10px 14px; white-space:nowrap;">
+                                    <td class="gestao-nowrap">
                                         Ap <?= htmlspecialchars($m['apto']) ?> · Bl <?= htmlspecialchars($m['bloco']) ?>
                                     </td>
-                                    <td style="padding:10px 14px;">
+                                    <td>
                                         <span class="<?= $st['classe'] ?>"><?= $st['texto'] ?></span>
                                     </td>
-                                    <td style="padding:10px 14px;">
+                                    <td>
                                         <?php if ($ehAdmin): ?>
                                             <span class="perfil-badge-admin"><?= $labelPrivilegio[(int)$m['privilegio']] ?? 'Admin' ?></span>
                                         <?php else: ?>
                                             <form action="<?= BASE_URL ?>/moradores/gestao/salvar" method="POST"
-                                                style="display:flex;gap:6px;align-items:center;">
+                                                class="gestao-perfil-form">
                                                 <input type="hidden" name="id_morador" value="<?= $m['id_user'] ?>">
                                                 <input type="hidden" name="admin_senha" value="">
-                                                <select name="privilegio" style="font-size:12px;padding:4px 8px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg-secondary);color:var(--text-primary);">
+                                                <select name="privilegio" class="gestao-perfil-select">
                                                     <?php foreach ($labelPrivilegio as $val => $label): ?>
                                                         <option value="<?= $val ?>" <?= (int)$m['privilegio'] === $val ? 'selected' : '' ?>>
                                                             <?= $label ?>
                                                         </option>
                                                     <?php endforeach; ?>
                                                 </select>
-                                                <button type="button" class="btn-primary js-confirm-admin"
-                                                    style="padding:4px 12px;font-size:12px;white-space:nowrap;"
+                                                <button type="button" class="btn-primary js-confirm-admin gestao-perfil-save"
                                                     data-title="Alterar perfil"
                                                     data-message="Alterar o perfil de <?= htmlspecialchars($m['nome']) ?>? Informe sua senha para confirmar.">
                                                     Salvar
@@ -149,7 +149,7 @@ $labelPrivilegio = [1 => 'Morador', 2 => 'Síndico', 3 => 'Porteiro', 4 => 'Admi
                                             </form>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="gestao-acoes-cell" style="padding:10px 14px;">
+                                    <td class="gestao-acoes-cell">
                                         <div class="gestao-acoes">
                                             <?php if ($m['status'] !== 'E'): ?>
                                                 <form action="<?= BASE_URL ?>/moradores/gestao/resetar-senha" method="POST" class="gestao-action-form">
@@ -273,53 +273,5 @@ $labelPrivilegio = [1 => 'Morador', 2 => 'Síndico', 3 => 'Porteiro', 4 => 'Admi
     </div>
 </div>
 
-<script>
-    const adminModal = document.getElementById('confirmAdminModal');
-    const adminPassword = document.getElementById('confirmAdminPassword');
-    const adminTitle = document.getElementById('confirmAdminTitle');
-    const adminMessage = document.getElementById('confirmAdminMessage');
-    const adminSubmit = document.getElementById('confirmAdminSubmit');
-    let pendingAdminForm = null;
-
-    function closeAdminModal() {
-        adminModal.classList.remove('is-open');
-        adminModal.setAttribute('aria-hidden', 'true');
-        adminPassword.value = '';
-        pendingAdminForm = null;
-    }
-
-    document.querySelectorAll('.js-confirm-admin').forEach((button) => {
-        button.addEventListener('click', () => {
-            if (button.disabled) return;
-
-            pendingAdminForm = button.closest('form');
-            adminTitle.textContent = button.dataset.title || 'Confirmar ação';
-            adminMessage.textContent = button.dataset.message || 'Informe sua senha para continuar.';
-            adminModal.classList.add('is-open');
-            adminModal.setAttribute('aria-hidden', 'false');
-            adminPassword.focus();
-        });
-    });
-
-    document.querySelectorAll('[data-modal-close]').forEach((button) => {
-        button.addEventListener('click', closeAdminModal);
-    });
-
-    adminPassword.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
-            adminSubmit.click();
-        }
-    });
-
-    adminSubmit.addEventListener('click', () => {
-        if (!pendingAdminForm || adminPassword.value.trim() === '') {
-            adminPassword.focus();
-            return;
-        }
-
-        pendingAdminForm.querySelector('input[name="admin_senha"]').value = adminPassword.value;
-        pendingAdminForm.submit();
-    });
-</script>
-
 <?php require_once __DIR__ . '/../../layout/footer.php'; ?>
+
