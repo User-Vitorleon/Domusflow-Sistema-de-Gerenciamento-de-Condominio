@@ -125,11 +125,9 @@ require_once __DIR__ . '/../layout/header.php';
     <br>
 </main>
 
-<script>
-    window.APP_DASHBOARD = <?= json_encode([
+<script type="application/json" id="dashboard-data"><?= json_encode([
                                 'chartLabels' => $chartLabels,
                                 'chartDados'  => $chartDados
-                            ]) ?>;
-</script>
+                            ]) ?></script>
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>

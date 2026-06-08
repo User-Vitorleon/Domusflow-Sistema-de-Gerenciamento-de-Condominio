@@ -2,6 +2,7 @@
 $paginaTitulo = 'Detalhes da Assembleia';
 $paginaAtiva  = 'assembleia';
 $cssTela = 'assembleia.css';
+$jsExtra = 'assembleia-detalhe-presencas.js';
 require_once __DIR__ . '/../layout/header.php';
 
 $totalConfirmadas = count(array_filter($presencas, fn($p) => $p['presenca'] === 'S'));
@@ -48,12 +49,11 @@ $totalPendentes   = count(array_filter($presencas, fn($p) => $p['presenca'] === 
             <div class="df-grid-2" style="margin-bottom: 16px;">
                 <div class="df-field" style="margin: 0;">
                     <label>Buscar morador</label>
-                    <input type="text" id="filtroNome" placeholder="Nome ou apartamento"
-                        oninput="filtrarPresencas()">
+                    <input type="text" id="filtroNome" placeholder="Nome ou apartamento">
                 </div>
                 <div class="df-field" style="margin: 0;">
                     <label>Presença</label>
-                    <select id="filtroPresenca" onchange="filtrarPresencas()">
+                    <select id="filtroPresenca">
                         <option value="">Todas</option>
                         <option value="S">Confirmadas</option>
                         <option value="N">Negadas</option>
@@ -117,41 +117,5 @@ $totalPendentes   = count(array_filter($presencas, fn($p) => $p['presenca'] === 
     </div>
 </main>
 
-<script>
-    function filtrarPresencas() {
-        const nome = document.getElementById('filtroNome').value.toLowerCase();
-        const presenca = document.getElementById('filtroPresenca').value;
-
-        let confirmadas = 0,
-            negadas = 0,
-            pendentes = 0,
-            total = 0;
-
-        document.querySelectorAll('#tabelaPresencas tr').forEach(row => {
-            const rowNome = row.dataset.nome ?? '';
-            const rowApto = row.dataset.apto ?? '';
-            const rowBloco = row.dataset.bloco ?? '';
-            const rowPresenca = row.dataset.presenca ?? '';
-
-            let ok = true;
-            if (nome && !rowNome.includes(nome) && !rowApto.includes(nome) && !rowBloco.includes(nome)) ok = false;
-            if (presenca && rowPresenca !== presenca) ok = false;
-
-            row.style.display = ok ? '' : 'none';
-
-            if (ok) {
-                total++;
-                if (rowPresenca === 'S') confirmadas++;
-                if (rowPresenca === 'N') negadas++;
-                if (rowPresenca === 'P') pendentes++;
-            }
-        });
-
-        document.getElementById('totalConfirmadas').textContent = confirmadas;
-        document.getElementById('totalNegadas').textContent = negadas;
-        document.getElementById('totalPendentes').textContent = pendentes;
-        document.getElementById('totalGeral').textContent = total;
-    }
-</script>
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>

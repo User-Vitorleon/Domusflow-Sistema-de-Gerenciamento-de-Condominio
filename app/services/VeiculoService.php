@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../repositories/VeiculoRepository.php';
 require_once __DIR__ . '/../repositories/MoradorRepository.php';
+require_once __DIR__ . '/../helpers/VeiculoCatalogo.php';
 require_once __DIR__ . '/ParametrosService.php';
 
 class VeiculoService
@@ -44,8 +45,11 @@ class VeiculoService
             }
         }
 
-        $marca  = ucwords(strtolower(trim($dados['marca'])));
-        $modelo = ucwords(strtolower(trim($dados['modelo'])));
+        $marca  = trim((string)($dados['marca'] ?? ''));
+        $modelo = trim((string)($dados['modelo'] ?? ''));
+        if (!VeiculoCatalogo::modeloValido($marca, $modelo)) {
+            return ['sucesso' => false, 'mensagem' => 'Selecione uma marca e modelo validos.'];
+        }
 
         $principal = (!empty($dados['principal']) || $this->repo->countByUser($idDono) === 0) ? 1 : 0;
         if ($principal) {
@@ -120,10 +124,16 @@ class VeiculoService
             return ['sucesso' => false, 'mensagem' => 'Placa inválida.'];
         }
 
+        $marca  = trim((string)($dados['marca'] ?? ''));
+        $modelo = trim((string)($dados['modelo'] ?? ''));
+        if (!VeiculoCatalogo::modeloValido($marca, $modelo)) {
+            return ['sucesso' => false, 'mensagem' => 'Selecione uma marca e modelo validos.'];
+        }
+
         $this->repo->update($id, [
             'placa'  => $placa,
-            'marca'  => ucwords(strtolower(trim($dados['marca']))),
-            'modelo' => ucwords(strtolower(trim($dados['modelo']))),
+            'marca'  => $marca,
+            'modelo' => $modelo,
             'cor'    => $dados['cor'],
         ]);
 
@@ -178,6 +188,11 @@ class VeiculoService
     private function normalizarPlaca(string $placa): string
     {
         return strtoupper(preg_replace('/[^A-Z0-9]/i', '', $placa));
+    }
+
+    public static function catalogoMarcaModelo(): array
+    {
+        return VeiculoCatalogo::marcasModelos();
     }
 
     private function excluirEReorganizarPrincipal(int $id): void

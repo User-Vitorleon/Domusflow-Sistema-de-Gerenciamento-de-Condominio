@@ -37,6 +37,7 @@ $rotulosPerfil = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="app-base-url" content="<?= htmlspecialchars(BASE_URL, ENT_QUOTES, 'UTF-8') ?>">
     <title><?= htmlspecialchars($paginaTitulo) ?> — DomusFlow</title>
     <link rel="icon" type="image/png" href="<?= BASE_URL ?>/public/assets/img/logo_icon.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -44,6 +45,7 @@ $rotulosPerfil = [
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/app.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/header.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/ocorrencia.css">
+    <script src="<?= BASE_URL ?>/public/js/theme-init.js"></script>
     <?php if ($cssExtra): ?>
         <link rel="stylesheet" href="<?= BASE_URL ?>/public/css/<?= $cssExtra ?>">
     <?php endif; ?>
@@ -61,7 +63,7 @@ $rotulosPerfil = [
                 <a href="<?= BASE_URL ?>/painel" class="df-topbar-home" aria-label="Ir para o Painel">
                     <img src="<?= BASE_URL ?>/public/assets/img/logo_icon.jpg"
                         alt="DomusFlow" class="df-topbar-home-logo"
-                        onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+                        data-hide-on-error>
                     <svg style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z" />
@@ -132,11 +134,6 @@ $rotulosPerfil = [
                         <span class="df-topbar-logout-label">Sair</span>
                     </a>
                 </div>
-
-                <script>
-    const t = localStorage.getItem('domusflow-tema');
-    if (t) document.documentElement.setAttribute('data-theme', t);
-</script>
 
             </div>
         </header>

@@ -6,6 +6,7 @@ require_once __DIR__ . '/../services/OcorrenciaService.php';
 class OcorrenciaController
 {
     private const ITENS_POR_PAGINA = 15;
+    private const ITENS_MORADOR_POR_PAGINA = 4;
 
     private OcorrenciaService $service;
 
@@ -21,10 +22,21 @@ public function index(): void
         $idUser = (int) $_SESSION['usuario_id'];
         $this->service->marcarNotificacoesLidas($idUser);
 
-        $usuario     = $this->getMoradorLogado();
-        $ocorrencias = $this->service->listarParaMorador($idUser);
-        $detalhe     = $this->buscarDetalheDoMorador($idUser);
-        $flash       = $this->montarFlashIndex();
+        $usuario        = $this->getMoradorLogado();
+        $statusFiltro   = $this->normalizarStatus($_GET['status'] ?? null);
+        $pagina         = max(1, (int) ($_GET['pagina'] ?? 1));
+        $porPagina      = self::ITENS_MORADOR_POR_PAGINA;
+        $totalOcorrencias = $this->service->contarParaMorador($idUser, $statusFiltro);
+        $totalOcorrencias = min($totalOcorrencias, 10);
+        $totalPaginas   = (int) ceil($totalOcorrencias / $porPagina);
+        if ($totalPaginas > 0 && $pagina > $totalPaginas) {
+            $pagina = $totalPaginas;
+        }
+        $offset         = ($pagina - 1) * $porPagina;
+        $porPagina      = min($porPagina, max(0, 10 - $offset));
+        $ocorrencias    = $this->service->listarParaMorador($idUser, $statusFiltro, $porPagina, $offset);
+        $detalhe        = $this->buscarDetalheDoMorador($idUser);
+        $flash          = $this->montarFlashIndex();
 
         require_once __DIR__ . '/../../resources/views/ocorrencia/index.php';
     }
@@ -164,6 +176,11 @@ private function buscarDetalheDoMorador(int $idUser): ?array
             'data_ini'      => $_GET['data_ini']      ?? null,
             'data_fim'      => $_GET['data_fim']      ?? null,
         ];
+    }
+
+    private function normalizarStatus(?string $status): ?string
+    {
+        return in_array($status, ['A', 'E', 'R', 'C'], true) ? $status : null;
     }
 
     private function montarFlashIndex(): ?array

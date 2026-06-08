@@ -2,6 +2,7 @@
 $paginaTitulo = 'Presenças nas Assembleias';
 $paginaAtiva  = 'assembleia';
 $cssTela = 'assembleia.css';
+$jsExtra = 'assembleia-presencas.js';
 require_once __DIR__ . '/../layout/header.php';
 ?>
 
@@ -18,12 +19,11 @@ require_once __DIR__ . '/../layout/header.php';
         <div class="df-grid-3">
             <div class="df-field">
                 <label>Buscar assembleia ou local</label>
-                <input type="text" id="filtroNome" placeholder="Titulos"
-                       oninput="filtrarPresencas()">
+                <input type="text" id="filtroNome" placeholder="Titulos">
             </div>
             <div class="df-field">
                 <label>Assembleia</label>
-                <select id="filtroAssembleia" onchange="filtrarPresencas()">
+                <select id="filtroAssembleia">
                     <option value="">Todas</option>
                     <?php foreach ($assembleias as $a): ?>
                         <option value="<?= htmlspecialchars($a['titulo']) ?>">
@@ -34,12 +34,12 @@ require_once __DIR__ . '/../layout/header.php';
             </div>
             <div class="df-field">
                 <label>Data</label>
-                <input type="date" id="filtroData" onchange="filtrarPresencas()">
+                <input type="date" id="filtroData">
             </div>
 
         </div>
         <div class="df-actions" style="padding-top: 8px; margin-top: 0; border-top: none;">
-            <button class="btn-ghost" onclick="limparFiltros()">Limpar filtros</button>
+            <button class="btn-ghost" type="button" data-presencas-limpar>Limpar filtros</button>
         </div>
     </div>
 
@@ -104,33 +104,5 @@ require_once __DIR__ . '/../layout/header.php';
 </div>
 </main>
 
-<script>
-function filtrarPresencas() {
-    const nome       = document.getElementById('filtroNome').value.toLowerCase();
-    const assembleia = document.getElementById('filtroAssembleia').value;
-    const data       = document.getElementById('filtroData').value;
-
-    document.querySelectorAll('#tabelaPresencas tr').forEach(row => {
-        const rowAssembleia = row.dataset.assembleia ?? '';
-        const rowLocal      = row.dataset.local      ?? '';
-        const rowData       = row.dataset.data       ?? '';
-        const textoBusca    = `${rowAssembleia} ${rowLocal}`.toLowerCase();
-
-        let ok = true;
-        if (nome && !textoBusca.includes(nome)) ok = false;
-        if (assembleia && rowAssembleia !== assembleia) ok = false;
-        if (data && rowData !== data) ok = false;
-
-        row.style.display = ok ? '' : 'none';
-    });
-}
-
-function limparFiltros() {
-    document.getElementById('filtroNome').value = '';
-    document.getElementById('filtroAssembleia').value = '';
-    document.getElementById('filtroData').value = '';
-    filtrarPresencas();
-}
-</script>
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>

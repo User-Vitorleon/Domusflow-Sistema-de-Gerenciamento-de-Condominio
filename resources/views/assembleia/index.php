@@ -127,7 +127,7 @@ $privilegio = $usuario['privilegio'] ?? 1;
                                 </form>
                             <?php elseif ($presenca === 'N'): ?>
                                 <span class="assembleia-presenca-negada">
-                                    <i class='bx bx-x-circle'></i> Presença Negada
+                                    <i class='bx bx-x-circle'></i> Participação recusada
                                 </span>
                                 <form action="<?= BASE_URL ?>/assembleia/presenca" method="POST">
                                     <input type="hidden" name="id_assembleia" value="<?= $a['id_assembleia'] ?>">
@@ -142,7 +142,7 @@ $privilegio = $usuario['privilegio'] ?? 1;
                                         <i class='bx bx-check'></i> Confirmar
                                     </button>
                                     <button type="submit" name="presenca" value="N" class="btn-danger-sm">
-                                        <i class='bx bx-x'></i> Não irei
+                                        <i class='bx bx-x'></i> Não participarei
                                     </button>
                                 </form>
                             <?php endif; ?>
@@ -150,7 +150,7 @@ $privilegio = $usuario['privilegio'] ?? 1;
 
                         <?php if (in_array($privilegio, [2, 4])): ?>
                             <form action="<?= BASE_URL ?>/assembleia/excluir" method="POST"
-                                  onsubmit="return confirm('Deseja remover esta assembleia?')">
+                                  data-confirm-message="Deseja remover esta assembleia?">
                                 <input type="hidden" name="id_assembleia" value="<?= $a['id_assembleia'] ?>">
                                 <button type="submit" class="btn-danger-sm">
                                     <i class='bx bx-trash'></i> Remover

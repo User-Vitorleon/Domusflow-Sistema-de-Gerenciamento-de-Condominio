@@ -108,6 +108,45 @@
         }
     });
 
+    document.addEventListener('input', function (e) {
+        if (e.target.matches('[data-uppercase]')) {
+            e.target.value = e.target.value.toUpperCase();
+        }
+    });
+
+    document.addEventListener('click', function (e) {
+        if (e.target.closest('[data-stop-propagation]')) {
+            e.stopPropagation();
+        }
+
+        if (e.target.closest('[data-open-fotos]')) {
+            abrirModalFotos();
+        }
+
+        if (e.target.closest('[data-close-fotos]')) {
+            fecharModalFotos();
+        }
+
+        if (e.target.closest('[data-toggle-filtros]')) {
+            toggleFiltros();
+        }
+
+        if (e.target.closest('[data-close-detalhe]')) {
+            fecharDetalhe();
+        }
+    });
+
+    document.querySelectorAll('[data-open-fotos]').forEach(function (el) {
+        el.addEventListener('click', abrirModalFotos);
+    });
+
+    document.querySelectorAll('[data-close-fotos]').forEach(function (el) {
+        el.addEventListener('click', function (e) {
+            e.stopPropagation();
+            fecharModalFotos();
+        });
+    });
+
     window.escHtml               = escHtml;
     window.formatDate            = formatDate;
     window.abrirModalFotos       = abrirModalFotos;

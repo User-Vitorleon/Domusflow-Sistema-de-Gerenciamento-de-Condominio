@@ -3,6 +3,7 @@
 require_once __DIR__ . '/../../config/app.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../app/helpers/CryptoHelper.php';
+require_once __DIR__ . '/../../app/helpers/VeiculoCatalogo.php';
 
 set_time_limit(180);
 
@@ -243,11 +244,8 @@ try {
     foreach ($taxas as $t) $stmtTaxa->execute($t);
 
     $stmtVeiculo = $pdo->prepare("INSERT INTO veiculos (placa, marca, modelo, cor, principal, id_user, id_user_cad, created_at) VALUES (?,?,?,?,?,?,?,?)");
-    $marcas = [
-        ['Fiat', 'Argo'], ['Volkswagen', 'Polo'], ['Chevrolet', 'Onix'], ['Toyota', 'Corolla'],
-        ['Honda', 'Civic'], ['Hyundai', 'HB20'], ['Renault', 'Duster'], ['Jeep', 'Compass'],
-        ['Ford', 'Ranger'], ['Nissan', 'Kicks'], ['Peugeot', '208'], ['Mitsubishi', 'Eclipse Cross'],
-    ];
+    $catalogoVeiculos = VeiculoCatalogo::marcasModelos();
+    $marcas = array_keys($catalogoVeiculos);
     $cores = ['Preto', 'Branco', 'Prata', 'Cinza', 'Azul', 'Vermelho', 'Verde', 'Bege'];
     $placas = [];
     $veiculos = 0;
@@ -265,7 +263,9 @@ try {
             );
             if (isset($placas[$placa])) continue;
             $placas[$placa] = true;
-            [$marca, $modelo] = $marcas[$veiculos % count($marcas)];
+            $marca = $marcas[$veiculos % count($marcas)];
+            $modelos = $catalogoVeiculos[$marca];
+            $modelo = $modelos[intdiv($veiculos, count($marcas)) % count($modelos)];
             $stmtVeiculo->execute([$placa, $marca, $modelo, $cores[$veiculos % count($cores)], $v === 0 ? 1 : 0, $moradorId, 5, dataRelativa(-120 + ($veiculos % 180))]);
             $veiculos++;
         }
@@ -369,10 +369,25 @@ try {
     }
 
     $stmtAviso = $pdo->prepare("INSERT INTO avisos (titulo, mensagem, id_user_cad, status, created_at) VALUES (?,?,?,?,?)");
+    $avisosRealistas = [
+        ['Manutencao preventiva dos elevadores', 'A manutencao preventiva dos elevadores dos blocos A e B ocorrera das 09h as 12h. Durante o periodo, utilize o elevador de servico quando disponivel.'],
+        ['Limpeza da caixa d agua', 'A limpeza semestral da caixa d agua sera realizada nesta semana. Pode haver oscilacao no abastecimento entre 08h e 14h.'],
+        ['Dedetizacao das areas comuns', 'A dedetizacao das garagens, halls e areas tecnicas ocorrera a partir das 13h. Evite circular nesses locais durante a aplicacao.'],
+        ['Atualizacao do cadastro de moradores', 'Solicitamos que moradores atualizem telefone e e-mail no sistema para melhorar a comunicacao oficial do condominio.'],
+        ['Obras no portao da garagem', 'O portao da garagem passara por ajustes tecnicos. A entrada e saida poderao ser realizadas com apoio da portaria.'],
+        ['Uso do salao de festas', 'Reforcamos que a entrega do salao deve ocorrer limpa e organizada, conforme regulamento interno.'],
+        ['Coleta seletiva', 'A coleta seletiva ocorre as tercas e quintas. Separe reciclaveis em sacos identificados e descarte no local correto.'],
+        ['Teste do sistema de incendio', 'Sera realizado teste dos alarmes e sensores de incendio. O acionamento sera apenas preventivo e acompanhado pela manutencao.'],
+        ['Comunicado sobre encomendas', 'Encomendas devem ser retiradas em ate 48 horas apos aviso da portaria para evitar acumulacao no espaco de recebimento.'],
+        ['Pintura das vagas de garagem', 'A pintura de demarcacao das vagas sera feita por etapas. Fique atento aos avisos de remanejamento temporario.'],
+        ['Regras de silencio', 'Lembramos que o horario de silencio deve ser respeitado entre 22h e 08h, inclusive em areas comuns.'],
+        ['Treinamento da equipe de portaria', 'A equipe de portaria participara de treinamento interno. O atendimento seguira normalmente, com apoio do sindico.'],
+    ];
     for ($i = 1; $i <= 36; $i++) {
+        $aviso = $avisosRealistas[($i - 1) % count($avisosRealistas)];
         $stmtAviso->execute([
-            'Comunicado condominial',
-            'Aviso sobre rotina, manutencao ou uso das areas comuns do condominio.',
+            $aviso[0],
+            $aviso[1],
             ($i % 2 === 0) ? 3 : 4,
             ($i % 9 === 0) ? 'I' : 'A',
             dataRelativa(-90 + $i),
@@ -381,14 +396,24 @@ try {
 
     $stmtAss = $pdo->prepare("INSERT INTO assembleias (titulo, data, hora, local, pauta, id_user_cad, status, created_at) VALUES (?,?,?,?,?,?,?,?)");
     $stmtPres = $pdo->prepare("INSERT INTO assembleias_presencas (id_assembleia, id_user, presenca, created_at) VALUES (?,?,?,?)");
-    for ($i = 0; $i < 8; $i++) {
-        $data = (new DateTime('2026-06-06'))->modify(($i - 4) . ' months')->format('Y-m-d');
+    $assembleiasRealistas = [
+        ['Assembleia ordinaria de prestacao de contas', 'Analise das receitas e despesas do periodo, apresentacao de inadimplencia e aprovacao das contas.', 'Salao de Festas Principal', '19:30:00', -5],
+        ['Assembleia para previsao orcamentaria', 'Discussao da previsao orcamentaria, reajuste condominial e contratos de manutencao.', 'Salao de Festas Principal', '19:00:00', -3],
+        ['Assembleia sobre seguranca patrimonial', 'Avaliacao de cameras, controle de acesso, portaria e procedimentos para visitantes.', 'Espaco Coworking', '20:00:00', -1],
+        ['Assembleia extraordinaria sobre garagem', 'Organizacao de vagas, circulacao, cadastro de veiculos e regras para visitantes.', 'Sala de Jogos', '19:30:00', 10],
+        ['Assembleia sobre obras e melhorias', 'Priorizacao de manutencoes, pintura, elevadores e melhorias nas areas comuns.', 'Salao de Festas Principal', '19:30:00', 24],
+        ['Assembleia de convivencia e regulamento interno', 'Revisao de regras de silencio, uso do salao, animais, encomendas e areas comuns.', 'Espaco Coworking', '20:00:00', 45],
+        ['Assembleia para fundo de reserva', 'Definicao de metas do fundo de reserva e planejamento para despesas extraordinarias.', 'Salao de Festas Pequeno', '19:00:00', 75],
+        ['Assembleia anual de planejamento condominial', 'Planejamento anual, calendario de manutencoes, contratos e prioridades da administracao.', 'Salao de Festas Principal', '19:30:00', 110],
+    ];
+    foreach ($assembleiasRealistas as $i => $assembleia) {
+        $data = (new DateTime('2026-06-06'))->modify(($assembleia[4] >= 0 ? '+' : '') . $assembleia[4] . ' days')->format('Y-m-d');
         $stmtAss->execute([
-            'Assembleia condominial',
+            $assembleia[0],
             $data,
-            '19:30:00',
-            'Salao de Festas Principal',
-            'Prestacao de contas, melhorias e assuntos gerais.',
+            $assembleia[3],
+            $assembleia[2],
+            $assembleia[1],
             3,
             ($i === 1) ? 'I' : 'A',
             $data . ' 10:00:00',

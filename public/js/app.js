@@ -1,4 +1,46 @@
+(function () {
+    const metaBaseUrl = document.querySelector('meta[name="app-base-url"]');
+    window.BASE_URL = window.BASE_URL || metaBaseUrl?.content || '';
+})();
+
 document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('[data-hide-on-error]').forEach(function (img) {
+        function ocultarImagemQuebrada() {
+            img.style.display = 'none';
+            if (img.nextElementSibling) {
+                img.nextElementSibling.style.display = 'block';
+            }
+        }
+
+        img.addEventListener('error', function () {
+            ocultarImagemQuebrada();
+        });
+
+        if (img.complete && img.naturalWidth === 0) {
+            ocultarImagemQuebrada();
+        }
+    });
+
+    document.querySelectorAll('[data-stop-propagation]').forEach(function (el) {
+        el.addEventListener('click', function (event) {
+            event.stopPropagation();
+        });
+    });
+
+    document.querySelectorAll('form[data-confirm-message]').forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!confirm(form.dataset.confirmMessage || 'Confirma esta ação?')) {
+                event.preventDefault();
+            }
+        });
+    });
+
+    document.addEventListener('click', function (event) {
+        if (event.target.closest('[data-inatividade-continuar]')) {
+            document.getElementById('df-inatividade-modal')?.remove();
+            window.resetarInatividade?.();
+        }
+    });
     const temaBtn  = document.getElementById('toggleTema');
     const iconeLua = document.getElementById('iconeLua');
     const iconeSol = document.getElementById('iconeSol');
@@ -50,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             <i class='bx bx-time-five'></i>
                             <h4>Sessão expirando</h4>
                             <p>Você será desconectado por inatividade em alguns segundos.</p>
-                            <button onclick="document.getElementById('df-inatividade-modal').remove(); resetarInatividade();">
+                            <button type="button" data-inatividade-continuar>
                                 Continuar sessão
                             </button>
                         </div>`;

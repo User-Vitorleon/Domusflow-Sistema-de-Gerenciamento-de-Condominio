@@ -60,7 +60,8 @@ $cores = [
                 <form action="<?= BASE_URL ?>/veiculo/salvar" method="POST"
                     data-total="<?= $privilegio == 1 ? $totalVeiculosMorador : count($veiculos) ?>"
                     data-limite="<?= $limiteVeiculosMorador ?>"
-                    data-prev="<?= $privilegio ?>">
+                    data-prev="<?= $privilegio ?>"
+                    data-catalogo-veiculos="<?= htmlspecialchars(json_encode($catalogoVeiculos ?? []), ENT_QUOTES, 'UTF-8') ?>">
 
                     <div class="df-grid-2">
                         <div class="df-field">
@@ -83,11 +84,18 @@ $cores = [
                     <div class="df-grid-2">
                         <div class="df-field">
                             <label>Marca</label>
-                            <input type="text" name="marca" placeholder="Ex: Honda" required>
+                            <select name="marca" id="selectMarcaVeiculo" required>
+                                <option value="">Selecione...</option>
+                                <?php foreach (array_keys($catalogoVeiculos ?? []) as $marca): ?>
+                                    <option value="<?= htmlspecialchars($marca) ?>"><?= htmlspecialchars($marca) ?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                         <div class="df-field">
                             <label>Modelo</label>
-                            <input type="text" name="modelo" placeholder="Ex: Civic" required>
+                            <select name="modelo" id="selectModeloVeiculo" required disabled>
+                                <option value="">Selecione a marca primeiro...</option>
+                            </select>
                         </div>
                     </div>
 
@@ -233,7 +241,7 @@ $podeAlterarPrincipal = $podeExcluir;
                                             <?php endif; ?>
                                             <?php if ($podeExcluir): ?>
                                                 <form action="<?= BASE_URL ?>/veiculo/excluir" method="POST"
-                                                    onsubmit="return confirm('Excluir o veículo <?= htmlspecialchars($v['placa']) ?>?')">
+                                                    data-confirm-message="Excluir o veículo <?= htmlspecialchars($v['placa']) ?>?">
                                                     <input type="hidden" name="id_veiculo" value="<?= $v['id_veiculo'] ?>">
                                                     <button type="submit" class="btn-danger-sm veiculo-action-btn">Excluir</button>
                                                 </form>

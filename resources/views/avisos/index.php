@@ -67,7 +67,7 @@ $privilegio = $usuario['privilegio'] ?? 1;
                     </div>
                     <?php if (in_array($privilegio, [2, 4])): ?>
                         <form action="<?= BASE_URL ?>/avisos/excluir" method="POST"
-                              onsubmit="return confirm('Deseja remover este aviso?')">
+                              data-confirm-message="Deseja remover este aviso?">
                             <input type="hidden" name="id_aviso" value="<?= $aviso['id_aviso'] ?>">
                             <button type="submit" class="btn-danger-sm">
                                 <i class='bx bx-trash'> Remover.</i>

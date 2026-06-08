@@ -10,10 +10,10 @@
 
 <div class="boleto-actions">
     <a href="<?= BASE_URL ?>/financeiro/historico" class="btn-voltar">← Voltar</a>
-    <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+    <button type="button" class="btn-imprimir" data-print-boleto>🖨️ Imprimir / Salvar PDF</button>
     <?php if ($lancamento['status'] === 'A'): ?>
         <form action="<?= BASE_URL ?>/financeiro/pagar" method="POST"
-              onsubmit="return confirm('Confirma o pagamento deste boleto?')">
+              data-confirm-message="Confirma o pagamento deste boleto?">
             <input type="hidden" name="id_lancamento" value="<?= $lancamento['id_lancamento'] ?>">
             <button type="submit" class="btn-imprimir">✅ Confirmar Pagamento</button>
         </form>
@@ -175,5 +175,6 @@
 
 </div>
 
+<script src="<?= BASE_URL ?>/public/js/boleto.js"></script>
 </body>
 </html>

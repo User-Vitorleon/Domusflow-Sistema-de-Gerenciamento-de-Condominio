@@ -1,6 +1,7 @@
 <?php
 $paginaTitulo = 'Painel de Ocorrências';
 $cssExtra     = 'ocorrencia.css';
+$jsExtra      = 'ocorrencia.js';
 require_once __DIR__ . '/../layout/header.php';
 
 function statusBadgeP(string $s): string
@@ -58,7 +59,7 @@ function statusBadgeP(string $s): string
         </div>
 
         <div class="oc-filtros-card">
-            <div class="oc-filtros-header" onclick="toggleFiltros()">
+            <div class="oc-filtros-header" data-toggle-filtros>
                 <div style="display:flex;align-items:center;gap:8px">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
@@ -208,7 +209,7 @@ function statusBadgeP(string $s): string
                                     <td class="oc-td-titulo"><?= htmlspecialchars(mb_strimwidth($oc['titulo'], 0, 48, '…')) ?></td>
                                     <td><?= statusBadgeP($oc['status']) ?></td>
                                     <td class="oc-td-data"><?= date('d/m/Y', strtotime($oc['created_at'])) ?></td>
-                                    <td onclick="event.stopPropagation()">
+                                    <td data-stop-propagation>
                                         <a href="<?= BASE_URL ?>/ocorrencia/detalhes?id=<?= (int)$oc['id_ocorrencia'] ?>"
                                             class="btn-ghost"
                                             style="padding:4px 10px;font-size:12px;text-decoration:none;display:inline-block">
@@ -288,8 +289,7 @@ function statusBadgeP(string $s): string
             <?php endif; ?>
         </div>
 
-    </div>
-    <script src="<?= BASE_URL ?>/public/js/ocorrencia.js"></script>
+    </div>
 </main>
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>

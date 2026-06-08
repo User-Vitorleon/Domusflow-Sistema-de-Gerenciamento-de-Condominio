@@ -173,8 +173,7 @@ $jsExtra = 'dashboard.js';
 
 </main>
 
-<script>
-    window.APP_DASHBOARD = <?= json_encode([
+<script type="application/json" id="dashboard-data"><?= json_encode([
                                 'chartOcorrenciasMorador' => [
                                     'labels' => ['Abertas', 'Em andamento', 'Resolvidas', 'Canceladas'],
                                     'dados' => [
@@ -184,7 +183,6 @@ $jsExtra = 'dashboard.js';
                                         (int) ($ocorrenciasMorador['cancelado'] ?? 0),
                                     ]
                                 ]
-                            ]) ?>;
-</script>
+                            ]) ?></script>
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>

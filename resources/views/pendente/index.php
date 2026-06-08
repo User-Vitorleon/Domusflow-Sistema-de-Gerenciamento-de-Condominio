@@ -70,8 +70,5 @@ $nome = htmlspecialchars($_SESSION['usuario_nome'] ?? 'Morador');
     </div>
 </div>
 
-<script>
-    window.APP_BASE_URL = '<?= BASE_URL ?>';
-</script>
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>

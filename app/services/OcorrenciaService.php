@@ -172,9 +172,14 @@ class OcorrenciaService
         return ['sucesso' => true];
     }
 
-    public function listarParaMorador(int $idUser): array
+    public function listarParaMorador(int $idUser, ?string $status = null, int $limit = 4, int $offset = 0): array
     {
-        return $this->repo->listarPorUsuario($idUser);
+        return $this->repo->listarPorUsuario($idUser, $status, $limit, $offset);
+    }
+
+    public function contarParaMorador(int $idUser, ?string $status = null): int
+    {
+        return $this->repo->contarPorUsuario($idUser, $status);
     }
 
     public function listarParaPainel(array $filtros, int $limit = 15, int $offset = 0): array

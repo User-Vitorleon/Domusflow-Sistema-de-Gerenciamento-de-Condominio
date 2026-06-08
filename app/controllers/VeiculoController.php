@@ -26,6 +26,7 @@ class VeiculoController
         $moradores = [];
         $limiteVeiculosMorador = (new ParametrosService())->limiteVeiculosPorMorador();
         $totalVeiculosMorador  = 0;
+        $catalogoVeiculos      = VeiculoService::catalogoMarcaModelo();
 
         $filtrosVeiculos = [];
         $queryVeiculos   = '';

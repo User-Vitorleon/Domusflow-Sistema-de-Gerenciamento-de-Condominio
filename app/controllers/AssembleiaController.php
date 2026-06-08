@@ -18,7 +18,7 @@ class AssembleiaController
 
         $moradorRepo    = new MoradorRepository();
         $usuario        = $moradorRepo->findById((int) $_SESSION['usuario_id']);
-        $avisos         = $this->repo->listar();
+        $avisos         = $this->repo->listar(true);
         $assembleiaRepo = $this->repo;
 
         require_once __DIR__ . '/../../resources/views/assembleia/index.php';
@@ -70,9 +70,16 @@ class AssembleiaController
         AuthGuard::requereUsuarioAtivo();
         AuthGuard::requerePost('/assembleia');
 
+        $idAssembleia = (int) $_POST['id_assembleia'];
         $presenca = $_POST['presenca'] ?? '';
+
+        if (!$this->repo->assembleiaDisponivelParaPresenca($idAssembleia)) {
+            $_SESSION['erro_assembleia'] = 'Esta assembleia ja ocorreu ou nao esta disponivel para confirmacao.';
+            $this->redirecionar('/assembleia');
+        }
+
         $this->repo->confirmarPresenca(
-            (int) $_POST['id_assembleia'],
+            $idAssembleia,
             (int) $_SESSION['usuario_id'],
             $presenca
         );

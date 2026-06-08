@@ -6,6 +6,20 @@
     const CORES_OCORRENCIAS = ['#EF4444', '#F59E0B', '#22C55E', '#94A3B8'];
     const LABELS_PADRAO = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
     const DADOS_PADRAO  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    const dashboardData = carregarDashboardData();
+
+    function carregarDashboardData() {
+        const dataEl = document.getElementById('dashboard-data');
+        if (!dataEl) {
+            return window.APP_DASHBOARD || {};
+        }
+
+        try {
+            return JSON.parse(dataEl.textContent || '{}');
+        } catch {
+            return {};
+        }
+    }
 
     function montarGraficoReservas() {
         const canvas = document.getElementById('chartReservas');
@@ -13,8 +27,8 @@
             return;
         }
 
-        const labels = window.APP_DASHBOARD?.chartLabels ?? LABELS_PADRAO;
-        const dados  = window.APP_DASHBOARD?.chartDados  ?? DADOS_PADRAO;
+        const labels = dashboardData.chartLabels ?? LABELS_PADRAO;
+        const dados  = dashboardData.chartDados  ?? DADOS_PADRAO;
 
         new Chart(canvas, {
             type: 'bar',
@@ -53,7 +67,7 @@
         if (!canvas) {
             return;
         }
-        const config = window.APP_DASHBOARD?.[configKey];
+        const config = dashboardData[configKey];
         if (!config) {
             return;
         }
@@ -113,9 +127,9 @@
             data() {
                 return {
                     resumo: {
-                        reservasPendentes: window.APP_DASHBOARD?.reservasPendentes ?? 0,
-                        locaisDisponiveis: window.APP_DASHBOARD?.locaisDisponiveis ?? 0,
-                        moradoresAtivos:   window.APP_DASHBOARD?.moradoresAtivos   ?? 0
+                        reservasPendentes: dashboardData.reservasPendentes ?? 0,
+                        locaisDisponiveis: dashboardData.locaisDisponiveis ?? 0,
+                        moradoresAtivos:   dashboardData.moradoresAtivos   ?? 0
                     }
                 };
             },

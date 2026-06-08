@@ -1,6 +1,7 @@
 <?php
 $paginaTitulo = 'Recuperar Senha';
 $cssExtra     = 'login.css';
+$jsExtra      = 'recuperar-senha.js';
 require_once __DIR__ . '/../layout/header.php';
 $sucesso = $_SESSION['sucesso_recuperacao'] ?? null;
 unset($_SESSION['sucesso_recuperacao']);
@@ -76,14 +77,3 @@ unset($_SESSION['erro_recuperacao']);
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>
 
-<script>
-    maskCpf(document.getElementById('user_cpf'));
-
-    document.querySelector('.lp-form').addEventListener('submit', function(e) {
-        const cpf = document.getElementById('user_cpf').value.replace(/\D/g, '');
-        if (cpf.length !== 11) {
-            e.preventDefault();
-            document.getElementById('user_cpf').focus();
-        }
-    });
-</script>

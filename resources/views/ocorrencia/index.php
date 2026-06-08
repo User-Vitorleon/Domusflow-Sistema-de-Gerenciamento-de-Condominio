@@ -1,6 +1,7 @@
 <?php
 $paginaTitulo = 'Minhas Ocorrências';
 $cssExtra     = 'ocorrencia.css';
+$jsExtra      = 'ocorrencia.js';
 require_once __DIR__ . '/../layout/header.php';
 
 function statusBadge(string $s): string
@@ -63,22 +64,20 @@ function statusBadge(string $s): string
                         <div class="df-field">
                             <label>Título <span style="color:#dc3545">*</span></label>
                             <input type="text" name="titulo" required
-                                placeholder="DESCREVA BREVEMENTE O PROBLEMA..."
-                                oninput="this.value = this.value.toUpperCase()"
+                                placeholder="DESCREVA BREVEMENTE O PROBLEMA..." data-uppercase
                                 value="<?= htmlspecialchars($_POST['titulo'] ?? '') ?>">
                         </div>
 
                         <div class="df-field">
                             <label>Descrição <span style="color:#dc3545">*</span></label>
                             <textarea name="descricao" rows="4" required
-                                placeholder="DETALHE A OCORRÊNCIA: LOCAL, HORÁRIO, ETC."
-                                oninput="this.value = this.value.toUpperCase()"
+                                placeholder="DETALHE A OCORRÊNCIA: LOCAL, HORÁRIO, ETC." data-uppercase
                                 style="resize:vertical"><?= htmlspecialchars($_POST['descricao'] ?? '') ?></textarea>
                         </div>
 
                         <div class="df-field">
                             <label>Fotos <span style="font-size:11px;color:#aaa;font-weight:400">(opcional)</span></label>
-                            <div class="oc-foto-area" onclick="abrirModalFotos()" title="Adicionar fotos">
+                            <div class="oc-foto-area" data-open-fotos title="Adicionar fotos">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
                                     stroke-linecap="round" stroke-linejoin="round" width="28" height="28"
                                     style="color:#aaa">
@@ -113,6 +112,21 @@ function statusBadge(string $s): string
                         <h4 style="font-size:15px;font-weight:700;margin:0">Minhas Ocorrências</h4>
                     </div>
 
+                    <form method="GET" action="<?= BASE_URL ?>/ocorrencia" style="padding:12px 16px;border-bottom:1px solid #f0f0f0;display:flex;gap:10px;align-items:end;flex-wrap:wrap">
+                        <div class="df-field" style="margin:0;min-width:180px;flex:1">
+                            <label>Status</label>
+                            <select name="status">
+                                <option value="">Todos</option>
+                                <option value="A" <?= ($statusFiltro ?? null) === 'A' ? 'selected' : '' ?>>Aberto</option>
+                                <option value="E" <?= ($statusFiltro ?? null) === 'E' ? 'selected' : '' ?>>Em Andamento</option>
+                                <option value="R" <?= ($statusFiltro ?? null) === 'R' ? 'selected' : '' ?>>Resolvido</option>
+                                <option value="C" <?= ($statusFiltro ?? null) === 'C' ? 'selected' : '' ?>>Cancelado</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary" style="height:38px">Filtrar</button>
+                        <a href="<?= BASE_URL ?>/ocorrencia" class="btn-ghost" style="height:38px;display:inline-flex;align-items:center;text-decoration:none">Limpar</a>
+                    </form>
+
                     <?php if (empty($ocorrencias)): ?>
                         <div class="empty-state">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
@@ -125,7 +139,7 @@ function statusBadge(string $s): string
                         </div>
                     <?php else: ?>
                         <div style="padding:8px 12px;border-bottom:1px solid #f0f0f0;font-size:12px;color:#aaa">
-                            <?= count($ocorrencias) ?> registro(s) encontrado(s).
+                            <?= (int)($totalOcorrencias ?? count($ocorrencias)) ?> registro(s) encontrado(s).
                         </div>
                         <div class="oc-lista-cards">
                             <?php foreach ($ocorrencias as $oc): ?>
@@ -136,8 +150,14 @@ function statusBadge(string $s): string
                                         <span class="oc-cat-pill oc-cat-pill--sm" style="margin-left:4px"><?= htmlspecialchars($oc['categoria']) ?></span>
                                     </div>
                                     <div class="oc-lista-card-titulo"><?= htmlspecialchars($oc['titulo']) ?></div>
+                                    <?php if (!empty($oc['ultimo_tramite_em'])): ?>
+                                        <div style="font-size:12px;color:#777;margin-top:4px">
+                                            Último trâmite: <?= htmlspecialchars($oc['ultimo_tramite_user'] ?? '-') ?>
+                                            em <?= date('d/m/Y H:i', strtotime($oc['ultimo_tramite_em'])) ?>
+                                        </div>
+                                    <?php endif; ?>
                                     <div class="oc-lista-card-bottom">
-                                        <span class="oc-td-data"><?= date('d/m/Y', strtotime($oc['created_at'])) ?></span>
+                                        <span class="oc-td-data">Aberto em: <?= date('d/m/Y', strtotime($oc['created_at'])) ?></span>
                                         <a href="<?= BASE_URL ?>/ocorrencia/detalhes?id=<?= (int)$oc['id_ocorrencia'] ?>"
                                             class="btn-ghost"
                                             style="padding:4px 12px;font-size:12px;text-decoration:none;display:inline-block">
@@ -147,6 +167,33 @@ function statusBadge(string $s): string
                                 </div>
                             <?php endforeach; ?>
                         </div>
+                        <?php if (($totalPaginas ?? 1) > 1): ?>
+                            <?php $basePaginacao = BASE_URL . '/ocorrencia?' . (($statusFiltro ?? null) ? 'status=' . urlencode($statusFiltro) . '&' : ''); ?>
+                            <nav class="mt-3 d-flex justify-content-center pb-3">
+                                <ul class="pagination">
+                                    <li class="page-item <?= $pagina <= 1 ? 'disabled' : '' ?>">
+                                        <a class="page-link" href="<?= $pagina > 1 ? $basePaginacao . 'pagina=' . ($pagina - 1) : '#' ?>">Anterior</a>
+                                    </li>
+                                    <?php
+                                    $range = 2;
+                                    for ($i = 1; $i <= $totalPaginas; $i++):
+                                        $mostrar = ($i === 1 || $i === $totalPaginas || ($i >= $pagina - $range && $i <= $pagina + $range));
+                                        if (!$mostrar):
+                                            if ($i === 2 || $i === $totalPaginas - 1): ?>
+                                                <li class="page-item disabled"><span class="page-link">...</span></li>
+                                        <?php endif;
+                                            continue;
+                                        endif; ?>
+                                        <li class="page-item <?= $i === $pagina ? 'active' : '' ?>">
+                                            <a class="page-link" href="<?= $basePaginacao ?>pagina=<?= $i ?>"><?= $i ?></a>
+                                        </li>
+                                    <?php endfor; ?>
+                                    <li class="page-item <?= $pagina >= $totalPaginas ? 'disabled' : '' ?>">
+                                        <a class="page-link" href="<?= $pagina < $totalPaginas ? $basePaginacao . 'pagina=' . ($pagina + 1) : '#' ?>">Próximo</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        <?php endif; ?>
                     <?php endif; ?>
                 </div>
             </div>
@@ -154,8 +201,8 @@ function statusBadge(string $s): string
         </div>
 
     </div>
-    <div class="oc-modal-overlay" id="modalFotos" style="display:none" onclick="fecharModalFotos()">
-        <div class="oc-modal" onclick="event.stopPropagation()" style="max-width:420px;text-align:center">
+    <div class="oc-modal-overlay" id="modalFotos" style="display:none" data-close-fotos>
+        <div class="oc-modal" data-stop-propagation style="max-width:420px;text-align:center">
             <div class="oc-modal-header">
                 <div style="display:flex;align-items:center;gap:8px">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -166,7 +213,7 @@ function statusBadge(string $s): string
                     </svg>
                     Adicionar Fotos
                 </div>
-                <button class="oc-modal-close" onclick="fecharModalFotos()">✕</button>
+                <button class="oc-modal-close" data-close-fotos>✕</button>
             </div>
             <hr style="border:none;border-top:1px solid #eee;margin:0">
             <div style="padding:40px 24px 32px">
@@ -180,12 +227,10 @@ function statusBadge(string $s): string
                 <p style="font-size:13px;color:#888;margin-bottom:0">O envio de fotos estará disponível em breve.</p>
             </div>
             <div style="padding:0 24px 24px">
-                <button class="btn-primary" style="width:100%" onclick="fecharModalFotos()">Fechar</button>
+                <button class="btn-primary" style="width:100%" data-close-fotos>Fechar</button>
             </div>
         </div>
     </div>
 
-</main>
-
-<script src="<?= BASE_URL ?>/public/js/ocorrencia.js"></script>
+</main>
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>

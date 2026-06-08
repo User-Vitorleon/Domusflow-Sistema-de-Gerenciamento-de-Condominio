@@ -3,7 +3,7 @@
 (function () {
     'use strict';
 
-    const BASE       = window.APP_BASE_URL || '';
+    const BASE       = window.BASE_URL || '';
     const INTERVALO  = 10;
     const CHECK_URL  = BASE + '/pendente/checar';
     const REDIRECT   = BASE + '/dashboard';
@@ -66,7 +66,5 @@
             checarAprovacao();
         }
     }, 1000);
-
-r
     checarAprovacao();
 })();

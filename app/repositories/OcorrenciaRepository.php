@@ -37,15 +37,54 @@ public function criar(array $dados): int
         return $row ?: null;
     }
 
-    public function listarPorUsuario(int $idUser): array
+    public function listarPorUsuario(int $idUser, ?string $status = null, int $limit = 4, int $offset = 0): array
     {
-        $stmt = $this->pdo->prepare("
-            SELECT * FROM ocorrencias
-            WHERE id_user = :id_user
-            ORDER BY created_at DESC
-        ");
-        $stmt->execute([':id_user' => $idUser]);
+        $sql = "
+            SELECT o.*,
+                   ult.nome_user_cad AS ultimo_tramite_user,
+                   ult.created_at AS ultimo_tramite_em
+            FROM ocorrencias o
+            LEFT JOIN (
+                SELECT t1.id_ocorrencia, t1.nome_user_cad, t1.created_at
+                FROM ocorrencia_tramites t1
+                INNER JOIN (
+                    SELECT id_ocorrencia, MAX(created_at) AS ultimo_em
+                    FROM ocorrencia_tramites
+                    GROUP BY id_ocorrencia
+                ) t2 ON t2.id_ocorrencia = t1.id_ocorrencia
+                    AND t2.ultimo_em = t1.created_at
+            ) ult ON ult.id_ocorrencia = o.id_ocorrencia
+            WHERE o.id_user = :id_user
+        ";
+        if ($status) {
+            $sql .= ' AND o.status = :status';
+        }
+        $sql .= ' ORDER BY o.created_at DESC LIMIT :limit OFFSET :offset';
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':id_user', $idUser, PDO::PARAM_INT);
+        if ($status) {
+            $stmt->bindValue(':status', $status);
+        }
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function contarPorUsuario(int $idUser, ?string $status = null): int
+    {
+        $sql = 'SELECT COUNT(*) FROM ocorrencias WHERE id_user = :id_user';
+        if ($status) {
+            $sql .= ' AND status = :status';
+        }
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':id_user', $idUser, PDO::PARAM_INT);
+        if ($status) {
+            $stmt->bindValue(':status', $status);
+        }
+        $stmt->execute();
+        return (int) $stmt->fetchColumn();
     }
 
     public function listarTodas(?string $status = null, int $limit = 15, int $offset = 0): array

@@ -83,12 +83,12 @@
             <label for="descricao_tramite">Anotação / Encaminhamento <span style="color:var(--error)">*</span></label>
             <textarea name="descricao" id="descricao_tramite" rows="3"
                       placeholder="EX: ENCAMINHADO AO JARDINEIRO PARA VERIFICAÇÃO..."
-                      required oninput="this.value = this.value.toUpperCase()"
+                      required data-uppercase
                       style="resize:vertical"></textarea>
         </div>
 
         <div class="df-actions" style="margin-top:0">
-            <button type="button" class="btn-ghost" onclick="fecharModal()">Fechar</button>
+            <button type="button" class="btn-ghost" data-close-detalhe>Fechar</button>
             <button type="submit" class="btn-primary">
                 <i class="fa-solid fa-arrow-right" style="margin-right:6px"></i>Registrar Tramitação
             </button>
@@ -96,7 +96,7 @@
     </form>
     <?php else: ?>
     <div class="df-actions" style="margin-top:16px">
-        <button type="button" class="btn-ghost" onclick="fecharModal()">Fechar</button>
+        <button type="button" class="btn-ghost" data-close-detalhe>Fechar</button>
     </div>
     <?php endif; ?>
 

@@ -9,14 +9,18 @@ class AssembleiaRepository
         $this->pdo = getConnection();
     }
 
-    public function listar(): array
+    public function listar(bool $somenteFuturas = false): array
     {
+        $whereData = $somenteFuturas ? "AND a.data >= CURDATE()" : "";
+        $ordem = $somenteFuturas ? "a.data ASC, a.hora ASC" : "a.data DESC";
+
         $stmt = $this->pdo->query("
             SELECT a.*, m.nome AS nome_autor
             FROM assembleias a
             INNER JOIN morador m ON a.id_user_cad = m.id_user
             WHERE a.status = 'A'
-            ORDER BY a.data DESC
+            {$whereData}
+            ORDER BY {$ordem}
         ");
         return $stmt->fetchAll();
     }
@@ -39,6 +43,10 @@ class AssembleiaRepository
 
     public function confirmarPresenca(int $idAssembleia, int $idUser, string $presenca): bool
     {
+        if (!in_array($presenca, ['S', 'N'], true)) {
+            return false;
+        }
+
         $stmt = $this->pdo->prepare("
             INSERT INTO assembleias_presencas (id_assembleia, id_user, presenca)
             VALUES (:id_assembleia, :id_user, :presenca)
@@ -144,5 +152,18 @@ class AssembleiaRepository
 
         $result = $stmt->fetch();
         return $result ? $result['presenca'] : null;
+    }
+
+    public function assembleiaDisponivelParaPresenca(int $idAssembleia): bool
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT COUNT(*)
+            FROM assembleias
+            WHERE id_assembleia = :id
+              AND status = 'A'
+              AND data >= CURDATE()
+        ");
+        $stmt->execute([':id' => $idAssembleia]);
+        return (int)$stmt->fetchColumn() > 0;
     }
 }

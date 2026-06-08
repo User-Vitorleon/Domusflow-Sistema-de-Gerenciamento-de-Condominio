@@ -14,13 +14,15 @@ class AuthGuard
             self::redirecionarParaLogin();
         }
 
-        if ($usuario['status'] === 'P') {
+        $status = $usuario['status'] ?? null;
+
+        if ($status === 'P') {
             self::redirecionar('/pendente');
         }
 
-        if ($usuario['status'] === 'B') {
-            $_SESSION['erro_login'] = 'Esta conta está inativa. Entre em contato com o síndico.';
+        if ($status !== 'L') {
             self::derrubarSessao();
+            $_SESSION['erro_login'] = 'Seu acesso foi encerrado. Entre em contato com a administracao.';
             self::redirecionarParaLogin();
         }
 

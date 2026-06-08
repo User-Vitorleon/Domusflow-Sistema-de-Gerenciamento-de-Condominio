@@ -1,6 +1,7 @@
 <?php
 $paginaTitulo = 'Detalhes da Ocorrência';
 $cssExtra     = 'ocorrencia.css';
+$jsExtra      = 'ocorrencia.js';
 require_once __DIR__ . '/../layout/header.php';
 
 if (!function_exists('statusBadgeP')) {
@@ -168,8 +169,7 @@ $encerrada = in_array($detalhe['status'] ?? '', ['R', 'C'], true);
                             <label>Descrição <span style="color:#dc3545">*</span></label>
                             <textarea name="descricao"
                                 rows="4"
-                                <?= $encerrada ? 'disabled' : 'required' ?>
-                                oninput="this.value = this.value.toUpperCase()"
+                                <?= $encerrada ? 'disabled' : 'required' ?> data-uppercase
                                 placeholder="<?= $encerrada ? 'OCORRÊNCIA ENCERRADA PARA NOVAS TRAMITAÇÕES.' : 'DESCREVA O QUE FOI FEITO OU ENCAMINHADO...' ?>"></textarea>
                         </div>
                     </div>
@@ -205,8 +205,7 @@ $encerrada = in_array($detalhe['status'] ?? '', ['R', 'C'], true);
                         <label>Descrição <span style="color:#dc3545">*</span></label>
                         <textarea name="descricao"
                             rows="4"
-                            <?= $encerrada ? 'disabled' : 'required' ?>
-                            oninput="this.value = this.value.toUpperCase()"
+                            <?= $encerrada ? 'disabled' : 'required' ?> data-uppercase
                             placeholder="<?= $encerrada ? 'OCORRÊNCIA ENCERRADA PARA NOVAS ATUALIZAÇÕES.' : 'ESCREVA SUA ATUALIZAÇÃO...' ?>"></textarea>
                     </div>
 

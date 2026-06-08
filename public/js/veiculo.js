@@ -18,6 +18,7 @@
         });
     }
 
+    configurarMarcaModelo();
     bloquearFormularioSeAtingiuLimite();
 
     function removerAvisoPrincipal() {
@@ -51,5 +52,42 @@
         alerta.className = 'df-alert df-alert-warning';
         alerta.textContent = `Voce ja atingiu o limite de ${limite} veiculos cadastrados, apague ou acione o(a) Sindico(a).`;
         form.prepend(alerta);
+    }
+
+    function configurarMarcaModelo() {
+        const form = document.querySelector('form[action*="veiculo/salvar"]');
+        const marca = document.getElementById('selectMarcaVeiculo');
+        const modelo = document.getElementById('selectModeloVeiculo');
+        if (!form || !marca || !modelo) return;
+
+        let catalogo = {};
+        try {
+            catalogo = JSON.parse(form.dataset.catalogoVeiculos || '{}');
+        } catch {
+            catalogo = {};
+        }
+
+        const resetModelo = (texto = 'Selecione a marca primeiro...') => {
+            modelo.innerHTML = `<option value="">${texto}</option>`;
+            modelo.disabled = true;
+        };
+
+        marca.addEventListener('change', () => {
+            const modelos = catalogo[marca.value] || [];
+            resetModelo(modelos.length ? 'Selecione...' : 'Nenhum modelo cadastrado');
+            if (!modelos.length) return;
+
+            modelos.forEach((item) => {
+                const option = document.createElement('option');
+                option.value = item;
+                option.textContent = item;
+                modelo.appendChild(option);
+            });
+            modelo.disabled = false;
+        });
+
+        form.addEventListener('reset', () => {
+            setTimeout(() => resetModelo(), 0);
+        });
     }
 })();

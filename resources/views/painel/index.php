@@ -59,7 +59,7 @@ function pn_icon(string $nome): string
                     <span class="pn-card-sub">Taxas, multas e faturas</span>
                 </div>
                 <svg class="pn-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
-                <ul class="dropdown-menu" onclick="event.stopPropagation()">
+                <ul class="dropdown-menu" data-stop-propagation>
                     <li><a class="dropdown-item" href="<?= BASE_URL ?>/financeiro/taxas">Cadastrar Taxas/Multas</a></li>
                     <li><a class="dropdown-item" href="<?= BASE_URL ?>/financeiro/lancamento">Lançamentos</a></li>
                 </ul>
@@ -84,7 +84,7 @@ function pn_icon(string $nome): string
                     <span class="pn-card-sub">Locais e solicitações pendentes</span>
                 </div>
                 <svg class="pn-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
-                <ul class="dropdown-menu" onclick="event.stopPropagation()">
+                <ul class="dropdown-menu" data-stop-propagation>
                     <li><a class="dropdown-item" href="<?= BASE_URL ?>/reserva?visao=locais">Locais</a></li>
                     <li><a class="dropdown-item" href="<?= BASE_URL ?>/reserva?visao=solicitacoes">Solicitações</a></li>
                 </ul>
@@ -98,7 +98,7 @@ function pn_icon(string $nome): string
                     <span class="pn-card-sub">Gerencie chamados dos moradores</span>
                 </div>
                 <svg class="pn-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
-                <ul class="dropdown-menu" onclick="event.stopPropagation()">
+                <ul class="dropdown-menu" data-stop-propagation>
                     <li><h6 class="dropdown-header">Minhas Ocorrências</h6></li>
                     <li><a class="dropdown-item" href="<?= BASE_URL ?>/ocorrencia">Abrir / Acompanhar</a></li>
                     <li><hr class="dropdown-divider"></li>
@@ -118,7 +118,7 @@ function pn_icon(string $nome): string
                     <span class="pn-card-sub">Próximas assembleias agendadas</span>
                 </div>
                 <svg class="pn-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
-                <ul class="dropdown-menu" onclick="event.stopPropagation()">
+                <ul class="dropdown-menu" data-stop-propagation>
                     <li><a class="dropdown-item" href="<?= BASE_URL ?>/assembleia">Assembleias</a></li>
                     <li><a class="dropdown-item" href="<?= BASE_URL ?>/assembleia/presencas">Ver Presenças</a></li>
                 </ul>
@@ -139,7 +139,7 @@ function pn_icon(string $nome): string
                         <span class="pn-card-sub">Nova reserva e histórico</span>
                     </div>
                     <svg class="pn-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
-                    <ul class="dropdown-menu" onclick="event.stopPropagation()">
+                    <ul class="dropdown-menu" data-stop-propagation>
                         <li><a class="dropdown-item" href="<?= BASE_URL ?>/reserva">Nova Reserva</a></li>
                         <li><a class="dropdown-item" href="<?= BASE_URL ?>/reserva/historico">Histórico</a></li>
                     </ul>

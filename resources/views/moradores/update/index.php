@@ -114,13 +114,13 @@ $perfil = $labels[$usuario['privilegio']] ?? 'Usuário';
         </div>
         <div class="danger-btns">
           <form action="<?= BASE_URL ?>/moradores/inativar" method="POST" class="perfil-danger-form"
-              onsubmit="return confirm('Deseja inativar sua conta? Você não conseguirá mais acessar o sistema.')">
+              data-confirm-message="Deseja inativar sua conta? Você não conseguirá mais acessar o sistema.">
               <button type="submit" class="btn-inativar">
                   <i class='bx bx-pause-circle'></i> Inativar conta
               </button>
           </form>
           <form action="<?= BASE_URL ?>/moradores/deletar" method="POST" class="perfil-danger-form"
-              onsubmit="return confirm('Atenção! Esta ação é irreversível. Seus dados pessoais serão anonimizados.')">
+              data-confirm-message="Atenção! Esta ação é irreversível. Seus dados pessoais serão anonimizados.">
               <button type="submit" class="btn-deletar">
                   <i class='bx bx-trash'></i> Apagar conta
               </button>
