@@ -51,13 +51,11 @@ Todas as senhas do seed são `123456`.
 | Perfil | Nome | CPF | Senha |
 |---|---|---|---|
 | Admin | Admin Principal | `00000000000` | `123456` |
-| Admin | Admin Reserva | `99999999999` | `123456` |
 | Síndico | Vitor Leon | `43209957835` | `123456` |
-| Síndico | Mariana Alves | `98765432100` | `123456` |
 | Porteiro | Carlos Lima | `11111111111` | `123456` |
-| Porteiro | Eduardo Moreira | `22222222222` | `123456` |
+| Morador | Gerado pelo seed | exibido ao final da execução | `123456` |
 
-O seed também imprime ao final um usuário-chave de cada perfil, incluindo um morador gerado dinamicamente. Além disso, popula 1000 moradores, veículos, reservas, ocorrências, assembleias, avisos, auditoria e dados financeiros para simular um condomínio real.
+O seed imprime ao final um usuário-chave de cada perfil para login. O CPF do morador é gerado dinamicamente, por isso deve ser consultado na própria saída do seed. Além disso, popula 1000 moradores, veículos, reservas, ocorrências, assembleias, avisos, auditoria e dados financeiros para simular um condomínio real.
 
 ## Perfis de Acesso
 
