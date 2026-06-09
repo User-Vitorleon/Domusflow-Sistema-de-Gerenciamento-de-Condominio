@@ -1,4 +1,4 @@
-/* DomusFlow — pendente.css */
+
 .page-centered {
     min-height: 100vh;
     display: flex;
@@ -109,7 +109,6 @@
     color: var(--primary);
 }
 
-/* Ícone pulsante na tela pendente */
 .pendente-icon {
     animation: pulse 2s ease-in-out infinite;
 }
@@ -128,7 +127,6 @@
     }
 }
 
-/* alerta Bootstrap!!!!! reforçado com paleta DomusFlow */
 .df-card-pendente .alert-warning {
     background: #FFFBEB;
     border: 1px solid #FDE68A;

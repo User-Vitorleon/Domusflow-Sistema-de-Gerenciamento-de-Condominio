@@ -1,346 +1,193 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Unit\Services;
 
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
-use MoradorRepository;
-use VeiculoRepository;
 use VeiculoService;
-
-require_once __DIR__ . '/../../app/repositories/VeiculoRepository.php';
-require_once __DIR__ . '/../../app/repositories/MoradorRepository.php';
-require_once __DIR__ . '/../../app/services/VeiculoService.php';
+use Tests\Support\FakeMoradorRepository;
+use Tests\Support\FakeVeiculoRepository;
 
 final class VeiculoServiceTest extends TestCase
 {
-    private function criarService(?FakeVeiculoRepository $repo = null): VeiculoService
+    private FakeVeiculoRepository $repo;
+    private FakeMoradorRepository $moradorRepo;
+    private VeiculoService $service;
+
+    protected function setUp(): void
     {
-        return new VeiculoService($repo ?? new FakeVeiculoRepository(), new FakeMoradorRepository());
+        $this->repo = new FakeVeiculoRepository();
+        $this->moradorRepo = new FakeMoradorRepository();
+        $this->moradorRepo->moradores[7] = ['id_user' => 7, 'privilegio' => 2];
+        $this->service = new VeiculoService($this->repo, $this->moradorRepo);
     }
 
-    private function invocarNormalizarPlaca(string $placa): string
+    private function dadosValidos(array $override = []): array
     {
-        $service = $this->criarService();
-        $ref     = new ReflectionClass($service);
-        $metodo  = $ref->getMethod('normalizarPlaca');
-        $metodo->setAccessible(true);
-        return $metodo->invoke($service, $placa);
+        return array_replace([
+            'placa' => 'abc-1234',
+            'id_user' => 7,
+            'marca' => 'Fiat',
+            'modelo' => 'Uno',
+            'cor' => 'Prata',
+        ], $override);
     }
 
-    public function testNormalizarPlacaConverteParaMaiusculo(): void
+    public function testCadastrarValidaPlacaCurta(): void
     {
-        $this->assertSame('ABC1D23', $this->invocarNormalizarPlaca('abc1d23'));
-    }
-
-    public function testNormalizarPlacaRemoveHifenEEspacos(): void
-    {
-        $this->assertSame('ABC1234', $this->invocarNormalizarPlaca('abc-1234'));
-        $this->assertSame('ABC1234', $this->invocarNormalizarPlaca(' abc 1234 '));
-    }
-
-    public function testNormalizarPlacaRemoveCaracteresEspeciais(): void
-    {
-        $this->assertSame('XYZ9999', $this->invocarNormalizarPlaca('xyz/9999@'));
-    }
-
-    public function testCadastroComPlacaCurtaRetornaErro(): void
-    {
-        $service = $this->criarService();
-        $resultado = $service->cadastrar(
-            ['placa' => 'AB1', 'id_user' => 1, 'marca' => 'x', 'modelo' => 'y', 'cor' => 'z'],
-            1,
-            1
-        );
+        $resultado = $this->service->cadastrar($this->dadosValidos(['placa' => 'AB1']), 2, 2);
 
         $this->assertFalse($resultado['sucesso']);
-        $this->assertStringContainsString('Placa inv', $resultado['mensagem']);
+        $this->assertStringContainsString('Placa', $resultado['mensagem']);
     }
 
-    public function testCadastrarComPlacaExistenteRetornaErro(): void
+    public function testCadastrarBloqueiaPlacaDuplicada(): void
     {
-        $repo = new FakeVeiculoRepository();
-        $repo->placaExiste = true;
+        $this->repo->placaExiste = true;
 
-        $resultado = $this->criarService($repo)->cadastrar(
-            ['placa' => 'abc-1234', 'id_user' => 1, 'marca' => 'Fiat', 'modelo' => 'Uno', 'cor' => 'Branca'],
-            99,
-            2
-        );
+        $resultado = $this->service->cadastrar($this->dadosValidos(), 2, 2);
 
         $this->assertFalse($resultado['sucesso']);
+        $this->assertStringContainsString('placa', $resultado['mensagem']);
         $this->assertStringContainsString('cadastrada', $resultado['mensagem']);
     }
 
-    public function testCadastrarSalvaDadosNormalizados(): void
+    public function testCadastrarValidaMarcaEModeloDoCatalogo(): void
     {
-        $repo = new FakeVeiculoRepository();
+        $resultado = $this->service->cadastrar($this->dadosValidos(['modelo' => 'Modelo Inexistente']), 2, 2);
 
-        $resultado = $this->criarService($repo)->cadastrar(
-            [
-                'placa' => 'abc-1234',
-                'id_user' => 7,
-                'marca' => ' fiat ',
-                'modelo' => ' uno way ',
-                'cor' => 'Prata',
-                'principal' => '1',
-            ],
-            99,
-            2
-        );
-
-        $this->assertTrue($resultado['sucesso']);
-        $this->assertSame('ABC1234', $repo->dadosSalvos['placa']);
-        $this->assertSame('Fiat', $repo->dadosSalvos['marca']);
-        $this->assertSame('Uno Way', $repo->dadosSalvos['modelo']);
-        $this->assertSame(1, $repo->dadosSalvos['principal']);
-        $this->assertSame(7, $repo->desmarcouPrincipalDoUsuario);
+        $this->assertFalse($resultado['sucesso']);
+        $this->assertSame('Selecione uma marca e modelo validos.', $resultado['mensagem']);
     }
 
-    public function testCadastrarRetornaErroQuandoRepositorioNaoSalva(): void
+    public function testCadastrarSalvaPlacaNormalizadaEPrimeiroVeiculoComoPrincipal(): void
     {
-        $repo = new FakeVeiculoRepository();
-        $repo->idSalvo = 0;
+        $resultado = $this->service->cadastrar($this->dadosValidos(), 3, 2);
 
-        $resultado = $this->criarService($repo)->cadastrar(
-            ['placa' => 'ABC1234', 'id_user' => 7, 'marca' => 'Fiat', 'modelo' => 'Uno', 'cor' => 'Prata'],
-            99,
-            2
-        );
+        $this->assertTrue($resultado['sucesso']);
+        $this->assertSame('ABC1234', $this->repo->dadosSalvos['placa']);
+        $this->assertSame(1, $this->repo->dadosSalvos['principal']);
+        $this->assertSame(7, $this->repo->usuarioDesmarcado);
+        $this->assertSame(3, $this->repo->dadosSalvos['id_user_cad']);
+    }
+
+    public function testCadastrarPodeSalvarVeiculoNaoPrincipalQuandoUsuarioJaTemVeiculo(): void
+    {
+        $this->repo->quantidadeUsuario = 1;
+
+        $resultado = $this->service->cadastrar($this->dadosValidos(), 3, 2);
+
+        $this->assertTrue($resultado['sucesso']);
+        $this->assertSame(0, $this->repo->dadosSalvos['principal']);
+        $this->assertNull($this->repo->usuarioDesmarcado);
+    }
+
+    public function testCadastrarRetornaErroQuandoRepositorioFalha(): void
+    {
+        $this->repo->saveResultado = false;
+
+        $resultado = $this->service->cadastrar($this->dadosValidos(), 3, 2);
 
         $this->assertFalse($resultado['sucesso']);
         $this->assertStringContainsString('Erro ao salvar', $resultado['mensagem']);
     }
 
-    public function testListarTodosRetornaDadosDoRepositorio(): void
+    public function testListagensDelegamAoRepositorio(): void
     {
-        $repo = new FakeVeiculoRepository();
-        $repo->todos = [['placa' => 'ABC1234']];
+        $this->repo->todos = [['placa' => 'AAA1111']];
+        $this->repo->porUsuario = [['placa' => 'BBB2222']];
+        $this->repo->filtrados = [['placa' => 'CCC3333']];
+        $this->repo->totalFiltrado = 8;
+        $this->repo->quantidadeUsuario = 1;
 
-        $this->assertSame($repo->todos, $this->criarService($repo)->listarTodos());
+        $this->assertSame($this->repo->todos, $this->service->listarTodos());
+        $this->assertSame($this->repo->porUsuario, $this->service->listarPorUsuario(7));
+        $this->assertSame($this->repo->filtrados, $this->service->listarTodosComFiltros(['placa' => 'C'], 10, 20));
+        $this->assertSame(8, $this->service->contarTodosComFiltros(['placa' => 'C']));
+        $this->assertSame(1, $this->service->contarPorUsuario(7));
     }
 
-    public function testListarPorUsuarioRetornaDadosDoRepositorio(): void
+    public function testConsultarPorPlacaNormalizaBusca(): void
     {
-        $repo = new FakeVeiculoRepository();
-        $repo->porUsuario = [['id_user' => 5]];
+        $this->repo->veiculoPorPlaca = ['placa' => 'ABC1234'];
 
-        $this->assertSame($repo->porUsuario, $this->criarService($repo)->listarPorUsuario(5));
-        $this->assertSame(5, $repo->usuarioConsultado);
-    }
-
-    public function testConsultarPorPlacaQuandoNaoEncontraRetornaErro(): void
-    {
-        $resultado = $this->criarService()->consultarPorPlaca('abc-1234');
-
-        $this->assertFalse($resultado['sucesso']);
-        $this->assertStringContainsString('Nenhum', $resultado['mensagem']);
-    }
-
-    public function testConsultarPorPlacaQuandoEncontraRetornaVeiculo(): void
-    {
-        $repo = new FakeVeiculoRepository();
-        $repo->veiculoPorPlaca = ['placa' => 'ABC1234'];
-
-        $resultado = $this->criarService($repo)->consultarPorPlaca('abc-1234');
+        $resultado = $this->service->consultarPorPlaca('abc-1234');
 
         $this->assertTrue($resultado['sucesso']);
         $this->assertSame(['placa' => 'ABC1234'], $resultado['veiculo']);
-        $this->assertSame('ABC1234', $repo->placaConsultada);
     }
 
-    public function testEditarSemPrivilegioRetornaErro(): void
+    public function testConsultarPorPlacaInexistenteRetornaErro(): void
     {
-        $resultado = $this->criarService()->editar(
-            1,
-            ['placa' => 'ABC1234', 'marca' => 'Fiat', 'modelo' => 'Uno', 'cor' => 'Branca'],
-            1
-        );
+        $resultado = $this->service->consultarPorPlaca('abc-1234');
 
         $this->assertFalse($resultado['sucesso']);
-        $this->assertStringContainsString('permiss', $resultado['mensagem']);
+        $this->assertStringContainsString('Nenhum', $resultado['mensagem']);
+        $this->assertStringContainsString('placa', $resultado['mensagem']);
     }
 
-    public function testEditarComPlacaCurtaRetornaErro(): void
+    public function testEditarExigePrivilegioPermitido(): void
     {
-        $resultado = $this->criarService()->editar(
-            1,
-            ['placa' => 'AB1', 'marca' => 'Fiat', 'modelo' => 'Uno', 'cor' => 'Branca'],
-            2
-        );
+        $resultado = $this->service->editar(1, $this->dadosValidos(), 1);
 
         $this->assertFalse($resultado['sucesso']);
-        $this->assertStringContainsString('Placa inv', $resultado['mensagem']);
+        $this->assertStringContainsString('permi', $resultado['mensagem']);
     }
 
-    public function testEditarComPrivilegioAtualizaDadosNormalizados(): void
+    public function testEditarAtualizaDadosValidos(): void
     {
-        $repo = new FakeVeiculoRepository();
-
-        $resultado = $this->criarService($repo)->editar(
-            8,
-            ['placa' => 'abc-1234', 'marca' => ' fiat ', 'modelo' => ' uno ', 'cor' => 'Branca'],
-            2
-        );
+        $resultado = $this->service->editar(5, $this->dadosValidos(['placa' => 'abc1d23']), 2);
 
         $this->assertTrue($resultado['sucesso']);
-        $this->assertSame(8, $repo->idAtualizado);
-        $this->assertSame('ABC1234', $repo->dadosAtualizados['placa']);
-        $this->assertSame('Fiat', $repo->dadosAtualizados['marca']);
-        $this->assertSame('Uno', $repo->dadosAtualizados['modelo']);
+        $this->assertSame(5, $this->repo->idAtualizado);
+        $this->assertSame('ABC1D23', $this->repo->dadosAtualizados['placa']);
     }
 
-    public function testDefinirPrincipalDesmarcaEAtualizaVeiculo(): void
+    public function testDefinirPrincipalExigeVeiculoExistente(): void
     {
-        $repo = new FakeVeiculoRepository();
-
-        $resultado = $this->criarService($repo)->definirPrincipal(3, 5);
-
-        $this->assertTrue($resultado['sucesso']);
-        $this->assertSame(5, $repo->desmarcouPrincipalDoUsuario);
-        $this->assertSame(3, $repo->veiculoMarcadoPrincipal);
-    }
-
-    public function testExcluirSemPrivilegioRetornaErro(): void
-    {
-        $resultado = $this->criarService()->excluir(1, 99, 1);
-        $this->assertFalse($resultado['sucesso']);
-    }
-
-    public function testExcluirComoSindicoRemoveVeiculo(): void
-    {
-        $repo = new FakeVeiculoRepository();
-
-        $resultado = $this->criarService($repo)->excluir(12, 2, 99);
-
-        $this->assertTrue($resultado['sucesso']);
-        $this->assertSame(12, $repo->idExcluido);
-    }
-
-    public function testExcluirMoradorQuandoVeiculoNaoExisteRetornaErro(): void
-    {
-        $resultado = $this->criarService()->excluir(12, 1, 7);
+        $resultado = $this->service->definirPrincipal(44, 2, 7);
 
         $this->assertFalse($resultado['sucesso']);
-        $this->assertStringContainsString('ncontrado', $resultado['mensagem']);
+        $this->assertSame('Veiculo nao encontrado.', $resultado['mensagem']);
     }
 
-    public function testExcluirMoradorNaoPermiteVeiculoDeOutroUsuario(): void
+    public function testDefinirPrincipalPermiteDonoOuGestao(): void
     {
-        $repo = new FakeVeiculoRepository();
-        $repo->veiculoPorId = ['id_user' => 8];
+        $this->repo->veiculoPorId = ['id_veiculo' => 44, 'id_user' => 7];
 
-        $resultado = $this->criarService($repo)->excluir(12, 1, 7);
-
-        $this->assertFalse($resultado['sucesso']);
-        $this->assertStringContainsString('permiss', $resultado['mensagem']);
-    }
-
-    public function testExcluirMoradorRemoveProprioVeiculo(): void
-    {
-        $repo = new FakeVeiculoRepository();
-        $repo->veiculoPorId = ['id_user' => 7];
-
-        $resultado = $this->criarService($repo)->excluir(12, 1, 7);
+        $resultado = $this->service->definirPrincipal(44, 1, 7);
 
         $this->assertTrue($resultado['sucesso']);
-        $this->assertSame(12, $repo->idExcluido);
-    }
-}
-
-final class FakeVeiculoRepository extends VeiculoRepository
-{
-    public bool $placaExiste = false;
-    public int $idSalvo = 1;
-    public ?array $dadosSalvos = null;
-    public ?array $dadosAtualizados = null;
-    public ?array $veiculoPorPlaca = null;
-    public ?array $veiculoPorId = null;
-    public array $todos = [];
-    public array $porUsuario = [];
-    public ?int $desmarcouPrincipalDoUsuario = null;
-    public ?int $veiculoMarcadoPrincipal = null;
-    public ?int $idAtualizado = null;
-    public ?int $idExcluido = null;
-    public ?int $usuarioConsultado = null;
-    public ?string $placaConsultada = null;
-
-    public function __construct()
-    {
+        $this->assertSame(7, $this->repo->usuarioDesmarcado);
+        $this->assertSame(44, $this->repo->veiculoPrincipal);
     }
 
-    public function existePlaca(string $p): bool
+    public function testExcluirMoradorNaoPodeExcluirVeiculoDeOutroUsuario(): void
     {
-        return $this->placaExiste;
+        $this->repo->veiculoPorId = ['id_veiculo' => 44, 'id_user' => 99];
+
+        $resultado = $this->service->excluir(44, 1, 7);
+
+        $this->assertFalse($resultado['sucesso']);
+        $this->assertStringContainsString('permi', $resultado['mensagem']);
     }
 
-    public function countByUser(int $id): int
+    public function testExcluirReorganizaPrincipalQuandoNecessario(): void
     {
-        return 0;
+        $this->repo->veiculoPorId = ['id_veiculo' => 44, 'id_user' => 7, 'principal' => 1];
+        $this->repo->porUsuario = [['id_veiculo' => 45, 'id_user' => 7]];
+
+        $resultado = $this->service->excluir(44, 2, 20);
+
+        $this->assertTrue($resultado['sucesso']);
+        $this->assertSame(44, $this->repo->idExcluido);
+        $this->assertSame(45, $this->repo->veiculoPrincipal);
     }
 
-    public function desmarcarPrincipal(int $id): bool
+    public function testCatalogoRetornaMarcasConhecidas(): void
     {
-        $this->desmarcouPrincipalDoUsuario = $id;
-        return true;
-    }
+        $catalogo = VeiculoService::catalogoMarcaModelo();
 
-    public function marcarPrincipal(int $id): bool
-    {
-        $this->veiculoMarcadoPrincipal = $id;
-        return true;
-    }
-
-    public function save(array $d): int
-    {
-        $this->dadosSalvos = $d;
-        return $this->idSalvo;
-    }
-
-    public function update(int $id, array $d): bool
-    {
-        $this->idAtualizado = $id;
-        $this->dadosAtualizados = $d;
-        return true;
-    }
-
-    public function delete(int $id): bool
-    {
-        $this->idExcluido = $id;
-        return true;
-    }
-
-    public function findAll(): array
-    {
-        return $this->todos;
-    }
-
-    public function findByUsuario(int $id): array
-    {
-        $this->usuarioConsultado = $id;
-        return $this->porUsuario;
-    }
-
-    public function findByPlaca(string $p): ?array
-    {
-        $this->placaConsultada = $p;
-        return $this->veiculoPorPlaca;
-    }
-
-    public function findById(int $id): ?array
-    {
-        return $this->veiculoPorId;
-    }
-}
-
-final class FakeMoradorRepository extends MoradorRepository
-{
-    public function __construct()
-    {
-    }
-
-    public function findById(int $id): ?array
-    {
-        return ['id_user' => $id, 'privilegio' => 2];
+        $this->assertArrayHasKey('Fiat', $catalogo);
+        $this->assertContains('Uno', $catalogo['Fiat']);
     }
 }

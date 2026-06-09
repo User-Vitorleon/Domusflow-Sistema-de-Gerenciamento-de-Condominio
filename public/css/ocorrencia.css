@@ -1,6 +1,4 @@
-/* ocorrencia.css — DomusFlow */
 
-/* ── Badges de status ───────────────────────────────────────────────────────── */
 .oc-badge {
     display: inline-flex;
     align-items: center;
@@ -31,7 +29,6 @@
     color: #666;
 }
 
-/* ── Pill de categoria ──────────────────────────────────────────────────────── */
 .oc-cat-pill {
     display: inline-block;
     padding: 2px 10px;
@@ -48,7 +45,6 @@
     padding: 2px 7px;
 }
 
-/* ── Layout da página do morador ────────────────────────────────────────────── */
 .df-page {
     width: 100%;
     max-width: 960px;
@@ -79,7 +75,6 @@
     align-items: start;
 }
 
-/* Layout lado a lado: formulário + lista */
 .oc-layout-grid {
     display: grid;
     grid-template-columns: 380px 1fr;
@@ -99,7 +94,6 @@
     }
 }
 
-/* ── Cards gerais ───────────────────────────────────────────────────────────── */
 .df-card {
     background: #fff;
     border: 1px solid #dde1e7;
@@ -123,7 +117,6 @@
     color: #888;
 }
 
-/* ── Campos de formulário ───────────────────────────────────────────────────── */
 .df-field {
     display: flex;
     flex-direction: column;
@@ -158,7 +151,6 @@
     background: #fff;
 }
 
-/* ── Botões ─────────────────────────────────────────────────────────────────── */
 .btn-primary {
     display: inline-flex;
     align-items: center;
@@ -228,7 +220,6 @@
     flex-wrap: wrap;
 }
 
-/* ── Alertas ────────────────────────────────────────────────────────────────── */
 .df-alert {
     padding: 10px 14px;
     border-radius: 6px;
@@ -251,7 +242,6 @@
     color: #721c24;
 }
 
-/* ── Lista de ocorrências (morador) ─────────────────────────────────────────── */
 .oc-list {
     display: flex;
     flex-direction: column;
@@ -305,7 +295,6 @@
     gap: 8px;
 }
 
-/* ── Empty state ────────────────────────────────────────────────────────────── */
 .empty-state {
     display: flex;
     flex-direction: column;
@@ -327,7 +316,6 @@
     font-size: 13px;
 }
 
-/* ── Detalhe (morador) ──────────────────────────────────────────────────────── */
 .oc-detalhe-meta {
     display: flex;
     justify-content: space-between;
@@ -358,7 +346,6 @@
     line-height: 1.6;
 }
 
-/* ── Timeline ───────────────────────────────────────────────────────────────── */
 .oc-timeline-title {
     font-size: 13px;
     font-weight: 700;
@@ -437,7 +424,6 @@
     margin: 0;
 }
 
-/* ── Modal ──────────────────────────────────────────────────────────────────── */
 .oc-modal-overlay {
     position: fixed;
     inset: 0;
@@ -485,7 +471,6 @@
     color: #333;
 }
 
-/* ── Sino (header) ──────────────────────────────────────────────────────────── */
 .oc-sino {
     position: relative;
     display: flex;
@@ -522,7 +507,6 @@
     border: 1.5px solid #fff;
 }
 
-/* ── Contadores (painel síndico) ─────────────────────────────────────────────── */
 .oc-contadores {
     display: flex;
     gap: 10px;
@@ -571,7 +555,6 @@
     color: #aaa;
 }
 
-/* ── Filtros (painel síndico) ────────────────────────────────────────────────── */
 .oc-filtros-card {
     background: #fff;
     border: 1px solid #dde1e7;
@@ -628,7 +611,6 @@
     gap: 8px;
 }
 
-/* ── Tabela (painel síndico) ─────────────────────────────────────────────────── */
 .oc-table-wrap {
     overflow-x: auto;
 }
@@ -695,7 +677,6 @@
     color: #aaa;
 }
 
-/* ── Cards mobile (painel síndico) ──────────────────────────────────────────── */
 .oc-mobile-cards {
     display: none;
 }
@@ -740,7 +721,6 @@
     margin-top: 4px;
 }
 
-/* ── Painel de detalhe (síndico) ─────────────────────────────────────────────── */
 .oc-detalhe-panel {
     background: #fff;
     border: 1px solid #dde1e7;
@@ -832,7 +812,6 @@
     background: #f0f7f7;
 }
 
-/* ===== LISTA DE OCORRÊNCIAS DO MORADOR ===== */
 .oc-lista-cards {
     display: flex;
     flex-direction: column;
@@ -875,12 +854,10 @@
     justify-content: space-between;
 }
 
-/* ===== MODAL DETALHE GRANDE ===== */
 .oc-modal--detalhe {
     width: 100%;
 }
 
-/* ===== FOTO AREA ===== */
 .oc-foto-area {
     display: flex;
     flex-direction: column;
@@ -901,13 +878,11 @@
     background: #f0f7f7;
 }
 
-/* ===== CONTADOR ATIVO ===== */
 .oc-contador--ativo {
     outline: 2px solid currentColor;
     outline-offset: 2px;
 }
 
-/* ===== MODAL OVERLAY (caso não exista) ===== */
 .oc-modal-overlay {
     position: fixed;
     inset: 0;
@@ -953,7 +928,6 @@
     background: #f0f0f0;
 }
 
-/* Ações do morador no detalhe */
 .oc-detalhe-acoes {
     display: flex;
     align-items: center;
@@ -992,7 +966,6 @@
     margin-top: 8px;
 }
 
-/* ===== EMPTY STATE ===== */
 .empty-state {
     display: flex;
     flex-direction: column;
@@ -1003,7 +976,6 @@
     color: #aaa;
 }
 
-/* ===== PAGINAÇÃO BOOTSTRAP FALLBACK ===== */
 .pagination {
     display: flex;
     list-style: none;
@@ -1045,7 +1017,6 @@
     background: #f5f5f5;
 }
 
-/* ===== UTILITIES ===== */
 .mt-3 {
     margin-top: 16px !important;
 }
@@ -1062,7 +1033,6 @@
     justify-content: center !important;
 }
 
-/* ── Dark Mode ── */
 [data-theme="dark"] .oc-filtros-card {
     background: #1e2029;
     border-color: #2e3240;
@@ -1101,7 +1071,6 @@
     border-color: #2e3240;
 }
 
-/* ── Responsividade ──────────────────────────────────────────────────────────── */
 @media (max-width: 640px) {
     .oc-table-wrap {
         display: none;

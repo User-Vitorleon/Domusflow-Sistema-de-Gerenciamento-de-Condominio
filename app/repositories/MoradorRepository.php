@@ -124,15 +124,16 @@ class MoradorRepository
         $sql   .= $params['sql'];
 
         $colunasPermitidas = [
-            'nome'  => 'nome',
-            'cpf'   => 'nome',
-            'bloco' => 'bloco',
+            'nome'             => 'nome',
+            'cpf'              => 'nome',
+            'bloco'            => 'bloco',
+            'data_solicitacao' => 'created_at',
         ];
 
-        $ordenar = $colunasPermitidas[$filtros['ordenar'] ?? 'nome'] ?? 'nome';
+        $ordenar = $colunasPermitidas[$filtros['ordenar'] ?? 'data_solicitacao'] ?? 'created_at';
         $direcao = strtolower($filtros['direcao'] ?? 'asc') === 'desc' ? 'DESC' : 'ASC';
 
-        $sql .= " ORDER BY {$ordenar} {$direcao} LIMIT :limit OFFSET :offset";
+        $sql .= " ORDER BY {$ordenar} {$direcao}, id_user ASC LIMIT :limit OFFSET :offset";
 
         $stmt = $this->pdo->prepare($sql);
         foreach ($params['bindings'] as $chave => $valor) {

@@ -1,96 +1,122 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Unit\Services;
 
-use LocalRepository;
 use LocalService;
-use MoradorRepository;
 use PHPUnit\Framework\TestCase;
-
-require_once __DIR__ . '/../../app/repositories/LocalRepository.php';
-require_once __DIR__ . '/../../app/repositories/MoradorRepository.php';
-require_once __DIR__ . '/../../app/services/LocalService.php';
+use Tests\Support\FakeLocalRepository;
+use Tests\Support\FakeMoradorRepository;
 
 final class LocalServiceTest extends TestCase
 {
-    public function testCadastrarSemPermissaoRetornaErro(): void
+    private FakeLocalRepository $localRepo;
+    private FakeMoradorRepository $moradorRepo;
+    private LocalService $service;
+
+    protected function setUp(): void
     {
-        $moradores = new LocalServiceMoradorRepositoryFake();
-        $moradores->usuarios[1] = ['privilegio' => 1];
-
-        $resultado = (new LocalService(new LocalServiceLocalRepositoryFake(), $moradores))
-            ->cadastrar(['nome_local' => 'Salao', 'capacidade' => 30, 'disponivel' => 'S'], 1);
-
-        $this->assertFalse($resultado['sucesso']);
-        $this->assertStringContainsString('permiss', $resultado['mensagem']);
+        $this->localRepo = new FakeLocalRepository();
+        $this->moradorRepo = new FakeMoradorRepository();
+        $this->moradorRepo->moradores[2] = ['id_user' => 2, 'privilegio' => 2];
+        $this->service = new LocalService($this->localRepo, $this->moradorRepo);
     }
 
-    public function testCadastrarComNomeVazioRetornaErro(): void
+    public function testCadastrarBloqueiaUsuarioSemPermissao(): void
     {
-        $moradores = new LocalServiceMoradorRepositoryFake();
-        $moradores->usuarios[2] = ['privilegio' => 2];
+        $this->moradorRepo->moradores[5] = ['id_user' => 5, 'privilegio' => 1];
 
-        $resultado = (new LocalService(new LocalServiceLocalRepositoryFake(), $moradores))
-            ->cadastrar(['nome_local' => '   ', 'capacidade' => 30, 'disponivel' => 'S'], 2);
+        $resultado = $this->service->cadastrar(['nome_local' => 'Salao', 'capacidade' => 30], 5);
 
         $this->assertFalse($resultado['sucesso']);
-        $this->assertStringContainsString('nome', $resultado['mensagem']);
+        $this->assertSame('Sem permissao.', $resultado['mensagem']);
+        $this->assertNull($this->localRepo->dadosSalvos);
     }
 
-    public function testCadastrarComCapacidadeZeroRetornaErro(): void
+    public function testCadastrarValidaNomeObrigatorio(): void
     {
-        $moradores = new LocalServiceMoradorRepositoryFake();
-        $moradores->usuarios[2] = ['privilegio' => 4];
-
-        $resultado = (new LocalService(new LocalServiceLocalRepositoryFake(), $moradores))
-            ->cadastrar(['nome_local' => 'Churrasqueira', 'capacidade' => 0, 'disponivel' => 'S'], 2);
+        $resultado = $this->service->cadastrar(['nome_local' => ' ', 'capacidade' => 30], 2);
 
         $this->assertFalse($resultado['sucesso']);
-        $this->assertStringContainsString('Capacidade', $resultado['mensagem']);
+        $this->assertSame('Informe o nome do local.', $resultado['mensagem']);
     }
 
-    public function testCadastrarComPermissaoSalvaDadosTratados(): void
+    public function testCadastrarValidaCapacidadeMaiorQueZero(): void
     {
-        $locais = new LocalServiceLocalRepositoryFake();
-        $moradores = new LocalServiceMoradorRepositoryFake();
-        $moradores->usuarios[2] = ['privilegio' => 2];
+        $resultado = $this->service->cadastrar(['nome_local' => 'Salao', 'capacidade' => 0], 2);
 
-        $resultado = (new LocalService($locais, $moradores))
-            ->cadastrar(['nome_local' => '  Salao de Festas  ', 'capacidade' => 80, 'disponivel' => 'N'], 2);
+        $this->assertFalse($resultado['sucesso']);
+        $this->assertSame('Capacidade deve ser maior que zero.', $resultado['mensagem']);
+    }
+
+    public function testCadastrarValidaStatusPermitido(): void
+    {
+        $resultado = $this->service->cadastrar([
+            'nome_local' => 'Salao',
+            'capacidade' => 30,
+            'disponivel' => 'talvez',
+        ], 2);
+
+        $this->assertFalse($resultado['sucesso']);
+        $this->assertSame('Status do local invalido.', $resultado['mensagem']);
+    }
+
+    public function testCadastrarSalvaDadosNormalizados(): void
+    {
+        $resultado = $this->service->cadastrar([
+            'nome_local' => '  Salao de Festas  ',
+            'capacidade' => '80',
+            'disponivel' => 'n',
+        ], 2);
 
         $this->assertTrue($resultado['sucesso']);
-        $this->assertSame('Salao de Festas', $locais->dadosSalvos['local']);
-        $this->assertSame(80, $locais->dadosSalvos['capacidade']);
-        $this->assertSame('N', $locais->dadosSalvos['disp_uso']);
-        $this->assertSame(2, $locais->dadosSalvos['id_user_cad']);
-    }
-}
-
-final class LocalServiceLocalRepositoryFake extends LocalRepository
-{
-    public ?array $dadosSalvos = null;
-
-    public function __construct()
-    {
+        $this->assertSame([
+            'local' => 'Salao de Festas',
+            'capacidade' => 80,
+            'disp_uso' => 'N',
+            'id_user_cad' => 2,
+        ], $this->localRepo->dadosSalvos);
     }
 
-    public function save(array $data): bool
+    public function testAtualizarExigeLocalExistente(): void
     {
-        $this->dadosSalvos = $data;
-        return true;
-    }
-}
+        $resultado = $this->service->atualizar(['id_local' => 99, 'nome_local' => 'Piscina', 'capacidade' => 20], 2);
 
-final class LocalServiceMoradorRepositoryFake extends MoradorRepository
-{
-    public array $usuarios = [];
-
-    public function __construct()
-    {
+        $this->assertFalse($resultado['sucesso']);
+        $this->assertSame('Local nao encontrado.', $resultado['mensagem']);
     }
 
-    public function findById(int $id): ?array
+    public function testAtualizarPersisteDadosValidados(): void
     {
-        return $this->usuarios[$id] ?? null;
+        $this->localRepo->locais[9] = ['id_local' => 9, 'local' => 'Antigo'];
+
+        $resultado = $this->service->atualizar([
+            'id_local' => 9,
+            'nome_local' => 'Churrasqueira',
+            'capacidade' => '25',
+            'disponivel' => 'S',
+        ], 2);
+
+        $this->assertTrue($resultado['sucesso']);
+        $this->assertSame(9, $this->localRepo->idAtualizado);
+        $this->assertSame([
+            'local' => 'Churrasqueira',
+            'capacidade' => 25,
+            'disp_uso' => 'S',
+        ], $this->localRepo->dadosAtualizados);
+    }
+
+    public function testAtualizarPropagaErroDoRepositorio(): void
+    {
+        $this->localRepo->locais[9] = ['id_local' => 9];
+        $this->localRepo->updateResultado = false;
+
+        $resultado = $this->service->atualizar([
+            'id_local' => 9,
+            'nome_local' => 'Piscina',
+            'capacidade' => 12,
+        ], 2);
+
+        $this->assertFalse($resultado['sucesso']);
+        $this->assertSame('Erro ao atualizar local.', $resultado['mensagem']);
     }
 }

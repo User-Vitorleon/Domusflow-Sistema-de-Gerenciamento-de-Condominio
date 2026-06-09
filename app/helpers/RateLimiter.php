@@ -3,7 +3,7 @@
 class RateLimiter
 {
     private const MAX_TENTATIVAS = 5;
-    private const JANELA_SEGUNDOS = 10 * 60; // 15 minutos
+    private const JANELA_SEGUNDOS = 10 * 60; 
 
     public static function verificar(string $chave): bool
     {
@@ -19,7 +19,6 @@ class RateLimiter
 
         $dados = &$_SESSION[$key];
 
-        // Reseta se a janela de tempo expirou
         if (($agora - $dados['primeiro_em']) > self::JANELA_SEGUNDOS) {
             $dados = ['tentativas' => 0, 'primeiro_em' => $agora];
         }

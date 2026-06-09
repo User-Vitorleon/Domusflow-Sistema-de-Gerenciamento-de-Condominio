@@ -372,7 +372,7 @@ private function extrairFiltrosPendentes(): array
             'apto'             => trim($_GET['apto']             ?? ''),
             'cpf'              => trim($_GET['cpf']              ?? ''),
             'data_solicitacao' => trim($_GET['data_solicitacao'] ?? ''),
-            'ordenar'          => trim($_GET['ordenar']          ?? 'nome'),
+            'ordenar'          => trim($_GET['ordenar']          ?? 'data_solicitacao'),
             'direcao'          => trim($_GET['direcao']          ?? 'asc'),
             'perfil'           => trim($_GET['perfil'] ?? ''),
         ];

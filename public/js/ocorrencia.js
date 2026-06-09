@@ -1,4 +1,3 @@
-/* ocorrencia.js — DomusFlow */
 
 (function () {
     'use strict';

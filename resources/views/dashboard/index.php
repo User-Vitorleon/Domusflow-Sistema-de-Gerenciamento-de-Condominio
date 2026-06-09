@@ -30,7 +30,7 @@ require_once __DIR__ . '/../layout/header.php';
                     $textoStatus = 'Negada';
                     $icone      = 'bx-x-circle';
                     break;
-                default: // 'P'
+                default:
                     $corFundo   = '#FEF9C3';
                     $corTexto   = '#CA8A04';
                     $textoStatus = 'Pendente';

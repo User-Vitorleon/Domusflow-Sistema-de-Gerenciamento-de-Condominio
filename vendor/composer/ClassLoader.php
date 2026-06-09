@@ -231,7 +231,7 @@ class ClassLoader
     {
         $paths = (array) $paths;
         if (!$prefix) {
-            // Register directories for the root namespace.
+           
             if ($prepend) {
                 $this->fallbackDirsPsr4 = array_merge(
                     $paths,
@@ -244,7 +244,7 @@ class ClassLoader
                 );
             }
         } elseif (!isset($this->prefixDirsPsr4[$prefix])) {
-            // Register directories for a new namespace.
+
             $length = strlen($prefix);
             if ('\\' !== $prefix[$length - 1]) {
                 throw new \InvalidArgumentException("A non-empty PSR-4 prefix must end with a namespace separator.");
@@ -252,13 +252,13 @@ class ClassLoader
             $this->prefixLengthsPsr4[$prefix[0]][$prefix] = $length;
             $this->prefixDirsPsr4[$prefix] = $paths;
         } elseif ($prepend) {
-            // Prepend directories for an already registered namespace.
+          
             $this->prefixDirsPsr4[$prefix] = array_merge(
                 $paths,
                 $this->prefixDirsPsr4[$prefix]
             );
         } else {
-            // Append directories for an already registered namespace.
+         
             $this->prefixDirsPsr4[$prefix] = array_merge(
                 $this->prefixDirsPsr4[$prefix],
                 $paths
@@ -441,7 +441,7 @@ class ClassLoader
      */
     public function findFile($class)
     {
-        // class map lookup
+
         if (isset($this->classMap[$class])) {
             return $this->classMap[$class];
         }
@@ -457,7 +457,6 @@ class ClassLoader
 
         $file = $this->findFileWithExtension($class, '.php');
 
-        // Search for Hack files if we are running on HHVM
         if (false === $file && defined('HHVM_VERSION')) {
             $file = $this->findFileWithExtension($class, '.hh');
         }

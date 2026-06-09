@@ -228,10 +228,10 @@ $cores = [
                                     <?php endif; ?>
                                     <td>
                                         <?php
-$podeExcluir = in_array($privilegio, [2, 4]) ||
-    ($privilegio == 1 && $v['id_user'] == $usuario['id_user']);
-$podeAlterarPrincipal = $podeExcluir;
-?>
+                                            $podeExcluir = in_array($privilegio, [2, 4]) ||
+                                                ($privilegio == 1 && $v['id_user'] == $usuario['id_user']);
+                                            $podeAlterarPrincipal = $podeExcluir;
+                                        ?>
                                         <div class="veiculo-row-actions">
                                             <?php if ($podeAlterarPrincipal && !$v['principal']): ?>
                                                 <form action="<?= BASE_URL ?>/veiculo/principal" method="POST">

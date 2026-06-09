@@ -27,7 +27,6 @@
         O sistema de pagamento integrado estará disponível em versão futura do DomusFlow.
     </div>
 
-    <!-- Cabeçalho -->
     <div class="boleto-header">
         <div class="logo">DomusFlow</div>
         <div class="banco">001-9</div>
@@ -43,7 +42,6 @@
         </div>
     </div>
 
-    <!-- Corpo -->
     <div class="boleto-section">
         <div class="boleto-row">
             <div class="boleto-field">
@@ -139,7 +137,6 @@
         </div>
     </div>
 
-    <!-- Código de barras -->
     <div class="codigo-barras-wrap">
         <p class="instrucoes">Corte aqui e pague em qualquer banco ou internet banking</p>
 

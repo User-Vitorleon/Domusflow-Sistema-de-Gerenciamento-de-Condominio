@@ -1,9 +1,3 @@
-/* ═══════════════════════════════════════════
-   DomusFlow — app.css
-   Reset · Tokens · Base · Main · Components
-═══════════════════════════════════════════ */
-
-/* ── Reset ── */
 *,
 *::before,
 *::after {
@@ -31,7 +25,6 @@ a:hover {
     color: var(--primary-dark);
 }
 
-/* ── Tokens ── */
 :root {
     --primary-dark: #11446E;
     --primary: #0F80B6;
@@ -51,7 +44,6 @@ a:hover {
     --error: #EF4444;
     --info: #3B82F6;
 
-    /* Tons de fundo/borda para alerts e badges */
     --success-bg:     #F0FDF4;
     --success-border: #BBF7D0;
     --success-text:   #16A34A;
@@ -77,7 +69,6 @@ a:hover {
     --topbar-h: 62px;
 }
 
-/* ── Base ── */
 body {
     font-family: var(--font);
     font-size: 15px;
@@ -86,7 +77,6 @@ body {
     line-height: 1.6;
 }
 
-/* ── Main Content ── */
 .main-content {
     padding: calc(var(--topbar-h) + 28px) 24px 48px;
     min-height: 100vh;
@@ -109,14 +99,12 @@ body {
     margin-top: 2px;
 }
 
-/* ── Wrapper centralizado padrão de todas as telas ── */
 .df-page {
     width: 100%;
     max-width: 980px;
     margin: 0 auto;
 }
 
-/* ── Card ── */
 .df-card {
     background: var(--white);
     border-radius: var(--radius-lg);
@@ -141,7 +129,6 @@ body {
     margin-top: 3px;
 }
 
-/* ── Forms ── */
 .df-field {
     display: flex;
     flex-direction: column;
@@ -205,7 +192,6 @@ body {
     border-top: 1px solid var(--border);
 }
 
-/* ── Buttons ── */
 .btn-primary {
     display: inline-flex;
     align-items: center;
@@ -286,7 +272,6 @@ body {
     background: #FEE2E2;
 }
 
-/* ── Alerts ── */
 .df-alert {
     padding: 11px 14px;
     border-radius: var(--radius);
@@ -320,7 +305,6 @@ body {
     display: none;
 }
 
-/* ── Misc ── */
 .df-divider {
     border: none;
     border-top: 1px solid var(--border);
@@ -350,7 +334,6 @@ body {
     font-size: 13px;
 }
 
-/* ── Moradores ── */
 .morador-list {
     display: flex;
     flex-direction: column;
@@ -399,7 +382,6 @@ body {
     gap: 8px;
 }
 
-/* ── Responsivo ── */
 @media (max-width: 768px) {
     .main-content {
         padding: calc(var(--topbar-h) + 16px) 14px 32px;
@@ -411,14 +393,12 @@ body {
     }
 }
 
-/* ── Wrapper centralizado telas internas ── */
 .df-container {
     width: 100%;
     max-width: 860px;
     margin: 0 auto;
 }
 
-/* ── Aviso card ── */
 .aviso-card {
     background: var(--white);
     border-radius: var(--radius-lg);
@@ -457,7 +437,6 @@ body {
     margin-right: 6px;
 }
 
-/* ── Textarea padrão ── */
 .df-field textarea {
     padding: 9px 13px;
     border: 1px solid var(--border);
@@ -477,7 +456,6 @@ body {
     box-shadow: 0 0 0 3px rgba(15, 128, 182, .12);
 }
 
-/* ── Section title ── */
 .section-title {
     font-size: 16px;
     font-weight: 700;
@@ -492,17 +470,11 @@ body {
     padding: var(--bs-offcanvas-padding-y) var(--bs-offcanvas-padding-x);
 }
 
-
-/* ── Wrapper containers ── */
 .df-container-lg {
     width: 100%;
     max-width: 1000px;
     margin: 0 auto;
 }
-
-/* ═══════════════════════════════════════════
-   Dark Mode
-═══════════════════════════════════════════ */
 
 [data-theme="dark"] {
     --primary-dark:  #3b9fd4;
@@ -787,7 +759,6 @@ body {
     }
 }
 
-/* ── Inatividade Modal ── */
 .df-inatividade-overlay {
     position: fixed;
     inset: 0;

@@ -6,7 +6,7 @@ $jsExtra      = 'moradores.js';
 require_once __DIR__ . '/../layout/header.php';
 
 $queryAtual   = $_GET;
-$ordenarAtual = $filtros['ordenar'] ?? 'nome';
+$ordenarAtual = $filtros['ordenar'] ?? 'data_solicitacao';
 $direcaoAtual = $filtros['direcao'] ?? 'asc';
 
 function montarOrdenacao(array $queryAtual, string $campo, string $ordenarAtual, string $direcaoAtual): string
@@ -120,7 +120,10 @@ function montarOrdenacao(array $queryAtual, string $campo, string $ordenarAtual,
                                 </th>
                                 <th>Apto</th>
                                 <th>Perfil</th>
-                                <th>Solicitação</th>
+                                <th>
+                                    <a href="<?= montarOrdenacao($queryAtual, 'data_solicitacao', $ordenarAtual, $direcaoAtual) ?>"
+                                        class="link-ordenacao">Solicitação</a>
+                                </th>
                                 <th>Ações</th>
                             </tr>
                         </thead>

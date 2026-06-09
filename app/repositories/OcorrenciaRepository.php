@@ -258,9 +258,7 @@ public function listarComFiltros(array $filtros, int $limit = 15, int $offset = 
         $this->aplicarFiltrosOcorrencia($filtros, $sql, $params);
 
         $sql .= "
-            ORDER BY
-                CASE o.status WHEN 'A' THEN 1 WHEN 'E' THEN 2 WHEN 'R' THEN 3 ELSE 4 END,
-                o.created_at DESC
+            ORDER BY o.created_at DESC, o.id_ocorrencia DESC
             LIMIT ? OFFSET ?";
 
         $params[] = $limit;

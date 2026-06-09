@@ -292,7 +292,7 @@ try {
             $marca = $marcas[$veiculos % count($marcas)];
             $modelos = $catalogoVeiculos[$marca];
             $modelo = $modelos[intdiv($veiculos, count($marcas)) % count($modelos)];
-            $stmtVeiculo->execute([$placa, $marca, $modelo, $cores[$veiculos % count($cores)], $v === 0 ? 1 : 0, $moradorId, 7, dataRelativa(-120 + ($veiculos % 180))]);
+            $stmtVeiculo->execute([$placa, $marca, $modelo, $cores[$veiculos % count($cores)], $v === 0 ? 1 : 0, $moradorId, 7, dataRelativa(-1 - ($veiculos % 180))]);
             $veiculos++;
         }
     }
@@ -319,7 +319,7 @@ try {
         } else {
             $diasReserva = -180 + ($i % 420);
         }
-        $created = dataRelativa($diasReserva - 12, '14:00:00');
+        $created = dataRelativa(min(-1, $diasReserva - 12), '14:00:00');
         $aprovado = in_array($status, ['A', 'N'], true);
         $idLocal = $idsLocais[$i % count($idsLocais)];
         $horario = $horarios[$i % count($horarios)];
@@ -348,7 +348,7 @@ try {
             $status,
             $aprovado ? (($i % 2 === 0) ? 3 : 4) : null,
             $aprovado ? (($i % 2 === 0) ? 'Vitor Leon' : 'Mariana Alves') : null,
-            $aprovado ? substr(dataRelativa($diasReserva - 10), 0, 10) : null,
+            $aprovado ? substr(dataRelativa(min(-1, $diasReserva - 10)), 0, 10) : null,
             $aprovado ? '10:30:00' : null,
             $created,
         ]);
@@ -398,26 +398,27 @@ try {
     $statusOc = ['A', 'E', 'R', 'C'];
     for ($i = 0; $i < 300; $i++) {
         $status = $statusOc[$i % count($statusOc)];
+        $aberturaDias = -181 + ($i % 160);
         $stmtOc->execute([
             $idsAtivos[$i % count($idsAtivos)],
             $categorias[$i % count($categorias)],
             $titulos[$i % count($titulos)],
             'Ocorrência registrada pelo morador para acompanhamento da administração.',
             $status,
-            dataRelativa(-120 + ($i % 160)),
+            dataRelativa($aberturaDias),
         ]);
         $idOc = (int)$pdo->lastInsertId();
         if (in_array($status, ['E', 'R'], true)) {
-            $stmtTr->execute([$idOc, 3, 'Vitor Leon', 'E', 'Ocorrência recebida e em análise pela equipe responsável.', dataRelativa(-100 + ($i % 120))]);
+            $stmtTr->execute([$idOc, 3, 'Vitor Leon', 'E', 'Ocorrência recebida e em análise pela equipe responsável.', dataRelativa(min(-1, $aberturaDias + 3))]);
         }
         if ($status === 'R') {
-            $stmtTr->execute([$idOc, 3, 'Vitor Leon', 'R', 'Problema solucionado e ocorrência encerrada.', dataRelativa(-90 + ($i % 120))]);
+            $stmtTr->execute([$idOc, 3, 'Vitor Leon', 'R', 'Problema solucionado e ocorrência encerrada.', dataRelativa(min(-1, $aberturaDias + 12))]);
         }
         if ($status === 'C') {
-            $stmtTr->execute([$idOc, $idsAtivos[$i % count($idsAtivos)], 'Morador', 'C', 'Ocorrência cancelada pelo solicitante.', dataRelativa(-95 + ($i % 120))]);
+            $stmtTr->execute([$idOc, $idsAtivos[$i % count($idsAtivos)], 'Morador', 'C', 'Ocorrência cancelada pelo solicitante.', dataRelativa(min(-1, $aberturaDias + 2))]);
         }
         if ($status !== 'A') {
-            $stmtNot->execute([$idOc, $idsAtivos[$i % count($idsAtivos)], $i % 2, dataRelativa(-90 + ($i % 120))]);
+            $stmtNot->execute([$idOc, $idsAtivos[$i % count($idsAtivos)], $i % 2, dataRelativa(min(-1, $aberturaDias + 4))]);
         }
     }
 

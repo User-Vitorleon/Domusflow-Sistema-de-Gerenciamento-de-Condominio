@@ -1,8 +1,4 @@
-/* ============================================
-   DomusFlow — dashboard.css
-   ============================================ */
 
-/* KPI Grid */
 .kpi-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -84,13 +80,11 @@
     color: inherit;
 }
 
-/* Feriado Card */
 .kpi-card-feriado {
     border-color: #fecaca;
     background: linear-gradient(180deg, #ffffff 0%, #fff7f7 100%);
 }
 
-/* Chart */
 .chart-card {
     background: var(--white);
     border-radius: var(--radius-lg);
@@ -106,7 +100,6 @@
     margin-bottom: 20px;
 }
 
-/* Empty State */
 .empty-state {
     display: flex;
     flex-direction: column;
@@ -152,9 +145,6 @@
     margin: 0;
 }
 
-/* ============================================
-   Layout Sections
-   ============================================ */
 .dashboard-section {
     margin-bottom: 28px;
     max-width: 1200px;
@@ -282,7 +272,6 @@
     font-size: 14px;
 }
 
-/* Placeholder p/ módulos ainda não desenvolvidos */
 .dashboard-placeholder {
     min-height: 180px;
     display: flex;
@@ -296,9 +285,6 @@
     font-size: 13px;
 }
 
-/* ============================================
-   Feriados Grid (3 colunas — morador/topo)
-   ============================================ */
 .feriado-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -364,9 +350,6 @@
     margin-top: 6px;
 }
 
-/* ============================================
-   Síndico — Reservas da semana / Ações rápidas
-   ============================================ */
 .acao-rapida-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -403,7 +386,6 @@
     font-size: 24px;
 }
 
-/* Cards de Reservas — versão melhorada */
 .reserva-card {
     background: var(--white);
     border: 1px solid var(--border);
@@ -504,7 +486,6 @@
     font-weight: 500;
 }
 
-/* Ocorrências — donut + legenda */
 .ocorrencia-chart-wrap {
     position: relative;
     width: 100%;
@@ -559,9 +540,6 @@
     height: 100% !important;
 }
 
-/* ============================================
-   Responsive
-   ============================================ */
 @media (max-width: 991px) {
     .dashboard-top-grid {
         grid-template-columns: 1fr;
@@ -611,7 +589,6 @@
     background: #2e3240 !important;
 }
 
-/* Admin dashboard */
 .admin-dashboard .admin-dashboard-shell {
     width: min(1180px, calc(100vw - 32px));
     margin: 0 auto;

@@ -1,254 +1,252 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Unit\Services;
 
-use MoradorRepository;
 use MoradorService;
 use PHPUnit\Framework\TestCase;
-
-require_once __DIR__ . '/../../../app/repositories/MoradorRepository.php';
-require_once __DIR__ . '/../../../app/services/MoradorService.php';
+use Tests\Support\FakeMoradorRepository;
 
 final class MoradorServiceTest extends TestCase
 {
-    public function testCadastrarComSenhasDiferentesRetornaErro(): void
+    private FakeMoradorRepository $repo;
+    private MoradorService $service;
+
+    protected function setUp(): void
     {
-        $resultado = (new MoradorService(new MoradorServiceRepositoryFake()))
-            ->cadastrar($this->dadosCadastro(['senha' => '123', 'conf_senha' => '456']));
+        $_SESSION = [];
+        $this->repo = new FakeMoradorRepository();
+        $this->service = new MoradorService($this->repo);
+    }
+
+    private function dadosCadastro(array $override = []): array
+    {
+        return array_replace([
+            'termos' => '1',
+            'nome' => 'Ana Silva',
+            'cpf' => '529.982.247-25',
+            'apto' => '101',
+            'bloco' => 'a',
+            'email' => 'ana@example.com',
+            'telefone' => '11999999999',
+            'senha' => 'senha123',
+            'conf_senha' => 'senha123',
+            'privilegio' => 1,
+        ], $override);
+    }
+
+    public function testCadastrarExigeAceiteDosTermos(): void
+    {
+        $resultado = $this->service->cadastrar($this->dadosCadastro(['termos' => '']));
+
+        $this->assertFalse($resultado['sucesso']);
+        $this->assertStringContainsString('termos', $resultado['mensagem']);
+    }
+
+    public function testCadastrarExigeCamposObrigatorios(): void
+    {
+        $resultado = $this->service->cadastrar($this->dadosCadastro(['email' => '']));
+
+        $this->assertFalse($resultado['sucesso']);
+        $this->assertStringContainsString('e-mail', $resultado['mensagem']);
+    }
+
+    public function testCadastrarValidaCpf(): void
+    {
+        $resultado = $this->service->cadastrar($this->dadosCadastro(['cpf' => '111.111.111-11']));
+
+        $this->assertFalse($resultado['sucesso']);
+        $this->assertStringContainsString('CPF', $resultado['mensagem']);
+    }
+
+    public function testCadastrarValidaAptoNumerico(): void
+    {
+        $resultado = $this->service->cadastrar($this->dadosCadastro(['apto' => 'ABC']));
+
+        $this->assertFalse($resultado['sucesso']);
+        $this->assertStringContainsString('Apartamento', $resultado['mensagem']);
+    }
+
+    public function testCadastrarValidaBlocoComUmaLetra(): void
+    {
+        $resultado = $this->service->cadastrar($this->dadosCadastro(['bloco' => 'AB']));
+
+        $this->assertFalse($resultado['sucesso']);
+        $this->assertStringContainsString('Bloco', $resultado['mensagem']);
+    }
+
+    public function testCadastrarValidaConfirmacaoDeSenha(): void
+    {
+        $resultado = $this->service->cadastrar($this->dadosCadastro(['conf_senha' => 'outra']));
 
         $this->assertFalse($resultado['sucesso']);
         $this->assertStringContainsString('senhas', $resultado['mensagem']);
     }
 
-    public function testCadastrarComCpfExistenteRetornaErro(): void
+    public function testCadastrarBloqueiaCpfDuplicado(): void
     {
-        $repo = new MoradorServiceRepositoryFake();
-        $repo->cpfExiste = true;
+        $this->repo->cpfExiste = true;
 
-        $resultado = (new MoradorService($repo))->cadastrar($this->dadosCadastro());
+        $resultado = $this->service->cadastrar($this->dadosCadastro());
 
         $this->assertFalse($resultado['sucesso']);
         $this->assertStringContainsString('CPF', $resultado['mensagem']);
-        $this->assertSame('12345678900', $repo->cpfConsultado);
     }
 
-    public function testCadastrarQuandoRepositorioFalhaRetornaErro(): void
+    public function testCadastrarBloqueiaEmailDuplicado(): void
     {
-        $repo = new MoradorServiceRepositoryFake();
-        $repo->idSalvo = false;
+        $this->repo->emailExiste = true;
 
-        $resultado = (new MoradorService($repo))->cadastrar($this->dadosCadastro());
+        $resultado = $this->service->cadastrar($this->dadosCadastro());
 
         $this->assertFalse($resultado['sucesso']);
-        $this->assertStringContainsString('Erro interno', $resultado['mensagem']);
-        $this->assertSame('12345678900', $repo->dadosSalvos['cpf']);
-        $this->assertSame('P', $repo->dadosSalvos['status']);
-        $this->assertTrue(password_verify('123456', $repo->dadosSalvos['senha']));
+        $this->assertStringContainsString('e-mail', $resultado['mensagem']);
     }
 
-    public function testListarPendentesRetornaRepositorio(): void
+    public function testCadastrarNormalizaUnidadeDeFuncionarios(): void
     {
-        $repo = new MoradorServiceRepositoryFake();
-        $repo->pendentes = [['nome' => 'Ana']];
+        $this->repo->saveResultado = false;
 
-        $this->assertSame($repo->pendentes, (new MoradorService($repo))->listarPendentes());
-    }
-
-    public function testLiberarOuBloquearSemPermissaoRetornaErro(): void
-    {
-        $repo = new MoradorServiceRepositoryFake();
-        $repo->usuarios[10] = ['privilegio' => 1];
-
-        $resultado = (new MoradorService($repo))->liberarOuBloquear(5, 'aceitar', 10);
+        $resultado = $this->service->cadastrar($this->dadosCadastro([
+            'privilegio' => 3,
+            'apto' => '999',
+            'bloco' => 'Z',
+        ]));
 
         $this->assertFalse($resultado['sucesso']);
-        $this->assertStringContainsString('permiss', $resultado['mensagem']);
+        $this->assertSame('0', $this->repo->dadosSalvos['apto']);
+        $this->assertSame('G', $this->repo->dadosSalvos['bloco']);
     }
 
-    public function testAtualizarComCampoObrigatorioVazioRetornaErro(): void
+    public function testAtualizarExigeCamposObrigatorios(): void
     {
-        $resultado = (new MoradorService(new MoradorServiceRepositoryFake()))
-            ->atualizar($this->dadosAtualizacao(['email' => '']));
+        $resultado = $this->service->atualizar(['id' => 5, 'nome' => 'Ana']);
 
         $this->assertFalse($resultado['sucesso']);
         $this->assertStringContainsString('Email', $resultado['mensagem']);
     }
 
-    public function testAtualizarComSenhaGeraHashESalva(): void
+    public function testAtualizarValidaSenhaConfirmada(): void
     {
-        $repo = new MoradorServiceRepositoryFake();
-
-        $resultado = (new MoradorService($repo))->atualizar($this->dadosAtualizacao([
-            'senha' => 'nova-senha',
-            'conf_senha' => 'nova-senha',
-        ]));
-
-        $this->assertTrue($resultado['sucesso']);
-        $this->assertTrue(password_verify('nova-senha', $repo->dadosAtualizados['senha']));
-    }
-
-    public function testAtualizarQuandoRepositorioFalhaRetornaErro(): void
-    {
-        $repo = new MoradorServiceRepositoryFake();
-        $repo->atualizacaoOk = false;
-
-        $resultado = (new MoradorService($repo))->atualizar($this->dadosAtualizacao());
+        $resultado = $this->service->atualizar([
+            'id' => 5,
+            'nome' => 'Ana',
+            'email' => 'ana@example.com',
+            'bloco' => 'A',
+            'apto' => '101',
+            'telefone' => '11999999999',
+            'senha' => 'abc',
+            'conf_senha' => 'xyz',
+        ]);
 
         $this->assertFalse($resultado['sucesso']);
-        $this->assertStringContainsString('Erro ao atualizar', $resultado['mensagem']);
+        $this->assertStringContainsString('senhas', $resultado['mensagem']);
+    }
+
+    public function testAtualizarBloqueiaEmailDeOutroCadastro(): void
+    {
+        $this->repo->emailOutroExiste = true;
+
+        $resultado = $this->service->atualizar([
+            'id' => 5,
+            'nome' => 'Ana',
+            'email' => 'ana@example.com',
+            'bloco' => 'A',
+            'apto' => '101',
+            'telefone' => '11999999999',
+        ]);
+
+        $this->assertFalse($resultado['sucesso']);
+        $this->assertStringContainsString('outro cadastro', $resultado['mensagem']);
+    }
+
+    public function testAtualizarPersisteDados(): void
+    {
+        $resultado = $this->service->atualizar([
+            'id' => 5,
+            'nome' => 'Ana',
+            'email' => 'ana@example.com',
+            'bloco' => 'A',
+            'apto' => '101',
+            'telefone' => '11999999999',
+        ]);
+
+        $this->assertTrue($resultado['sucesso']);
+        $this->assertSame('Ana', $this->repo->dadosAtualizados['nome']);
     }
 
     public function testDeletarChamaRepositorio(): void
     {
-        $repo = new MoradorServiceRepositoryFake();
-
-        $resultado = (new MoradorService($repo))->deletar(['id' => 33]);
+        $resultado = $this->service->deletar(['id' => 42]);
 
         $this->assertTrue($resultado['sucesso']);
-        $this->assertSame(33, $repo->idDeletado);
+        $this->assertSame(42, $this->repo->idDeletado);
     }
 
-    public function testAtualizarStatusGestaoValidaStatusPermitido(): void
+    public function testAtualizarStatusGestaoValidaEntrada(): void
     {
-        $repo = new MoradorServiceRepositoryFake();
-
-        $resultado = (new MoradorService($repo))->atualizarStatusGestao(8, 'I');
-
-        $this->assertTrue($resultado['sucesso']);
-        $this->assertSame([8, 'I'], $repo->statusAtualizado);
-    }
-
-    public function testAtualizarStatusGestaoPermiteReativar(): void
-    {
-        $repo = new MoradorServiceRepositoryFake();
-
-        $resultado = (new MoradorService($repo))->atualizarStatusGestao(8, 'L');
-
-        $this->assertTrue($resultado['sucesso']);
-        $this->assertSame([8, 'L'], $repo->statusAtualizado);
-    }
-
-    public function testAtualizarStatusGestaoRecusaStatusInvalido(): void
-    {
-        $repo = new MoradorServiceRepositoryFake();
-
-        $resultado = (new MoradorService($repo))->atualizarStatusGestao(8, 'E');
+        $resultado = $this->service->atualizarStatusGestao(0, 'X');
 
         $this->assertFalse($resultado['sucesso']);
-        $this->assertNull($repo->statusAtualizado);
+        $this->assertSame('Status invalido.', $resultado['mensagem']);
     }
 
-    public function testAtualizarPrivilegioRetornaResultadoDoRepositorio(): void
+    public function testAtualizarStatusGestaoBloqueiaUnidadeDuplicadaAoLiberar(): void
     {
-        $repo = new MoradorServiceRepositoryFake();
+        $this->repo->moradores[5] = ['id_user' => 5, 'privilegio' => 1, 'apto' => '101', 'bloco' => 'A'];
+        $this->repo->unidadeOcupada = true;
 
-        $this->assertTrue((new MoradorService($repo))->atualizarPrivilegio(8, 4));
-        $this->assertSame([8, 4], $repo->privilegioAtualizado);
+        $resultado = $this->service->atualizarStatusGestao(5, 'L');
+
+        $this->assertFalse($resultado['sucesso']);
+        $this->assertStringContainsString('morador ativo', $resultado['mensagem']);
     }
 
-    private function dadosCadastro(array $sobrescrever = []): array
+    public function testAtualizarStatusGestaoAtualizaStatus(): void
     {
-        return array_merge([
-            'nome' => 'Maria Silva',
-            'cpf' => '123.456.789-00',
-            'apto' => '101',
-            'bloco' => 'A',
-            'email' => 'maria@example.com',
-            'telefone' => '11999999999',
-            'telefone_recado' => null,
-            'senha' => '123456',
-            'conf_senha' => '123456',
-            'termos' => '1',
-        ], $sobrescrever);
+        $this->repo->moradores[5] = ['id_user' => 5, 'privilegio' => 1, 'apto' => '101', 'bloco' => 'A'];
+
+        $resultado = $this->service->atualizarStatusGestao(5, 'i');
+
+        $this->assertTrue($resultado['sucesso']);
+        $this->assertSame([5, 'I'], $this->repo->statusAtualizado);
     }
 
-    private function dadosAtualizacao(array $sobrescrever = []): array
+    public function testAtualizarPrivilegioValidaPerfil(): void
     {
-        return array_merge([
-            'id' => 7,
-            'nome' => 'Maria Silva',
-            'email' => 'maria@example.com',
-            'apto' => '101',
-            'bloco' => 'A',
-            'telefone' => '11999999999',
-            'tell_recado' => null,
-            'senha' => '',
-            'conf_senha' => '',
-        ], $sobrescrever);
-    }
-}
-
-final class MoradorServiceRepositoryFake extends MoradorRepository
-{
-    public bool $cpfExiste = false;
-    public int|bool $idSalvo = 1;
-    public bool $atualizacaoOk = true;
-    public ?string $cpfConsultado = null;
-    public ?array $dadosSalvos = null;
-    public ?array $dadosAtualizados = null;
-    public array $pendentes = [];
-    public array $usuarios = [];
-    public ?int $idDeletado = null;
-    public ?array $privilegioAtualizado = null;
-    public ?array $statusAtualizado = null;
-
-    public function __construct()
-    {
+        $this->assertFalse($this->service->atualizarPrivilegio(5, 99));
     }
 
-    public function existeCpf(string $cpf): bool
+    public function testAtualizarPrivilegioNaoAlteraAdministrador(): void
     {
-        $this->cpfConsultado = $cpf;
-        return $this->cpfExiste;
+        $this->repo->moradores[5] = ['id_user' => 5, 'privilegio' => 4];
+
+        $this->assertFalse($this->service->atualizarPrivilegio(5, 2));
     }
 
-    public function existeEmail(string $email): bool
+    public function testAtualizarPrivilegioAlteraPerfilPermitido(): void
     {
-        return false;
+        $this->repo->moradores[5] = ['id_user' => 5, 'privilegio' => 1];
+
+        $this->assertTrue($this->service->atualizarPrivilegio(5, 2));
+        $this->assertSame([5, 2], $this->repo->privilegioAtualizado);
     }
 
-    public function existeEmailParaOutro(string $email, int $idAtual): bool
+    public function testAtualizarUnidadeNormalizaAptoEBloco(): void
     {
-        return false;
+        $resultado = $this->service->atualizarUnidade(5, 'Apto 301', 'b');
+
+        $this->assertTrue($resultado['sucesso']);
+        $this->assertSame([5, '301', 'B'], $this->repo->unidadeAtualizada);
     }
 
-    public function save(array $data): int|bool
+    public function testAtualizarPrivilegioEUnidadeDefineUnidadeGenericaParaPerfilSemApartamento(): void
     {
-        $this->dadosSalvos = $data;
-        return $this->idSalvo;
-    }
+        $this->repo->moradores[5] = ['id_user' => 5, 'privilegio' => 1, 'status' => 'P'];
 
-    public function findPendentes(): array
-    {
-        return $this->pendentes;
-    }
+        $resultado = $this->service->atualizarPrivilegioEUnidade(5, 3, '101', 'A');
 
-    public function findById(int $id): ?array
-    {
-        return $this->usuarios[$id] ?? null;
-    }
-
-    public function atualizarDados(array $update): bool
-    {
-        $this->dadosAtualizados = $update;
-        return $this->atualizacaoOk;
-    }
-
-    public function deletarDados(int $id): bool
-    {
-        $this->idDeletado = $id;
-        return true;
-    }
-
-    public function atualizarPrivilegio(int $id, int $privilegio): bool
-    {
-        $this->privilegioAtualizado = [$id, $privilegio];
-        return true;
-    }
-
-    public function atualizarStatus(int $id, string $status): bool
-    {
-        $this->statusAtualizado = [$id, $status];
-        return true;
+        $this->assertTrue($resultado);
+        $this->assertSame([5, 3], $this->repo->privilegioAtualizado);
+        $this->assertSame([5, '0', 'G'], $this->repo->unidadeAtualizada);
     }
 }

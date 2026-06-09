@@ -23,7 +23,6 @@ body::before {
     z-index: 9999;
 }
 
-/* ── WRAPPER ── */
 .pn-page {
     position: relative;
     z-index: 1;
@@ -36,7 +35,6 @@ body::before {
     box-sizing: border-box;
 }
 
-/* ── LOGO ── */
 .pn-brand {
     display: flex;
     justify-content: center;
@@ -50,7 +48,6 @@ body::before {
     border-radius: 14px;
 }
 
-/* ── GRID — desktop: 3 colunas ── */
 .pn-grid {
     width: 100%;
     display: grid;
@@ -59,7 +56,6 @@ body::before {
     box-sizing: border-box;
 }
 
-/* ── CARD ── */
 .pn-card {
     display: flex;
     align-items: center;
@@ -148,7 +144,6 @@ body::before {
     transform: translateX(2px);
 }
 
-/* ── AJUDA ── */
 .pn-help {
     width: 100%;
     max-width: 480px;
@@ -200,7 +195,6 @@ body::before {
     color: var(--primary-dark);
 }
 
-/* ── TOPBAR ── */
 .df-topbar {
     height: 60px !important;
 }
@@ -209,11 +203,6 @@ body::before {
     font-size: 15px !important;
     font-weight: 700 !important;
 }
-
-/*
-   MOBILE
-   1 card por linha, largura total
-*/
 
 @media (max-width: 680px) {
     body {

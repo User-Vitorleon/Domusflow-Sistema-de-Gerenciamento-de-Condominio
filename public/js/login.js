@@ -1,5 +1,3 @@
-/* login.js — DomusFlow · Tela de login
-   Máscara CPF · Toggle de senha (reaproveita utils.js) */
 
 (function () {
     'use strict';

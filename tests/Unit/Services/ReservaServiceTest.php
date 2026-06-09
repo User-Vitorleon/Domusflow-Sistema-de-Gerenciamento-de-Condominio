@@ -1,199 +1,104 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Unit\Services;
 
-use LocalRepository;
-use MoradorRepository;
 use PHPUnit\Framework\TestCase;
-use ReservaRepository;
 use ReservaService;
-
-require_once __DIR__ . '/../../app/repositories/ReservaRepository.php';
-require_once __DIR__ . '/../../app/repositories/LocalRepository.php';
-require_once __DIR__ . '/../../app/repositories/MoradorRepository.php';
-require_once __DIR__ . '/../../app/services/ReservaService.php';
+use Tests\Support\FakeLocalRepository;
+use Tests\Support\FakeMoradorRepository;
+use Tests\Support\FakeReservaRepository;
 
 final class ReservaServiceTest extends TestCase
 {
-    public function testSalvarComCamposObrigatoriosAusentesRetornaErro(): void
+    private FakeReservaRepository $reservaRepo;
+    private FakeLocalRepository $localRepo;
+    private FakeMoradorRepository $moradorRepo;
+    private ReservaService $service;
+
+    protected function setUp(): void
     {
-        $resultado = $this->criarService()->salvar([], 1);
+        $this->reservaRepo = new FakeReservaRepository();
+        $this->localRepo = new FakeLocalRepository();
+        $this->moradorRepo = new FakeMoradorRepository();
+        $this->localRepo->locais[1] = ['id_local' => 1, 'local' => 'Salao', 'disp_uso' => 'S'];
+        $this->moradorRepo->moradores[7] = ['id_user' => 7, 'nome' => 'Ana', 'email' => 'ana@example.com'];
+        $this->service = new ReservaService($this->reservaRepo, $this->localRepo, $this->moradorRepo);
+    }
+
+    private function dadosValidos(array $override = []): array
+    {
+        return array_replace([
+            'id_local' => 1,
+            'data_reserva' => date('Y-m-d', strtotime('+3 days')),
+            'hora_ini' => '10:00',
+            'hora_fim' => '12:00',
+        ], $override);
+    }
+
+    public function testSalvarExigeCamposObrigatorios(): void
+    {
+        $resultado = $this->service->salvar(['id_local' => 1], 7);
 
         $this->assertFalse($resultado['sucesso']);
         $this->assertStringContainsString('obrig', $resultado['mensagem']);
     }
 
-    public function testSalvarComDataPassadaRetornaErro(): void
+    public function testSalvarNaoPermiteDataPassada(): void
     {
-        $resultado = $this->criarService()->salvar([
-            'id_local' => 1,
-            'data_reserva' => '2000-01-01',
-            'hora_ini' => '10:00',
-            'hora_fim' => '12:00',
-        ], 1);
+        $resultado = $this->service->salvar($this->dadosValidos(['data_reserva' => '2000-01-01']), 7);
 
         $this->assertFalse($resultado['sucesso']);
-        $this->assertStringContainsString('passada', $resultado['mensagem']);
+        $this->assertStringContainsString('data passada', $resultado['mensagem']);
     }
 
-    public function testSalvarComHorarioFimMenorOuIgualInicioRetornaErro(): void
+    public function testSalvarExigeHoraFimMaiorQueInicio(): void
     {
-        $resultado = $this->criarService()->salvar([
-            'id_local' => 1,
-            'data_reserva' => date('Y-m-d', strtotime('+1 day')),
-            'hora_ini' => '12:00',
-            'hora_fim' => '12:00',
-        ], 1);
+        $resultado = $this->service->salvar($this->dadosValidos(['hora_ini' => '12:00', 'hora_fim' => '11:00']), 7);
 
         $this->assertFalse($resultado['sucesso']);
-        $this->assertStringContainsString('t', $resultado['mensagem']);
+        $this->assertStringContainsString('maior que', $resultado['mensagem']);
     }
 
-    public function testSalvarComLocalIndisponivelRetornaErro(): void
+    public function testSalvarBloqueiaLocalIndisponivel(): void
     {
-        $locais = new ReservaServiceLocalRepositoryFake();
-        $locais->localPorId = ['disp_uso' => 'N'];
+        $this->localRepo->locais[1]['disp_uso'] = 'N';
 
-        $resultado = $this->criarService(localRepo: $locais)->salvar($this->dadosValidos(), 1);
+        $resultado = $this->service->salvar($this->dadosValidos(), 7);
 
         $this->assertFalse($resultado['sucesso']);
-        $this->assertStringContainsString('indispon', $resultado['mensagem']);
+        $this->assertStringContainsString('Local', $resultado['mensagem']);
+        $this->assertStringContainsString('reserva', $resultado['mensagem']);
     }
 
-    public function testSalvarComConflitoRetornaErro(): void
+    public function testSalvarBloqueiaConflitoDeHorario(): void
     {
-        $reservas = new ReservaServiceReservaRepositoryFake();
-        $reservas->temConflito = true;
+        $this->reservaRepo->conflito = true;
 
-        $resultado = $this->criarService(reservaRepo: $reservas)->salvar($this->dadosValidos(), 1);
+        $resultado = $this->service->salvar($this->dadosValidos(), 7);
 
         $this->assertFalse($resultado['sucesso']);
         $this->assertStringContainsString('reserva aprovada', $resultado['mensagem']);
+        $this->assertSame([1, $this->dadosValidos()['data_reserva'], '10:00', '12:00'], $this->reservaRepo->conflitoConsultado);
     }
 
-    public function testSalvarComPendenteDoUsuarioRetornaErro(): void
+    public function testListarLocaisDisponiveisDelegadoAoRepositorio(): void
     {
-        $reservas = new ReservaServiceReservaRepositoryFake();
-        $reservas->temPendente = true;
+        $this->localRepo->disponiveis = [['id_local' => 1, 'local' => 'Salao']];
 
-        $resultado = $this->criarService(reservaRepo: $reservas)->salvar($this->dadosValidos(), 1);
-
-        $this->assertFalse($resultado['sucesso']);
-        $this->assertStringContainsString('reserva pendente', $resultado['mensagem']);
+        $this->assertSame($this->localRepo->disponiveis, $this->service->listarLocaisDisponiveis());
     }
 
-    public function testListarLocaisDisponiveisRetornaRepositorio(): void
+    public function testListarPendentesGeralDelegadoAoRepositorio(): void
     {
-        $locais = new ReservaServiceLocalRepositoryFake();
-        $locais->disponiveis = [['local' => 'Salao']];
+        $this->reservaRepo->pendentesGeral = [['id_reserva' => 2]];
 
-        $this->assertSame($locais->disponiveis, $this->criarService(localRepo: $locais)->listarLocaisDisponiveis());
+        $this->assertSame($this->reservaRepo->pendentesGeral, $this->service->listarPendentesGeral(5, 15));
     }
 
-    public function testListarPendentesGeralRetornaRepositorio(): void
+    public function testContarPendentesGeralDelegadoAoRepositorio(): void
     {
-        $reservas = new ReservaServiceReservaRepositoryFake();
-        $reservas->pendentes = [['id_reserva' => 1]];
+        $this->reservaRepo->totalPendentesGeral = 6;
 
-        $resultado = $this->criarService(reservaRepo: $reservas)->listarPendentesGeral(10, 5);
-
-        $this->assertSame($reservas->pendentes, $resultado);
-        $this->assertSame([10, 5], $reservas->consultaPendentes);
-    }
-
-    public function testContarPendentesGeralRetornaRepositorio(): void
-    {
-        $reservas = new ReservaServiceReservaRepositoryFake();
-        $reservas->totalPendentes = 12;
-
-        $this->assertSame(12, $this->criarService(reservaRepo: $reservas)->contarPendentesGeral());
-    }
-
-    private function criarService(
-        ?ReservaServiceReservaRepositoryFake $reservaRepo = null,
-        ?ReservaServiceLocalRepositoryFake $localRepo = null,
-        ?ReservaServiceMoradorRepositoryFake $moradorRepo = null
-    ): ReservaService {
-        return new ReservaService(
-            $reservaRepo ?? new ReservaServiceReservaRepositoryFake(),
-            $localRepo ?? new ReservaServiceLocalRepositoryFake(),
-            $moradorRepo ?? new ReservaServiceMoradorRepositoryFake()
-        );
-    }
-
-    private function dadosValidos(): array
-    {
-        return [
-            'id_local' => 1,
-            'data_reserva' => date('Y-m-d', strtotime('+1 day')),
-            'hora_ini' => '10:00',
-            'hora_fim' => '12:00',
-        ];
-    }
-}
-
-final class ReservaServiceReservaRepositoryFake extends ReservaRepository
-{
-    public bool $temConflito = false;
-    public bool $temPendente = false;
-    public array $pendentes = [];
-    public int $totalPendentes = 0;
-    public ?array $consultaPendentes = null;
-
-    public function __construct()
-    {
-    }
-
-    public function existeConflito(int $idLocal, string $data, string $horaIni, string $horaFim): bool
-    {
-        return $this->temConflito;
-    }
-
-    public function existeReservaPendente(int $idUser): bool
-    {
-        return $this->temPendente;
-    }
-
-    public function buscarReservasPendentesGeral(int $offset = 0, int $limite = 10): array
-    {
-        $this->consultaPendentes = [$offset, $limite];
-        return $this->pendentes;
-    }
-
-    public function countPendentesGeral(): int
-    {
-        return $this->totalPendentes;
-    }
-}
-
-final class ReservaServiceLocalRepositoryFake extends LocalRepository
-{
-    public ?array $localPorId = ['disp_uso' => 'S', 'local' => 'Salao'];
-    public array $disponiveis = [];
-
-    public function __construct()
-    {
-    }
-
-    public function findById(int $id): ?array
-    {
-        return $this->localPorId;
-    }
-
-    public function findDisponiveis(): array
-    {
-        return $this->disponiveis;
-    }
-}
-
-final class ReservaServiceMoradorRepositoryFake extends MoradorRepository
-{
-    public function __construct()
-    {
-    }
-
-    public function findById(int $id): ?array
-    {
-        return ['email' => 'maria@example.com', 'nome' => 'Maria'];
+        $this->assertSame(6, $this->service->contarPendentesGeral());
     }
 }
