@@ -28,9 +28,25 @@ class MoradorRepository
     public function findAtivos(): array
     {
         $stmt = $this->pdo->query(
-            "SELECT * FROM morador WHERE status = 'L' AND privilegio = 1 ORDER BY nome ASC"
+            "SELECT * FROM morador WHERE status = 'L' AND privilegio = 1"
         );
-        return $this->descriptografarLista($stmt->fetchAll());
+        $moradores = $this->descriptografarLista($stmt->fetchAll());
+
+        usort($moradores, static function ($a, $b) {
+            $porNome = strcasecmp((string)($a['nome'] ?? ''), (string)($b['nome'] ?? ''));
+            if ($porNome !== 0) {
+                return $porNome;
+            }
+
+            $porBloco = strcasecmp((string)($a['bloco'] ?? ''), (string)($b['bloco'] ?? ''));
+            if ($porBloco !== 0) {
+                return $porBloco;
+            }
+
+            return strnatcasecmp((string)($a['apto'] ?? ''), (string)($b['apto'] ?? ''));
+        });
+
+        return $moradores;
     }
 
     public function findTodos(): array

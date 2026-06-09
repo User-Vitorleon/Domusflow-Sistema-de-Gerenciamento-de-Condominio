@@ -115,7 +115,7 @@ class FinancasRepository
                 FROM lancamentos l
                 INNER JOIN morador m ON l.id_user = m.id_user
                 WHERE 1=1 {$where}
-                ORDER BY l.data_lancamento DESC
+                ORDER BY l.id_lancamento DESC
                 LIMIT :limite OFFSET :offset
             ";
         } else {
@@ -125,7 +125,7 @@ class FinancasRepository
                 SELECT l.*
                 FROM lancamentos l
                 WHERE 1=1 {$where}
-                ORDER BY l.data_lancamento DESC
+                ORDER BY l.id_lancamento DESC
                 LIMIT :limite OFFSET :offset
             ";
         }
