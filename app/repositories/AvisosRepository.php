@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../helpers/CryptoHelper.php';
+
 class AvisosRepository
 {
     private PDO $pdo;
@@ -18,7 +20,10 @@ class AvisosRepository
             WHERE a.status = 'A'
             ORDER BY a.created_at DESC
         ");
-        return $stmt->fetchAll();
+        return array_map(function ($aviso) {
+            $aviso['nome_autor'] = CryptoHelper::decrypt($aviso['nome_autor']);
+            return $aviso;
+        }, $stmt->fetchAll());
     }
 
     public function salvarAvisos(array $dados): bool

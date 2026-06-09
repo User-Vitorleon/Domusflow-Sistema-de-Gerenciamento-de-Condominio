@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../helpers/CryptoHelper.php';
+
 class AssembleiaRepository
 {
     private PDO $pdo;
@@ -22,7 +24,10 @@ class AssembleiaRepository
             {$whereData}
             ORDER BY {$ordem}
         ");
-        return $stmt->fetchAll();
+        return array_map(function ($assembleia) {
+            $assembleia['nome_autor'] = CryptoHelper::decrypt($assembleia['nome_autor']);
+            return $assembleia;
+        }, $stmt->fetchAll());
     }
 
     public function salvarAssembleia(array $dados): bool
@@ -99,7 +104,10 @@ class AssembleiaRepository
         ");
         $params = $idAssembleia ? [':id' => $idAssembleia] : [];
         $stmt->execute($params);
-        return $stmt->fetchAll();
+        return array_map(function ($presenca) {
+            $presenca['nome'] = CryptoHelper::decrypt($presenca['nome']);
+            return $presenca;
+        }, $stmt->fetchAll());
     }
 
     public function listarPresencasAgrupadas(): array{

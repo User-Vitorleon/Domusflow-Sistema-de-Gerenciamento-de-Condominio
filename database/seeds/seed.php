@@ -84,10 +84,12 @@ try {
         '43209957835' => true,
         '98765432100' => true,
     ];
+    $cpfSindicoExtra1 = gerarCpfValido($cpfsUsados);
+    $cpfSindicoExtra2 = gerarCpfValido($cpfsUsados);
 
     echo "<pre>";
     echo "Seed DomusFlow iniciado.\n";
-    echo "Senha padrao de todos os usuarios: {$senhaPadrao}\n\n";
+    echo "Senha padrão de todos os usuários: {$senhaPadrao}\n\n";
 
     $stmtMorador = $pdo->prepare("
         INSERT INTO morador
@@ -97,23 +99,32 @@ try {
     ");
 
     $usuariosSistema = [
-        [1, 'Admin Root', '0', 'G', '00000000000', 'admin@domusflow.com', '(11) 3000-0000', null, 'L', 4],
-        [2, 'Admin Beatriz Costa', '0', 'G', '99999999999', 'admin.beatriz@domusflow.com', '(11) 3000-0001', null, 'L', 4],
+        [1, 'Admin Principal', '0', 'G', '00000000000', 'ana.costa@domusflow.com', '(11) 3000-0000', null, 'L', 4],
+        [2, 'Admin Reserva', '0', 'G', '99999999999', 'marcos.ribeiro@domusflow.com', '(11) 3000-0001', null, 'L', 4],
         [3, 'Vitor Leon', '10', 'A', '43209957835', 'sindico@domusflow.com', '(11) 98522-9900', '(11) 95907-3260', 'L', 2],
-        [4, 'Sindica Mariana Alves', '11', 'B', '98765432100', 'sindica.mariana@domusflow.com', '(11) 98888-1100', null, 'L', 2],
-        [5, 'Porteiro Padrao', '0', 'G', '11111111111', 'porteiro@domusflow.com', '(11) 3000-0002', null, 'L', 3],
-        [6, 'Porteiro Carlos Lima', '0', 'G', '22222222222', 'porteiro.carlos@domusflow.com', '(11) 3000-0003', null, 'L', 3],
+        [4, 'Mariana Alves', '11', 'B', '98765432100', 'mariana.alves@domusflow.com', '(11) 98888-1100', null, 'L', 2],
+        [5, 'Roberto Martins', '12', 'C', $cpfSindicoExtra1, 'roberto.martins@domusflow.com', '(11) 97777-1200', null, 'L', 2],
+        [6, 'Patricia Gomes', '13', 'D', $cpfSindicoExtra2, 'patricia.gomes@domusflow.com', '(11) 96666-1300', null, 'L', 2],
+        [7, 'Carlos Lima', '0', 'G', '11111111111', 'porteiro@domusflow.com', '(11) 3000-0002', null, 'L', 3],
+        [8, 'Eduardo Moreira', '0', 'G', '22222222222', 'eduardo.moreira@domusflow.com', '(11) 3000-0003', null, 'L', 3],
     ];
 
     foreach ($usuariosSistema as $u) {
         $stmtMorador->execute([
-            $u[0], gerarUuid(), $u[1], $u[2], $u[3],
+            $u[0], gerarUuid(), CryptoHelper::encrypt($u[1]), $u[2], $u[3],
             CryptoHelper::encrypt($u[4]), CryptoHelper::hashCpf($u[4]),
             CryptoHelper::encrypt($u[5]), CryptoHelper::hashEmail($u[5]),
             CryptoHelper::encrypt($u[6]), CryptoHelper::encrypt($u[7]),
             $hash, $u[8], $u[9], dataRelativa(-180 + $u[0]),
         ]);
     }
+
+    $credenciaisChave = [
+        'admin' => ['nome' => $usuariosSistema[0][1], 'cpf' => $usuariosSistema[0][4]],
+        'sindico' => ['nome' => $usuariosSistema[2][1], 'cpf' => $usuariosSistema[2][4]],
+        'porteiro' => ['nome' => $usuariosSistema[6][1], 'cpf' => $usuariosSistema[6][4]],
+        'morador' => null,
+    ];
 
     $nomesMasculinos = [
         'Carlos', 'Joao', 'Pedro', 'Lucas', 'Marcos', 'Rafael', 'Bruno', 'Felipe', 'Thiago', 'Diego',
@@ -133,7 +144,8 @@ try {
         'Lima', 'Cardoso', 'Nogueira', 'Monteiro', 'Correia', 'Farias', 'Duarte', 'Peixoto', 'Queiroz', 'Moura',
         'Neves', 'Sales', 'Campos', 'Rezende', 'Borges', 'Amaral', 'Cunha', 'Vieira', 'Pinto', 'Araújo',
     ];
-    $blocos = ['A', 'B', 'C', 'D', 'E'];
+    $blocos = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+    $aptosPorBloco = 100;
     $statusDistribuicao = array_merge(
         array_fill(0, 800, 'L'),
         array_fill(0, 80, 'P'),
@@ -147,7 +159,14 @@ try {
     $idsInativos = [];
     $idsBloqueados = [];
     $emailsUsados = [];
-    $id = 7;
+    $unidadesSistema = [];
+    foreach ($usuariosSistema as $u) {
+        if ((int)$u[9] === 2) {
+            $unidadesSistema[$u[3] . '-' . $u[2]] = true;
+        }
+    }
+    $proximaUnidadeAtiva = 0;
+    $id = 9;
     $nomeIndex = 0;
 
     for ($i = 0; $i < 1000; $i++, $id++) {
@@ -163,11 +182,14 @@ try {
         $status = $statusDistribuicao[$i];
 
         if ($status === 'L') {
-            $apto = (string)($i + 1);
-            $bloco = $blocos[$i % count($blocos)];
+            do {
+                $apto = (string)(($proximaUnidadeAtiva % $aptosPorBloco) + 1);
+                $bloco = $blocos[intdiv($proximaUnidadeAtiva, $aptosPorBloco) % count($blocos)];
+                $proximaUnidadeAtiva++;
+            } while (isset($unidadesSistema[$bloco . '-' . $apto]));
         } else {
-            $apto = (string)(($i % 180) + 1);
-            $bloco = $blocos[$i % count($blocos)];
+            $apto = (string)(($i % $aptosPorBloco) + 1);
+            $bloco = $blocos[intdiv($i, $aptosPorBloco) % count($blocos)];
         }
 
         $emailBase = slug($nome);
@@ -185,7 +207,7 @@ try {
         $stmtMorador->execute([
             $id,
             gerarUuid(),
-            $nome,
+            CryptoHelper::encrypt($nome),
             $apto,
             $bloco,
             CryptoHelper::encrypt($cpf),
@@ -200,6 +222,10 @@ try {
             dataRelativa(-160 + ($i % 150)),
         ]);
 
+        if ($credenciaisChave['morador'] === null && $status === 'L') {
+            $credenciaisChave['morador'] = ['nome' => $nome, 'cpf' => $cpf];
+        }
+
         $idsMoradores[] = $id;
         if ($status === 'L') $idsAtivos[] = $id;
         if ($status === 'P') $idsPendentes[] = $id;
@@ -207,7 +233,7 @@ try {
         if ($status === 'B') $idsBloqueados[] = $id;
     }
 
-    echo "Usuarios do sistema: 6\n";
+    echo "Usuários do sistema: 8\n";
     echo "Moradores: 1000 (ativos: " . count($idsAtivos) . ", pendentes: " . count($idsPendentes) . ", inativos: " . count($idsInativos) . ", bloqueados: " . count($idsBloqueados) . ")\n";
 
     $locais = [
@@ -266,7 +292,7 @@ try {
             $marca = $marcas[$veiculos % count($marcas)];
             $modelos = $catalogoVeiculos[$marca];
             $modelo = $modelos[intdiv($veiculos, count($marcas)) % count($modelos)];
-            $stmtVeiculo->execute([$placa, $marca, $modelo, $cores[$veiculos % count($cores)], $v === 0 ? 1 : 0, $moradorId, 5, dataRelativa(-120 + ($veiculos % 180))]);
+            $stmtVeiculo->execute([$placa, $marca, $modelo, $cores[$veiculos % count($cores)], $v === 0 ? 1 : 0, $moradorId, 7, dataRelativa(-120 + ($veiculos % 180))]);
             $veiculos++;
         }
     }
@@ -281,20 +307,47 @@ try {
         ['18:00:00', '22:00:00'], ['19:00:00', '23:00:00'],
     ];
     $statusReservas = ['A', 'A', 'A', 'P', 'P', 'N'];
+    $pendentesAntigas = 0;
+    $slotsReservados = [];
     for ($i = 0; $i < 1000; $i++) {
         $status = $statusReservas[$i % count($statusReservas)];
-        $diasReserva = -180 + ($i % 420);
+        if ($status === 'P' && $pendentesAntigas < 25) {
+            $diasReserva = -($pendentesAntigas + 1);
+            $pendentesAntigas++;
+        } elseif ($status === 'P') {
+            $diasReserva = $i % 90;
+        } else {
+            $diasReserva = -180 + ($i % 420);
+        }
         $created = dataRelativa($diasReserva - 12, '14:00:00');
         $aprovado = in_array($status, ['A', 'N'], true);
+        $idLocal = $idsLocais[$i % count($idsLocais)];
+        $horario = $horarios[$i % count($horarios)];
+        $dataReserva = (new DateTime('2026-06-06'))->modify(($diasReserva >= 0 ? '+' : '') . $diasReserva . ' days')->format('Y-m-d');
+
+        if (in_array($status, ['A', 'P'], true)) {
+            for ($tentativa = 0; $tentativa < 240; $tentativa++) {
+                $chaveSlot = $idLocal . '|' . $dataReserva . '|' . $horario[0] . '|' . $horario[1];
+                if (!isset($slotsReservados[$chaveSlot])) {
+                    $slotsReservados[$chaveSlot] = true;
+                    break;
+                }
+
+                $idLocal = $idsLocais[($i + $tentativa + 1) % count($idsLocais)];
+                $horario = $horarios[($i + $tentativa + 1) % count($horarios)];
+                $dataReserva = (new DateTime('2026-06-06'))->modify(($diasReserva + $tentativa + 1) . ' days')->format('Y-m-d');
+            }
+        }
+
         $stmtReserva->execute([
-            $idsLocais[$i % count($idsLocais)],
+            $idLocal,
             $idsAtivos[$i % count($idsAtivos)],
-            (new DateTime('2026-06-06'))->modify(($diasReserva >= 0 ? '+' : '') . $diasReserva . ' days')->format('Y-m-d'),
-            $horarios[$i % count($horarios)][0],
-            $horarios[$i % count($horarios)][1],
+            $dataReserva,
+            $horario[0],
+            $horario[1],
             $status,
             $aprovado ? (($i % 2 === 0) ? 3 : 4) : null,
-            $aprovado ? (($i % 2 === 0) ? 'Vitor Leon' : 'Sindica Mariana Alves') : null,
+            $aprovado ? (($i % 2 === 0) ? 'Vitor Leon' : 'Mariana Alves') : null,
             $aprovado ? substr(dataRelativa($diasReserva - 10), 0, 10) : null,
             $aprovado ? '10:30:00' : null,
             $created,
@@ -349,19 +402,19 @@ try {
             $idsAtivos[$i % count($idsAtivos)],
             $categorias[$i % count($categorias)],
             $titulos[$i % count($titulos)],
-            'Ocorrencia registrada pelo morador para acompanhamento da administracao.',
+            'Ocorrência registrada pelo morador para acompanhamento da administração.',
             $status,
             dataRelativa(-120 + ($i % 160)),
         ]);
         $idOc = (int)$pdo->lastInsertId();
         if (in_array($status, ['E', 'R'], true)) {
-            $stmtTr->execute([$idOc, 3, 'Vitor Leon', 'E', 'Ocorrencia recebida e em analise pela equipe responsavel.', dataRelativa(-100 + ($i % 120))]);
+            $stmtTr->execute([$idOc, 3, 'Vitor Leon', 'E', 'Ocorrência recebida e em análise pela equipe responsável.', dataRelativa(-100 + ($i % 120))]);
         }
         if ($status === 'R') {
-            $stmtTr->execute([$idOc, 3, 'Vitor Leon', 'R', 'Problema solucionado e ocorrencia encerrada.', dataRelativa(-90 + ($i % 120))]);
+            $stmtTr->execute([$idOc, 3, 'Vitor Leon', 'R', 'Problema solucionado e ocorrência encerrada.', dataRelativa(-90 + ($i % 120))]);
         }
         if ($status === 'C') {
-            $stmtTr->execute([$idOc, $idsAtivos[$i % count($idsAtivos)], 'Morador', 'C', 'Ocorrencia cancelada pelo solicitante.', dataRelativa(-95 + ($i % 120))]);
+            $stmtTr->execute([$idOc, $idsAtivos[$i % count($idsAtivos)], 'Morador', 'C', 'Ocorrência cancelada pelo solicitante.', dataRelativa(-95 + ($i % 120))]);
         }
         if ($status !== 'A') {
             $stmtNot->execute([$idOc, $idsAtivos[$i % count($idsAtivos)], $i % 2, dataRelativa(-90 + ($i % 120))]);
@@ -383,14 +436,14 @@ try {
         ['Regras de silencio', 'Lembramos que o horario de silencio deve ser respeitado entre 22h e 08h, inclusive em areas comuns.'],
         ['Treinamento da equipe de portaria', 'A equipe de portaria participara de treinamento interno. O atendimento seguira normalmente, com apoio do sindico.'],
     ];
-    for ($i = 1; $i <= 36; $i++) {
+    for ($i = 1; $i <= 12; $i++) {
         $aviso = $avisosRealistas[($i - 1) % count($avisosRealistas)];
         $stmtAviso->execute([
             $aviso[0],
             $aviso[1],
             ($i % 2 === 0) ? 3 : 4,
-            ($i % 9 === 0) ? 'I' : 'A',
-            dataRelativa(-90 + $i),
+            'A',
+            dataRelativa(-20 + $i),
         ]);
     }
 
@@ -442,16 +495,19 @@ try {
     $pdo->commit();
 
     echo "Locais: " . count($idsLocais) . "\n";
-    echo "Veiculos: {$veiculos}\n";
+    echo "Veículos: {$veiculos}\n";
     echo "Reservas: 1000\n";
     echo "Lancamentos financeiros: {$totalLancamentos}\n";
-    echo "Ocorrencias: 300\n";
-    echo "Avisos: 36\n";
+    echo "Ocorrências: 300\n";
+    echo "Avisos: 12\n";
     echo "Assembleias: 8\n";
     echo "Auditoria: 150\n";
-    echo "\nSeed concluido com sucesso.\n";
-    echo "Admin: 00000000000 / 123456\n";
-    echo "Porteiro: 11111111111 / 123456\n";
+    echo "\nSeed concluído com sucesso.\n";
+    echo "\nUsuários-chave para login:\n";
+    echo "Admin: {$credenciaisChave['admin']['nome']} | CPF: {$credenciaisChave['admin']['cpf']} | Senha: {$senhaPadrao}\n";
+    echo "Síndico: {$credenciaisChave['sindico']['nome']} | CPF: {$credenciaisChave['sindico']['cpf']} | Senha: {$senhaPadrao}\n";
+    echo "Porteiro: {$credenciaisChave['porteiro']['nome']} | CPF: {$credenciaisChave['porteiro']['cpf']} | Senha: {$senhaPadrao}\n";
+    echo "Morador: {$credenciaisChave['morador']['nome']} | CPF: {$credenciaisChave['morador']['cpf']} | Senha: {$senhaPadrao}\n";
     echo "</pre>";
 } catch (Throwable $e) {
     if (isset($pdo) && $pdo->inTransaction()) {

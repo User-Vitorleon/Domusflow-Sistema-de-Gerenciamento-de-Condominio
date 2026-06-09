@@ -143,6 +143,20 @@ class ReservaController
         $this->redirecionar('/reserva?visao=solicitacoes');
     }    
 
+    public function recusarVencidas(): void
+    {
+        AuthGuard::requereUsuarioAtivo();
+        AuthGuard::requerePost('/reserva?visao=solicitacoes');
+        $this->requireSindicoOuAdmin();
+
+        $total = (new ReservaRepository())->recusarPendentesAnteriores();
+        $_SESSION['sucesso_reserva'] = $total > 0
+            ? "{$total} reserva(s) pendente(s) vencida(s) foram recusadas."
+            : 'Nenhuma reserva pendente vencida encontrada.';
+
+        $this->redirecionar('/reserva?visao=solicitacoes');
+    }
+
 
     private function montarPaginacaoPendentes(array $filtros): array{
         $pagina       = max(1, (int)($_GET['pagina'] ?? 1));

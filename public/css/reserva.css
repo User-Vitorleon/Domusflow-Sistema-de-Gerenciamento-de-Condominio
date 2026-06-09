@@ -67,6 +67,28 @@
     font-weight: 700;
 }
 
+.reserva-section-head-actions h3 {
+    order: 0;
+}
+
+.reserva-section-head-actions span {
+    order: 1;
+}
+
+.reserva-recusa-vencidas-form {
+    order: 2;
+    margin-left: auto;
+}
+
+.reserva-recusa-vencidas-form .btn-danger-sm {
+    min-height: 34px;
+    padding: 7px 12px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
 .reserva-status-field,
 .reserva-convidados {
     max-width: 240px;
@@ -335,6 +357,16 @@
     .reserva-section-head {
         align-items: flex-start;
         flex-direction: column;
+    }
+
+    .reserva-recusa-vencidas-form {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .reserva-recusa-vencidas-form .btn-danger-sm {
+        width: 100%;
+        justify-content: center;
     }
 
     .reserva-status-field,

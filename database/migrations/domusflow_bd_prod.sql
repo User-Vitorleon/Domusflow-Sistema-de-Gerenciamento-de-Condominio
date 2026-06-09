@@ -38,6 +38,10 @@ CREATE TABLE `morador` (
   KEY `idx_morador_status_unidade` (`status`, `bloco`, `apto`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- LGPD: nome, CPF, e-mail e telefones são criptografados pela aplicação.
+-- Exclusão lógica: status='E', UUID regenerado, dados pessoais descriptografam como '***'
+-- e cpf_hash/email_hash recebem hashes técnicos únicos para manter as constraints.
+
 CREATE TABLE `auditoria` (
   `id_auditoria` int(11)      NOT NULL AUTO_INCREMENT,
   `id_user`      int(11)      DEFAULT NULL,

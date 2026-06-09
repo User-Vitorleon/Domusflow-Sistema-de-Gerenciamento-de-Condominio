@@ -226,9 +226,15 @@ $basePaginacao .= '&';
         </div>
 
         <div class="df-card reserva-solicitacoes-card">
-            <div class="reserva-section-head">
+            <div class="reserva-section-head reserva-section-head-actions">
                 <h3>Solicitações de Reserva Pendentes</h3>
                 <span><?= count($reservasParaAprovar ?? []) ?> nesta página</span>
+                <form action="<?= BASE_URL ?>/reservas/recusar-vencidas" method="POST" class="reserva-recusa-vencidas-form">
+                    <button type="submit" class="btn-danger-sm"
+                        onclick="return confirm('Recusar todas as reservas pendentes com data anterior a hoje?');">
+                        Recusar pendentes vencidas
+                    </button>
+                </form>
             </div>
 
             <?php if (empty($reservasParaAprovar)): ?>

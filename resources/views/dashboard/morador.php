@@ -1,188 +1,121 @@
 <?php
 $paginaTitulo = 'Dashboard - Morador';
 $cssExtra = 'dashboard.css';
-$jsExtra = 'dashboard.js';
+
+$reservasVisiveis = array_slice($minhasReservas ?? [], 0, 6);
+$totalOcorrencias = (int) (($ocorrenciasMorador['aberto'] ?? 0) +
+    ($ocorrenciasMorador['andamento'] ?? 0) +
+    ($ocorrenciasMorador['resolvido'] ?? 0) +
+    ($ocorrenciasMorador['cancelado'] ?? 0));
 ?>
 
 <?php require_once __DIR__ . '/../layout/header.php'; ?>
 
-<main class="main-content">
+<main class="main-content" id="app">
     <div class="page-header">
-        <h2>Dashboard</h2>
-        <p class="text-muted">Bem-vindo, <?= htmlspecialchars(explode(' ', $usuario['nome'])[0]) ?>!</p>
+        <h2>Dashboard Morador</h2>
+        <p class="text-muted">Resumo das suas reservas, ocorrências e pendências financeiras.</p>
     </div>
-    <?php if (!empty($boletosVencendo)): ?>
-        <div class="df-alert df-alert-warning" style="margin-bottom: 20px;">
-            <i class='bx bx-error-circle' style="font-size:18px;"></i>
-            <div>
-                <strong>Atenção!</strong> Você tem <?= count($boletosVencendo) ?> boleto(s) vencendo nos próximos 5 dias:
-                <ul style="margin: 6px 0 0 16px; font-size: 13px;">
-                    <?php foreach ($boletosVencendo as $b): ?>
-                        <li>
-                            <?= htmlspecialchars($b['descricao']) ?> —
-                            <strong>R$ <?= number_format($b['valor'], 2, ',', '.') ?></strong>
-                            · vence em <?= date('d/m/Y', strtotime($b['data_vencimento'])) ?>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
+
+    <section class="dashboard-section">
+        <div class="kpi-grid">
+            <a href="<?= BASE_URL ?>/financeiro/historico" class="kpi-card kpi-card-link">
+                <div class="kpi-icon" style="background:#fff7ed;color:#ea580c"><i class="bx bx-receipt"></i></div>
+                <div>
+                    <p class="kpi-label">Em aberto</p>
+                    <h3 class="kpi-value">R$ <?= number_format((float) ($totalPendenteMorador ?? 0), 2, ',', '.') ?></h3>
+                </div>
+            </a>
+            <a href="<?= BASE_URL ?>/reserva/historico" class="kpi-card kpi-card-link">
+                <div class="kpi-icon" style="background:#eff8ff;color:#0f80b6"><i class="bx bx-calendar-check"></i></div>
+                <div>
+                    <p class="kpi-label">Reservas exibidas</p>
+                    <h3 class="kpi-value"><?= count($reservasVisiveis) ?></h3>
+                </div>
+            </a>
         </div>
+    </section>
+
+    <?php if (!empty($boletosVencendo)): ?>
+        <section class="dashboard-section">
+            <div class="df-alert df-alert-warning">
+                <i class="bx bx-error-circle"></i>
+                <div>
+                    <strong>Atenção.</strong> Você tem <?= count($boletosVencendo) ?> boleto(s) vencendo nos próximos 5 dias.
+                </div>
+            </div>
+        </section>
     <?php endif; ?>
 
     <section class="dashboard-section">
-        <h3 class="section-title">Próximos Feriados</h3>
+        <h3 class="section-title">Próximos 2 feriados</h3>
         <?php if (!empty($proximosFeriados)): ?>
-            <div class="row g-3 mb-4">
+            <div class="feriado-grid feriado-grid--compact">
                 <?php foreach ($proximosFeriados as $feriado): ?>
-                    <div class="col-12 col-md-4">
-                        <article class="feriado-card">
-                            <div class="feriado-card-top">
-                                <div class="feriado-card-icon">
-                                    <i class='bx bx-party'></i>
-                                </div>
-                                <div>
-                                    <h4 class="feriado-nome"><?= htmlspecialchars($feriado['name']) ?></h4>
-                                    <p class="feriado-data"><?= htmlspecialchars($feriado['data_formatada']) ?></p>
-                                </div>
+                    <article class="feriado-card">
+                        <div class="feriado-card-top">
+                            <div class="feriado-card-icon"><i class="bx bx-calendar-star"></i></div>
+                            <div>
+                                <h4 class="feriado-nome"><?= htmlspecialchars($feriado['name']) ?></h4>
+                                <p class="feriado-data"><?= htmlspecialchars($feriado['data_formatada']) ?></p>
                             </div>
-                            <span class="feriado-restante">
-                                <?= (int) $feriado['dias_restantes'] === 0 ? 'Hoje' : 'Em ' . (int) $feriado['dias_restantes'] . ' dia(s)' ?>
-                            </span>
-                        </article>
-                    </div>
+                        </div>
+                        <span class="feriado-restante">
+                            <?= (int) $feriado['dias_restantes'] === 0 ? 'Hoje' : 'Em ' . (int) $feriado['dias_restantes'] . ' dia(s)' ?>
+                        </span>
+                    </article>
                 <?php endforeach; ?>
             </div>
         <?php else: ?>
-            <div class="dashboard-placeholder col-12 col-md-8">
-                Nenhum feriado próximo disponível no momento.
-            </div>
+            <div class="dashboard-placeholder">Nenhum feriado próximo disponível.</div>
         <?php endif; ?>
     </section>
 
     <section class="dashboard-section">
-        <h3 class="section-title">Minhas Reservas</h3>
-        <?php if (empty($minhasReservas)): ?>
-            <div class="row justify-content-center">
-                <div class="col-md-6">
-                    <div class="empty-state">
-                        <div class="empty-state-icon">
-                            <i class="bx bx-calendar-x"></i>
-                        </div>
-                        <h5>Você ainda não possui reservas</h5>
-                        <p>Faça sua primeira reserva nas áreas comuns do condomínio.</p>
-                        <a href="<?= BASE_URL ?>/reserva" class="btn btn-primary">Fazer Primeira Reserva</a>
-                    </div>
-                </div>
-            </div>
-        <?php else: ?>
-            <div class="row g-3">
-                <?php foreach ($minhasReservas as $reserva): ?>
-                    <?php
-                    $statusLabel = match ($reserva['status']) {
-                        'A' => ['Aprovada', 'A'],
-                        'P' => ['Pendente', 'P'],
-                        'N' => ['Negada',   'N'],
-                        default => ['Pendente', 'P']
-                    };
-                    $statusTexto = $statusLabel[0];
-                    $statusKey   = $statusLabel[1];
-                    ?>
-                    <div class="col-12 col-md-4">
-                        <div class="reserva-card">
-                            <div class="reserva-header">
-                                <h4 class="reserva-local mb-0 flex-grow-1">
-                                    <?= htmlspecialchars($reserva['local']) ?>
-                                </h4>
-                                <span class="reserva-badge <?= $statusKey ?>"><?= $statusTexto ?></span>
-                            </div>
-                            <div class="reserva-body">
-                                <div class="reserva-datetime">
-                                    <i class='bx bx-calendar'></i>
-                                    <span><?= date('d/m/Y', strtotime($reserva['data_reserva'])) ?></span>
-                                    <span>•</span>
-                                    <span><?= substr($reserva['hora_ini'], 0, 5) ?> - <?= substr($reserva['hora_fim'], 0, 5) ?></span>
-                                </div>
-                                <div class="reserva-aprovador">
-                                    <i class='bx bx-user-check'></i>
-                                    <span><?= $statusKey === 'P' ? 'Aguardando aprovação' : 'Aprov. por: ' . htmlspecialchars($reserva['nome_user_aprov'] ?? '—') ?></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        <?php endif; ?>
-    </section>
-
-    <section class="dashboard-section">
-        <h3 class="section-title">Minhas Ocorrências</h3>
-        <?php
-        $totalOcorrencias = (int) (($ocorrenciasMorador['aberto'] ?? 0) +
-            ($ocorrenciasMorador['andamento'] ?? 0) +
-            ($ocorrenciasMorador['resolvido'] ?? 0) +
-            ($ocorrenciasMorador['cancelado'] ?? 0));
-        ?>
-        <?php if ($totalOcorrencias === 0): ?>
+        <h3 class="section-title">Minhas reservas</h3>
+        <?php if (empty($reservasVisiveis)): ?>
             <div class="empty-state">
-                <div class="empty-state-icon">
-                    <i class="bx bx-check-shield"></i>
-                </div>
-                <h5>Nenhuma ocorrência registrada</h5>
-                <p>Tudo tranquilo por aqui!</p>
+                <div class="empty-state-icon"><i class="bx bx-calendar-x"></i></div>
+                <h5>Nenhuma reserva encontrada</h5>
+                <p>Suas próximas solicitações aparecerão aqui.</p>
             </div>
         <?php else: ?>
-            <div class="row g-3">
-                <div class="col-12 col-md-5">
-                    <div class="chart-card h-100">
-                        <h5 class="chart-title">Situação geral</h5>
-                        <div class="ocorrencia-chart-wrap">
-                            <canvas id="chartOcorrenciasMorador"></canvas>
+            <div class="dashboard-card-grid">
+                <?php foreach ($reservasVisiveis as $reserva): ?>
+                    <?php
+                    $statusTexto = match ($reserva['status']) {
+                        'A' => 'Aprovada',
+                        'N' => 'Recusada',
+                        default => 'Pendente'
+                    };
+                    ?>
+                    <article class="reserva-card">
+                        <div class="reserva-header">
+                            <h4 class="reserva-local"><?= htmlspecialchars($reserva['local']) ?></h4>
+                            <span class="reserva-badge <?= htmlspecialchars($reserva['status']) ?>"><?= $statusTexto ?></span>
                         </div>
-                    </div>
-                </div>
-                <div class="col-12 col-md-3">
-                    <div class="chart-card h-100">
-                        <h5 class="chart-title">Detalhes</h5>
-                        <div class="ocorrencia-legenda">
-                            <div class="ocorrencia-legenda-item">
-                                <span class="ocorrencia-dot" style="background:#EF4444"></span>
-                                <span>Abertas</span>
-                                <strong><?= $ocorrenciasMorador['aberto'] ?? 0 ?></strong>
-                            </div>
-                            <div class="ocorrencia-legenda-item">
-                                <span class="ocorrencia-dot" style="background:#F59E0B"></span>
-                                <span>Em andamento</span>
-                                <strong><?= $ocorrenciasMorador['andamento'] ?? 0 ?></strong>
-                            </div>
-                            <div class="ocorrencia-legenda-item">
-                                <span class="ocorrencia-dot" style="background:#22C55E"></span>
-                                <span>Resolvidas</span>
-                                <strong><?= $ocorrenciasMorador['resolvido'] ?? 0 ?></strong>
-                            </div>
-                            <div class="ocorrencia-legenda-item">
-                                <span class="ocorrencia-dot" style="background:#94A3B8"></span>
-                                <span>Canceladas</span>
-                                <strong><?= $ocorrenciasMorador['cancelado'] ?? 0 ?></strong>
+                        <div class="reserva-body">
+                            <div class="reserva-datetime">
+                                <i class="bx bx-calendar"></i>
+                                <span><?= date('d/m/Y', strtotime($reserva['data_reserva'])) ?></span>
+                                <span><?= substr($reserva['hora_ini'], 0, 5) ?> - <?= substr($reserva['hora_fim'], 0, 5) ?></span>
                             </div>
                         </div>
-                    </div>
-                </div>
+                    </article>
+                <?php endforeach; ?>
             </div>
         <?php endif; ?>
     </section>
 
+    <section class="dashboard-section">
+        <h3 class="section-title">Minhas ocorrências</h3>
+        <div class="dashboard-card-grid dashboard-card-grid--four">
+            <div class="chart-card"><span class="kpi-sub">Abertas</span><strong class="kpi-value"><?= (int) ($ocorrenciasMorador['aberto'] ?? 0) ?></strong></div>
+            <div class="chart-card"><span class="kpi-sub">Em andamento</span><strong class="kpi-value"><?= (int) ($ocorrenciasMorador['andamento'] ?? 0) ?></strong></div>
+            <div class="chart-card"><span class="kpi-sub">Resolvidas</span><strong class="kpi-value"><?= (int) ($ocorrenciasMorador['resolvido'] ?? 0) ?></strong></div>
+            <div class="chart-card"><span class="kpi-sub">Canceladas</span><strong class="kpi-value"><?= (int) ($ocorrenciasMorador['cancelado'] ?? 0) ?></strong></div>
+        </div>
+    </section>
 </main>
-
-<script type="application/json" id="dashboard-data"><?= json_encode([
-                                'chartOcorrenciasMorador' => [
-                                    'labels' => ['Abertas', 'Em andamento', 'Resolvidas', 'Canceladas'],
-                                    'dados' => [
-                                        (int) ($ocorrenciasMorador['aberto'] ?? 0),
-                                        (int) ($ocorrenciasMorador['andamento'] ?? 0),
-                                        (int) ($ocorrenciasMorador['resolvido'] ?? 0),
-                                        (int) ($ocorrenciasMorador['cancelado'] ?? 0),
-                                    ]
-                                ]
-                            ]) ?></script>
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>

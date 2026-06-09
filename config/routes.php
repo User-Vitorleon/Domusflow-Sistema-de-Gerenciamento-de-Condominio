@@ -37,6 +37,7 @@ $routes = [
     'reserva/salvar'                 => ['ReservaController',    'salvar'],
     'reserva/local/editar'           => ['ReservaController',    'editarLocal'],
     'reservas/decidir'               => ['ReservaController',    'decidir'],
+    'reservas/recusar-vencidas'      => ['ReservaController',    'recusarVencidas'],
 
     'veiculo'                        => ['VeiculoController',    'index'],
     'veiculo/salvar'                 => ['VeiculoController',    'salvar'],

@@ -58,17 +58,11 @@ require_once __DIR__ . '/../layout/header.php';
                         <div class="df-field">
                             <label>Unidade</label>
                             <p class="resultado-valor">
-                                Ap <?= htmlspecialchars($v['apto']) ?> · Bloco <?= htmlspecialchars($v['bloco']) ?>
+                                Ap <?= htmlspecialchars($v['apto']) ?> - Bloco <?= htmlspecialchars($v['bloco']) ?>
                             </p>
                         </div>
                         <div class="df-field">
-                            <label>Unidade</label>
-                            <p class="resultado-valor">
-                                Ap <?= htmlspecialchars($v['apto']) ?> · Bloco <?= htmlspecialchars($v['bloco']) ?>
-                            </p>
-                        </div>
-                        <div class="df-field">
-                            <label>Veículo Principal ou Secundário?</label>
+                            <label>Tipo de veículo</label>
                             <p class="resultado-valor">
                                 <?php if ($v['principal']): ?>
                                     <span class="badge bg-success">Principal</span>

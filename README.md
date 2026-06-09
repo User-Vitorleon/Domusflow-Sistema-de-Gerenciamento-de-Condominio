@@ -1,6 +1,6 @@
 # DomusFlow
 
-Sistema de gerenciamento de condomínio desenvolvido em **PHP**, **PDO** e **MySQL/MariaDB**, com arquitetura MVC e execução local via **XAMPP**.
+Sistema de gerenciamento de condomínio desenvolvido em **PHP**, **PDO** e **MySQL/MariaDB**, com arquitetura MVC, execução local via **XAMPP** e módulos voltados à rotina operacional de moradores, síndicos, porteiros e administradores.
 
 ## Stack
 
@@ -48,12 +48,16 @@ http://localhost/Domusflow-Sistema-de-Gerenciamento-de-Condominio
 
 Todas as senhas do seed são `123456`.
 
-| Perfil | CPF | Senha |
-|---|---|---|
-| Admin | `00000000000` | `123456` |
-| Porteiro | `11111111111` | `123456` |
+| Perfil | Nome | CPF | Senha |
+|---|---|---|---|
+| Admin | Admin Principal | `00000000000` | `123456` |
+| Admin | Admin Reserva | `99999999999` | `123456` |
+| Síndico | Vitor Leon | `43209957835` | `123456` |
+| Síndico | Mariana Alves | `98765432100` | `123456` |
+| Porteiro | Carlos Lima | `11111111111` | `123456` |
+| Porteiro | Eduardo Moreira | `22222222222` | `123456` |
 
-O seed também popula síndicos, moradores ativos, pendentes, inativos, bloqueados, veículos, reservas, ocorrências, assembleias, avisos e dados financeiros para simular um condomínio real.
+O seed também imprime ao final um usuário-chave de cada perfil, incluindo um morador gerado dinamicamente. Além disso, popula 1000 moradores, veículos, reservas, ocorrências, assembleias, avisos, auditoria e dados financeiros para simular um condomínio real.
 
 ## Perfis de Acesso
 
@@ -69,23 +73,24 @@ O seed também popula síndicos, moradores ativos, pendentes, inativos, bloquead
 - **Autenticação**: login por CPF e senha, controle de sessão e bloqueio por status.
 - **Cadastro**: validação de CPF, regras de bloco/apartamento e aprovação de novos usuários.
 - **Moradores**: gestão de privilégios, status, unidade, recusa, bloqueio, inativação e exclusão lógica com anonimização.
-- **Veículos**: cadastro, limite parametrizado, veículo principal, filtros e consulta por placa.
-- **Reservas**: locais, solicitações pendentes, histórico do morador, aprovação e recusa.
+- **Veículos**: cadastro, limite parametrizado, veículo principal, catálogo de marcas/modelos de carros e motos, filtros e consulta por placa.
+- **Reservas**: locais, solicitações pendentes, histórico do morador, aprovação, recusa e limpeza de reservas pendentes vencidas.
 - **Financeiro**: taxas/multas padrão, lançamentos, faturas, filtros e confirmação por senha.
-- **Ocorrências**: abertura, painel de gestão, tramitação, status e histórico.
+- **Ocorrências**: abertura, painel de gestão, tramitação, status, fotos e histórico.
 - **Assembleias**: convocação, presença e painel de presenças.
 - **Avisos**: publicação e remoção de comunicados.
 - **Parâmetros**: limite de moradores ativos, limite de veículos por morador e regra de reserva pendente.
-- **Dashboard**: visões por perfil.
+- **Dashboard**: visões por perfil com indicadores operacionais e próximos feriados via BrasilAPI.
 
 ## LGPD e Segurança
 
-- Dados sensíveis são protegidos no banco quando aplicável.
-- CPF e e-mail possuem versão criptografada e hash para busca/validação.
-- Senhas são armazenadas com hash seguro.
-- Exclusão de morador é lógica, com anonimização dos dados pessoais.
+- Nome, CPF, e-mail e telefones são criptografados no banco.
+- CPF e e-mail possuem hash técnico para busca e validação sem expor o valor original.
+- Senhas são armazenadas com hash seguro via `password_hash`.
+- Exclusão de morador é lógica, com anonimização dos dados pessoais e substituição visual por `***`.
 - Usuários inativos, bloqueados ou excluídos são impedidos de continuar usando o sistema na próxima requisição protegida.
 - Alterações administrativas sensíveis usam confirmação de senha.
+- Contas administrativas são protegidas contra bloqueio, inativação, exclusão, reset de senha e alteração de privilégio por outro admin.
 
 ## Estrutura
 

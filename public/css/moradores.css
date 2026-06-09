@@ -497,6 +497,22 @@
     opacity: .55;
 }
 
+.gestao-protected-admin {
+    grid-column: 1 / -1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: var(--bg-soft);
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+}
+
 .btn-action {
     display: inline-flex;
     align-items: center;

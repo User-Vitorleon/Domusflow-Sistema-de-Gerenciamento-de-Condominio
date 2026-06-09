@@ -154,7 +154,7 @@ class ReservaRepository
         $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->descriptografarMoradores($stmt->fetchAll(PDO::FETCH_ASSOC));
     }
 
     public function buscarPendentesComFiltros(array $filtros, int $offset = 0, int $limite = 10): array
@@ -167,7 +167,7 @@ class ReservaRepository
             INNER JOIN morador m ON r.id_user = m.id_user
             WHERE r.status = 'P'
             {$params['sql']}
-            ORDER BY r.created_at ASC, m.nome ASC, r.data_reserva ASC, r.hora_ini ASC
+            ORDER BY r.data_reserva ASC, r.hora_ini ASC, m.nome ASC, r.created_at ASC
             LIMIT :limite OFFSET :offset
         ";
 
@@ -178,7 +178,7 @@ class ReservaRepository
         $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->descriptografarMoradores($stmt->fetchAll(PDO::FETCH_ASSOC));
     }
 
     public function existeReservaPendente(int $idUser): bool
@@ -211,7 +211,7 @@ class ReservaRepository
         $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->descriptografarMoradores($stmt->fetchAll(PDO::FETCH_ASSOC));
     }
 
     public function countHistoricoPorUsuario(int $idUser, array $filtros): int
@@ -312,6 +312,18 @@ class ReservaRepository
         return $stmt->execute([':status' => $status, ':id' => $id]);
     }
 
+    public function recusarPendentesAnteriores(): int
+    {
+        $stmt = $this->pdo->prepare("
+            UPDATE reservas
+            SET status = 'N'
+            WHERE status = 'P'
+              AND data_reserva < CURDATE()
+        ");
+        $stmt->execute();
+        return $stmt->rowCount();
+    }
+
     public function countByStatus(string $status): int
     {
         $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM reservas WHERE status = :status");
@@ -371,11 +383,14 @@ class ReservaRepository
         ");
         $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->descriptografarMoradores($stmt->fetchAll(PDO::FETCH_ASSOC));
     }
 
     private function descriptografarEmail(?array $row): ?array
     {
+        if ($row && array_key_exists('nome_morador', $row)) {
+            $row['nome_morador'] = CryptoHelper::decrypt($row['nome_morador']);
+        }
         if ($row && array_key_exists('email', $row)) {
             $row['email'] = CryptoHelper::decrypt($row['email']);
         }
@@ -385,5 +400,15 @@ class ReservaRepository
     private function descriptografarEmails(array $rows): array
     {
         return array_map(fn ($row) => $this->descriptografarEmail($row), $rows);
+    }
+
+    private function descriptografarMoradores(array $rows): array
+    {
+        return array_map(function ($row) {
+            if (array_key_exists('nome_morador', $row)) {
+                $row['nome_morador'] = CryptoHelper::decrypt($row['nome_morador']);
+            }
+            return $row;
+        }, $rows);
     }
 }

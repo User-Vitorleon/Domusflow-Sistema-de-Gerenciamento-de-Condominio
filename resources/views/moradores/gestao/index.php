@@ -167,7 +167,9 @@ $labelPrivilegio = [1 => 'Morador', 2 => 'Síndico', 3 => 'Porteiro', 4 => 'Admi
                                     </td>
                                     <td class="gestao-acoes-cell">
                                         <div class="gestao-acoes">
-                                            <?php if ($m['status'] !== 'E'): ?>
+                                            <?php if ($ehAdmin): ?>
+                                                <span class="gestao-protected-admin">Conta administrativa protegida</span>
+                                            <?php elseif ($m['status'] !== 'E'): ?>
                                                 <form action="<?= BASE_URL ?>/moradores/gestao/resetar-senha" method="POST" class="gestao-action-form">
                                                     <input type="hidden" name="uuid_morador" value="<?= htmlspecialchars($m['uuid']) ?>">
                                                     <input type="hidden" name="admin_senha" value="">
@@ -178,7 +180,7 @@ $labelPrivilegio = [1 => 'Morador', 2 => 'Síndico', 3 => 'Porteiro', 4 => 'Admi
                                                     </button>
                                                 </form>
                                             <?php endif; ?>
-                                            <?php if (!$ehUsuarioLogado && $m['status'] !== 'E'): ?>
+                                            <?php if (!$ehAdmin && !$ehUsuarioLogado && $m['status'] !== 'E'): ?>
                                                 <form action="<?= BASE_URL ?>/moradores/gestao/status" method="POST" class="gestao-action-form">
                                                     <input type="hidden" name="uuid_morador" value="<?= htmlspecialchars($m['uuid']) ?>">
                                                     <input type="hidden" name="status" value="I">

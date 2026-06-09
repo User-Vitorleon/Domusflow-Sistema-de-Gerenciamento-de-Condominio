@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../helpers/CryptoHelper.php';
+
 class OcorrenciaRepository
 {
     private PDO $pdo;
@@ -34,7 +36,7 @@ public function criar(array $dados): int
         ");
         $stmt->execute([':id' => $id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $row ?: null;
+        return $this->descriptografarNomeMorador($row ?: null);
     }
 
     public function listarPorUsuario(int $idUser, ?string $status = null, int $limit = 4, int $offset = 0): array
@@ -109,7 +111,7 @@ public function criar(array $dados): int
         $stmt->bindValue(':limit',  $limit,  PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->descriptografarNomesMoradores($stmt->fetchAll(PDO::FETCH_ASSOC));
     }
 
     public function contarTodas(?string $status = null): int
@@ -266,7 +268,7 @@ public function listarComFiltros(array $filtros, int $limit = 15, int $offset = 
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->descriptografarNomesMoradores($stmt->fetchAll(PDO::FETCH_ASSOC));
     }
 
     public function contarComFiltros(array $filtros): int
@@ -325,7 +327,10 @@ public function listarComFiltros(array $filtros, int $limit = 15, int $offset = 
             INNER JOIN morador m ON m.id_user = o.id_user
             ORDER BY m.nome ASC, m.bloco ASC, m.apto ASC
         ");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return array_map(function ($row) {
+            $row['nome'] = CryptoHelper::decrypt($row['nome']);
+            return $row;
+        }, $stmt->fetchAll(PDO::FETCH_ASSOC));
     }
 
     public function contarPorStatusUsuario(int $idUser): array
@@ -365,5 +370,18 @@ public function listarComFiltros(array $filtros, int $limit = 15, int $offset = 
         }
 
         return $map;
+    }
+
+    private function descriptografarNomesMoradores(array $rows): array
+    {
+        return array_map(fn($row) => $this->descriptografarNomeMorador($row), $rows);
+    }
+
+    private function descriptografarNomeMorador(?array $row): ?array
+    {
+        if ($row && array_key_exists('nome_morador', $row)) {
+            $row['nome_morador'] = CryptoHelper::decrypt($row['nome_morador']);
+        }
+        return $row;
     }
 }

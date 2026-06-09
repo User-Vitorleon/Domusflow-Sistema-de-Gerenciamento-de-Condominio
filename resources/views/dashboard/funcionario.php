@@ -1,130 +1,115 @@
 <?php
-$paginaTitulo = 'Dashboard - Funcionário';
-$cssExtra     = 'dashboard.css';
+$paginaTitulo = 'Dashboard - Porteiro';
+$cssExtra = 'dashboard.css';
 ?>
 
 <?php require_once __DIR__ . '/../layout/header.php'; ?>
 
-<main class="main-content">
+<main class="main-content" id="app">
     <div class="page-header">
-        <h2>Dashboard Operacional</h2>
-        <p class="text-muted">Pendências do dia</p>
-    </div>
-
-    <div class="row g-3 mb-5">
-        <div class="col-md-6 col-xl-3">
-            <div class="kpi-card text-center">
-                <i class="bx bx-error-circle fs-1 text-danger mb-2"></i>
-                <h3 class="text-danger"><?= (int) ($ocorrenciasFuncionario['aberto'] ?? 0) ?></h3>
-                <p class="text-muted mb-0">Ocorrências Abertas</p>
-            </div>
-        </div>
-        <div class="col-md-6 col-xl-3">
-            <div class="kpi-card text-center">
-                <i class="bx bx-time-five fs-1 text-warning mb-2"></i>
-                <h3 class="text-warning"><?= (int) ($ocorrenciasFuncionario['andamento'] ?? 0) ?></h3>
-                <p class="text-muted mb-0">Em Espera</p>
-            </div>
-        </div>
-        <div class="col-md-6 col-xl-3">
-            <div class="kpi-card text-center">
-                <i class="bx bx-user-check fs-1 text-info mb-2"></i>
-                <h3 class="text-info"><?= (int) ($moradoresPendentes ?? 0) ?></h3>
-                <p class="text-muted mb-0">Moradores Pendentes</p>
-            </div>
-        </div>
-        <div class="col-md-6 col-xl-3">
-            <div class="kpi-card text-center">
-                <i class="bx bx-calendar-check fs-1 text-success mb-2"></i>
-                <h3 class="text-success"><?= $reservasPendentes ?></h3>
-                <p class="text-muted mb-0">Reservas Pendentes</p>
-            </div>
-        </div>
+        <h2>Dashboard Porteiro</h2>
+        <p class="text-muted">Consulta rápida para apoio à portaria e controle de veículos.</p>
     </div>
 
     <section class="dashboard-section">
-        <h3 class="section-title">Veículos</h3>
-
-        <div class="row g-3 mb-4">
-            <div class="col-12 col-md-4">
-                <div class="chart-card h-100">
-                    <h5 class="chart-title">Total Cadastrado</h5>
-                    <div class="kpi-value"><?= (int) ($totalVeiculos ?? 0) ?></div>
-                    <span class="kpi-sub">Veículos no sistema</span>
+        <div class="kpi-grid">
+            <a href="<?= BASE_URL ?>/veiculo" class="kpi-card kpi-card-link">
+                <div class="kpi-icon" style="background:#eff8ff;color:#0f80b6"><i class="bx bx-car"></i></div>
+                <div>
+                    <p class="kpi-label">Veículos cadastrados</p>
+                    <h3 class="kpi-value"><?= (int) ($totalVeiculos ?? 0) ?></h3>
                 </div>
-            </div>
-
-            <div class="col-12 col-md-4">
-                <div class="chart-card h-100">
-                    <h5 class="chart-title">Top Marcas</h5>
-                    <?php if (!empty($topMarcasVeiculos)): ?>
-                        <div class="dashboard-list">
-                            <?php foreach ($topMarcasVeiculos as $marca): ?>
-                                <div class="reserva-semana-item">
-                                    <div class="reserva-semana-info">
-                                        <div class="reserva-semana-local"><?= htmlspecialchars($marca['marca']) ?></div>
-                                    </div>
-                                    <strong><?= (int) $marca['total'] ?></strong>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    <?php else: ?>
-                        <div class="dashboard-placeholder">Sem dados de marcas.</div>
-                    <?php endif; ?>
+            </a>
+            <a href="<?= BASE_URL ?>/veiculo/consultar" class="kpi-card kpi-card-link">
+                <div class="kpi-icon" style="background:#f0fdf4;color:#16a34a"><i class="bx bx-search"></i></div>
+                <div>
+                    <p class="kpi-label">Busca rápida</p>
+                    <h3 class="kpi-value-sm">Consultar placa</h3>
+                    <span class="kpi-sub">Identifique morador, bloco e apto</span>
                 </div>
-            </div>
-
-            <div class="col-12 col-md-4">
-                <div class="chart-card h-100">
-                    <h5 class="chart-title">Top Cores</h5>
-                    <?php if (!empty($topCoresVeiculos)): ?>
-                        <div class="dashboard-list">
-                            <?php foreach ($topCoresVeiculos as $cor): ?>
-                                <div class="reserva-semana-item">
-                                    <div class="reserva-semana-info">
-                                        <div class="reserva-semana-local"><?= htmlspecialchars($cor['cor']) ?></div>
-                                    </div>
-                                    <strong><?= (int) $cor['total'] ?></strong>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    <?php else: ?>
-                        <div class="dashboard-placeholder">Sem dados de cores.</div>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
-
-        <div class="row g-3 mb-5">
-            <div class="col-12 col-md-6">
-                <div class="chart-card h-100">
-                    <h5 class="chart-title">Top Modelos</h5>
-                    <?php if (!empty($topModelosVeiculos)): ?>
-                        <div class="dashboard-list">
-                            <?php foreach ($topModelosVeiculos as $modelo): ?>
-                                <div class="reserva-semana-item">
-                                    <div class="reserva-semana-info">
-                                        <div class="reserva-semana-local"><?= htmlspecialchars($modelo['modelo']) ?></div>
-                                    </div>
-                                    <strong><?= (int) $modelo['total'] ?></strong>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    <?php else: ?>
-                        <div class="dashboard-placeholder">Sem dados de modelos.</div>
-                    <?php endif; ?>
-                </div>
-            </div>
-
-            <div class="col-12 col-md-6">
-                <div class="chart-card h-100">
-                    <h5 class="chart-title">Avisos Recentes</h5>
-                    <div class="dashboard-placeholder">Em desenvolvimento</div>
-                </div>
-            </div>
+            </a>
         </div>
     </section>
 
+    <section class="dashboard-section">
+        <h3 class="section-title">Próximos 2 feriados</h3>
+        <?php if (!empty($proximosFeriados)): ?>
+            <div class="feriado-grid feriado-grid--compact">
+                <?php foreach ($proximosFeriados as $feriado): ?>
+                    <article class="feriado-card">
+                        <div class="feriado-card-top">
+                            <div class="feriado-card-icon"><i class="bx bx-calendar-star"></i></div>
+                            <div>
+                                <h4 class="feriado-nome"><?= htmlspecialchars($feriado['name']) ?></h4>
+                                <p class="feriado-data"><?= htmlspecialchars($feriado['data_formatada']) ?></p>
+                            </div>
+                        </div>
+                        <span class="feriado-restante">
+                            <?= (int) $feriado['dias_restantes'] === 0 ? 'Hoje' : 'Em ' . (int) $feriado['dias_restantes'] . ' dia(s)' ?>
+                        </span>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+        <?php else: ?>
+            <div class="dashboard-placeholder">Nenhum feriado próximo disponível.</div>
+        <?php endif; ?>
+    </section>
+
+    <section class="dashboard-section">
+        <h3 class="section-title">Veículos recentes</h3>
+        <?php if (empty($veiculosRecentes)): ?>
+            <div class="dashboard-placeholder">Nenhum veículo cadastrado.</div>
+        <?php else: ?>
+            <div class="dashboard-table-card">
+                <table class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>Placa</th>
+                            <th>Veículo</th>
+                            <th>Morador</th>
+                            <th>Unidade</th>
+                            <th>Cadastro</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($veiculosRecentes as $veiculo): ?>
+                            <tr>
+                                <td><strong><?= htmlspecialchars($veiculo['placa']) ?></strong></td>
+                                <td><?= htmlspecialchars($veiculo['marca'] . ' ' . $veiculo['modelo']) ?></td>
+                                <td><?= htmlspecialchars($veiculo['nome_morador']) ?></td>
+                                <td>Bl. <?= htmlspecialchars($veiculo['bloco']) ?> Ap. <?= htmlspecialchars($veiculo['apto']) ?></td>
+                                <td><?= !empty($veiculo['created_at']) ? date('d/m/Y', strtotime($veiculo['created_at'])) : '-' ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
+    </section>
+
+    <section class="dashboard-section">
+        <h3 class="section-title">Resumo da frota</h3>
+        <div class="dashboard-card-grid">
+            <div class="chart-card">
+                <h5 class="chart-title">Top marcas</h5>
+                <?php foreach (($topMarcasVeiculos ?? []) as $marca): ?>
+                    <div class="dashboard-list-row"><span><?= htmlspecialchars($marca['marca']) ?></span><strong><?= (int) $marca['total'] ?></strong></div>
+                <?php endforeach; ?>
+            </div>
+            <div class="chart-card">
+                <h5 class="chart-title">Top cores</h5>
+                <?php foreach (($topCoresVeiculos ?? []) as $cor): ?>
+                    <div class="dashboard-list-row"><span><?= htmlspecialchars($cor['cor']) ?></span><strong><?= (int) $cor['total'] ?></strong></div>
+                <?php endforeach; ?>
+            </div>
+            <div class="chart-card">
+                <h5 class="chart-title">Top modelos</h5>
+                <?php foreach (($topModelosVeiculos ?? []) as $modelo): ?>
+                    <div class="dashboard-list-row"><span><?= htmlspecialchars($modelo['modelo']) ?></span><strong><?= (int) $modelo['total'] ?></strong></div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </section>
 </main>
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>

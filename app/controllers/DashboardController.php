@@ -48,7 +48,7 @@ class DashboardController
         extract($this->montarKpis(), EXTR_OVERWRITE);
         extract($this->montarVeiculosResumo(), EXTR_OVERWRITE);
         extract($this->montarOcorrenciasResumo($idLogado), EXTR_OVERWRITE);
-        extract($this->montarFinanceiroResumo(), EXTR_OVERWRITE);
+        extract($this->montarFinanceiroResumo($idLogado), EXTR_OVERWRITE);
         extract($this->montarReservasResumo(), EXTR_OVERWRITE);
 
         $reservasParaAprovar = $this->ehSindicoOuAdmin($usuario)
@@ -69,7 +69,7 @@ class DashboardController
             'moradoresPendentes'  => $this->moradorRepo->countByStatus('P'),
             'moradoresStatus'     => $this->moradorRepo->contarPorStatus(),
             'proximoFeriado'      => $this->feriadoService->getProximoFeriado(),
-            'proximosFeriados'    => $this->feriadoService->getProximosFeriados(3),
+            'proximosFeriados'    => $this->feriadoService->getProximosFeriados(2),
         ];
     }
 
@@ -77,6 +77,7 @@ class DashboardController
     {
         return [
             'totalVeiculos'      => $this->veiculoRepo->countAll(),
+            'veiculosRecentes'   => $this->veiculoRepo->recentes(6),
             'topMarcasVeiculos'  => $this->veiculoRepo->topMarcas(3),
             'topCoresVeiculos'   => $this->veiculoRepo->topCores(3),
             'topModelosVeiculos' => $this->veiculoRepo->topModelos(3),
@@ -92,9 +93,10 @@ class DashboardController
         ];
     }
 
-    private function montarFinanceiroResumo(): array{
+    private function montarFinanceiroResumo(int $idLogado): array{
         return [
             'totalPendenteGeral'  => $this->financasRepo->totalGeralPendente(),
+            'totalPendenteMorador'=> $this->financasRepo->totalPendente($idLogado),
             'countLancPendentes'  => $this->financasRepo->countLancamentosPendentes(),
             'countInadimplentes'  => $this->financasRepo->countMoradoresInadimplentes(),
             'countFaturas'        => $this->financasRepo->countFaturasGeradas(),

@@ -209,6 +209,9 @@ public function inativar(): void
         AuthGuard::requerePost('/moradores/gestao');
 
         $idMorador = $this->idMoradorPorPost();
+        if ($this->alvoEhAdmin($idMorador)) {
+            $this->redirecionarGestaoComFoco($idMorador, 'erro=1');
+        }
         if (!$this->confirmarSenhaAdmin($_POST['admin_senha'] ?? '')) {
             $this->redirecionarGestaoComFoco($idMorador, 'senha=1');
         }
@@ -257,6 +260,9 @@ public function inativar(): void
         if ($idMorador === (int) ($_SESSION['usuario_id'] ?? 0)) {
             $this->redirecionarGestaoComFoco($idMorador, 'erro=1');
         }
+        if ($this->alvoEhAdmin($idMorador)) {
+            $this->redirecionarGestaoComFoco($idMorador, 'erro=1');
+        }
         if (!$this->confirmarSenhaAdmin($_POST['admin_senha'] ?? '')) {
             $this->redirecionarGestaoComFoco($idMorador, 'senha=1');
         }
@@ -276,6 +282,9 @@ public function inativar(): void
 
         $idMorador = $this->idMoradorPorPost();
         if ($idMorador <= 0 || $idMorador === (int) ($_SESSION['usuario_id'] ?? 0)) {
+            $this->redirecionarGestaoComFoco($idMorador, 'erro=1');
+        }
+        if ($this->alvoEhAdmin($idMorador)) {
             $this->redirecionarGestaoComFoco($idMorador, 'erro=1');
         }
         if (!$this->confirmarSenhaAdmin($_POST['admin_senha'] ?? '')) {
@@ -307,6 +316,18 @@ public function inativar(): void
         $admin = $repo->findById((int) ($_SESSION['usuario_id'] ?? 0));
 
         return $admin && password_verify($senha, $admin['senha'] ?? '');
+    }
+
+    private function alvoEhAdmin(int $idMorador): bool
+    {
+        if ($idMorador <= 0) {
+            return true;
+        }
+
+        $repo = new MoradorRepository();
+        $morador = $repo->findById($idMorador);
+
+        return !$morador || (int) ($morador['privilegio'] ?? 0) === self::PRIVILEGIO_ADMIN;
     }
 
     public function cpf(): void

@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../helpers/CryptoHelper.php';
+
 class VeiculoRepository
 {
     private PDO $pdo;
@@ -22,7 +24,7 @@ class VeiculoRepository
             JOIN morador cad  ON cad.id_user  = v.id_user_cad
             ORDER BY v.created_at DESC, dono.nome ASC
         ");
-        return $stmt->fetchAll();
+        return $this->descriptografarNomes($stmt->fetchAll());
     }
 
     public function findByUsuario(int $idUser): array
@@ -40,7 +42,26 @@ class VeiculoRepository
             ORDER BY v.created_at DESC, dono.nome ASC
         ");
         $stmt->execute([':id' => $idUser]);
-        return $stmt->fetchAll();
+        return $this->descriptografarNomes($stmt->fetchAll());
+    }
+
+    public function recentes(int $limite = 6): array
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT v.*,
+                   dono.nome AS nome_morador,
+                   dono.apto AS apto,
+                   dono.bloco AS bloco,
+                   cad.nome  AS cadastrado_por
+            FROM veiculos v
+            JOIN morador dono ON dono.id_user = v.id_user
+            JOIN morador cad  ON cad.id_user  = v.id_user_cad
+            ORDER BY v.created_at DESC, v.id_veiculo DESC
+            LIMIT :limite
+        ");
+        $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
+        $stmt->execute();
+        return $this->descriptografarNomes($stmt->fetchAll(PDO::FETCH_ASSOC));
     }
 
     public function findAllComFiltros(array $filtros, int $limite, int $offset): array
@@ -68,7 +89,7 @@ class VeiculoRepository
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
 
-        return $stmt->fetchAll();
+        return $this->descriptografarNomes($stmt->fetchAll());
     }
 
     public function countAllComFiltros(array $filtros): int
@@ -102,7 +123,7 @@ class VeiculoRepository
             LIMIT 1
         ");
         $stmt->execute([':placa' => strtoupper($placa)]);
-        return $stmt->fetch() ?: null;
+        return $this->descriptografarNome($stmt->fetch() ?: null);
     }
 
     public function findById(int $id): ?array
@@ -118,7 +139,7 @@ class VeiculoRepository
             LIMIT 1
         ");
         $stmt->execute([':id' => $id]);
-        return $stmt->fetch() ?: null;
+        return $this->descriptografarNome($stmt->fetch() ?: null);
     }
 
     public function existePlaca(string $placa): bool
@@ -263,5 +284,25 @@ class VeiculoRepository
         }
 
         return [$where ? 'WHERE ' . implode(' AND ', $where) : '', $params];
+    }
+
+    private function descriptografarNomes(array $linhas): array
+    {
+        return array_map(fn($linha) => $this->descriptografarNome($linha), $linhas);
+    }
+
+    private function descriptografarNome(?array $linha): ?array
+    {
+        if (!$linha) {
+            return $linha;
+        }
+
+        foreach (['nome_morador', 'cadastrado_por'] as $campo) {
+            if (array_key_exists($campo, $linha)) {
+                $linha[$campo] = CryptoHelper::decrypt($linha[$campo]);
+            }
+        }
+
+        return $linha;
     }
 }

@@ -137,7 +137,7 @@ class FinancasRepository
         $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
-        return $stmt->fetchAll();
+        return $this->descriptografarNomesMoradores($stmt->fetchAll());
     }
 
     public function excluirLancamento(int $id): bool
@@ -400,6 +400,9 @@ class FinancasRepository
         ");
         $stmt->execute([':id' => $id]);
         $lancamento = $stmt->fetch() ?: null;
+        if ($lancamento && array_key_exists('nome', $lancamento)) {
+            $lancamento['nome'] = CryptoHelper::decrypt($lancamento['nome']);
+        }
         if ($lancamento && array_key_exists('cpf', $lancamento)) {
             $lancamento['cpf'] = CryptoHelper::decrypt($lancamento['cpf']);
         }
@@ -448,6 +451,19 @@ class FinancasRepository
         ");
         $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return array_map(function ($morador) {
+            $morador['nome'] = CryptoHelper::decrypt($morador['nome']);
+            return $morador;
+        }, $stmt->fetchAll(PDO::FETCH_ASSOC));
+    }
+
+    private function descriptografarNomesMoradores(array $rows): array
+    {
+        return array_map(function ($row) {
+            if (array_key_exists('nome_morador', $row)) {
+                $row['nome_morador'] = CryptoHelper::decrypt($row['nome_morador']);
+            }
+            return $row;
+        }, $rows);
     }
 }
