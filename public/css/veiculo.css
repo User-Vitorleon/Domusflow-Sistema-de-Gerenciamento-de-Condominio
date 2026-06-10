@@ -1,0 +1,337 @@
+.section-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--text);
+}
+
+.table-wrap {
+    overflow-x: auto;
+    width: 100%;
+}
+
+.veiculo-filtros {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(120px, 1fr)) auto;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 18px;
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+}
+
+.veiculo-filtros .df-field {
+    margin-bottom: 0;
+}
+
+.veiculo-filtros-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.veiculo-filtros-actions .btn-primary,
+.veiculo-filtros-actions .btn-ghost {
+    min-height: 40px;
+    white-space: nowrap;
+}
+
+.df-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.df-table thead th {
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+}
+
+.df-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background var(--transition);
+}
+
+.df-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+
+.df-table td {
+    padding: 12px 14px;
+    color: var(--text);
+}
+
+.veiculo-table th,
+.veiculo-table td {
+    vertical-align: middle;
+}
+
+.veiculo-table {
+    min-width: 0;
+    table-layout: fixed;
+    font-size: 13px;
+}
+
+.veiculo-table th,
+.veiculo-table td {
+    padding: 10px 9px;
+    word-break: normal;
+}
+
+.veiculo-table td:last-child {
+    width: 136px;
+    min-width: 136px;
+    white-space: nowrap;
+}
+
+.veiculo-subinfo {
+    display: block;
+    margin-top: 3px;
+    color: var(--text-muted);
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+.veiculo-principal-label {
+    display: inline-flex;
+    width: fit-content;
+    padding: 2px 8px;
+    border: 1px solid #DDD6FE;
+    border-radius: 999px;
+    background: #F5F3FF;
+    color: #7C3AED;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.veiculo-row-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    flex-wrap: nowrap;
+}
+
+.veiculo-action-btn {
+    min-height: 30px;
+    padding: 5px 7px;
+    font-size: 12px;
+}
+
+.veiculo-muted {
+    color: var(--text-muted);
+}
+
+.veiculo-principal-aviso {
+    display: block;
+    margin-top: 4px;
+    color: #b45309;
+    font-size: 12px;
+}
+
+.badge-principal {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    white-space: nowrap;
+}
+
+.badge-principal::before {
+    content: '★';
+    font-size: 10px;
+}
+
+.df-field-check {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.df-field-check input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.df-field-check label {
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    margin: 0;
+}
+
+.veiculo-counter {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+}
+
+.veiculo-counter-bar {
+    display: flex;
+    gap: 4px;
+}
+
+.veiculo-counter-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--border);
+}
+
+.veiculo-counter-dot.usado {
+    background: var(--primary);
+}
+
+.resultado-card {
+    margin-top: 24px;
+}
+
+.resultado-valor {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    margin: 0;
+}
+
+.df-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+}
+
+.df-page-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 10px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--white);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    transition: background var(--transition), border-color var(--transition), color var(--transition);
+}
+
+.df-page-btn:hover:not(.disabled):not(.active) {
+    background: var(--bg);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.df-page-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+    pointer-events: none;
+}
+
+.df-page-btn.disabled {
+    opacity: .4;
+    pointer-events: none;
+}
+
+.df-page-ellipsis {
+    color: var(--text-muted);
+    font-size: 13px;
+    padding: 0 4px;
+}
+
+.df-table tbody tr {
+    transition: background var(--transition);
+}
+
+.df-table tbody tr:hover {
+    background: var(--bg) !important;
+}
+
+[data-theme="dark"] .df-table tbody tr:hover {
+    background: #2e3240 !important;
+}
+
+@media (max-width: 900px) {
+    .veiculo-filtros {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .veiculo-filtros-actions {
+        grid-column: 1 / -1;
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 560px) {
+    .veiculo-filtros {
+        grid-template-columns: 1fr;
+    }
+
+    .veiculo-filtros-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .veiculo-table {
+        min-width: 760px;
+        table-layout: auto;
+    }
+}
+
+@media (min-width: 901px) {
+    .veiculo-table th:nth-child(1),
+    .veiculo-table td:nth-child(1) {
+        width: 90px;
+    }
+
+    .veiculo-table th:nth-child(2),
+    .veiculo-table td:nth-child(2) {
+        width: 140px;
+    }
+
+    .veiculo-table th:nth-child(3),
+    .veiculo-table td:nth-child(3) {
+        width: 82px;
+    }
+
+    .veiculo-table th:nth-child(4),
+    .veiculo-table td:nth-child(4) {
+        width: 140px;
+    }
+
+    .veiculo-table th:nth-child(5),
+    .veiculo-table td:nth-child(5) {
+        width: 95px;
+        white-space: nowrap;
+    }
+
+    .veiculo-table th:nth-child(6),
+    .veiculo-table td:nth-child(6) {
+        width: 120px;
+    }
+}

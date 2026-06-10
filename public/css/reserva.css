@@ -1,0 +1,399 @@
+.reserva-page .page-header p {
+    margin: 4px 0 0;
+}
+
+.reserva-page {
+    max-width: 1180px;
+}
+
+.reserva-form-card,
+.reserva-locais-card,
+.reserva-filtros-card,
+.reserva-solicitacoes-card {
+    margin-bottom: 20px;
+}
+
+.reserva-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+}
+
+.reserva-tab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+    padding: 8px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--white);
+    color: var(--primary-dark);
+    font-size: 13px;
+    font-weight: 800;
+    text-decoration: none;
+    transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
+}
+
+.reserva-tab:hover,
+.reserva-tab.active {
+    border-color: var(--primary);
+    background: rgba(15, 128, 182, .08);
+    color: var(--primary-dark);
+    box-shadow: 0 2px 10px rgba(15, 128, 182, .12);
+}
+
+.reserva-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+}
+
+.reserva-section-head h3 {
+    margin: 0;
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.reserva-section-head span {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.reserva-section-head-actions h3 {
+    order: 0;
+}
+
+.reserva-section-head-actions span {
+    order: 1;
+}
+
+.reserva-recusa-vencidas-form {
+    order: 2;
+    margin-left: auto;
+}
+
+.reserva-recusa-vencidas-form .btn-danger-sm {
+    min-height: 34px;
+    padding: 7px 12px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.reserva-status-field,
+.reserva-convidados {
+    max-width: 240px;
+    margin-top: 15px;
+}
+
+.reserva-feriado-alert {
+    margin-top: 20px;
+}
+
+.reserva-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.reserva-locais-table,
+.reserva-solicitacoes-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.reserva-locais-table th,
+.reserva-locais-table td,
+.reserva-solicitacoes-table th,
+.reserva-solicitacoes-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.reserva-locais-table th,
+.reserva-solicitacoes-table th {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.reserva-locais-table tbody tr:hover td,
+.reserva-solicitacoes-table tbody tr:hover td {
+    background: var(--bg);
+}
+
+.reserva-inline-input {
+    width: 100%;
+    min-width: 150px;
+    min-height: 34px;
+    padding: 7px 9px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: var(--white);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 13px;
+    outline: none;
+}
+
+.reserva-inline-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(15, 128, 182, .12);
+}
+
+.reserva-capacidade-input {
+    min-width: 90px;
+    max-width: 120px;
+}
+
+.reserva-table-btn {
+    min-height: 34px;
+    padding: 7px 14px;
+    font-size: 13px;
+}
+
+.reserva-pendentes {
+    margin-top: 24px;
+}
+
+.reserva-filtros {
+    display: grid;
+    grid-template-columns: minmax(150px, 1.25fr) minmax(90px, .7fr) minmax(90px, .7fr) minmax(130px, 1fr) minmax(130px, 1fr) auto;
+    gap: 10px;
+    align-items: end;
+}
+
+.reserva-historico-filtros {
+    display: grid;
+    grid-template-columns: minmax(180px, 1.3fr) minmax(140px, 1fr) minmax(140px, 1fr) auto;
+    gap: 10px;
+    align-items: end;
+}
+
+.reserva-filtros .df-field,
+.reserva-historico-filtros .df-field {
+    margin-bottom: 0;
+}
+
+.reserva-filter-actions,
+.reserva-row-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.reserva-filter-actions {
+    justify-content: flex-end;
+    align-self: end;
+    min-height: 40px;
+    margin-bottom: 0;
+}
+
+.reserva-filter-actions .btn-primary,
+.reserva-filter-actions .btn-ghost {
+    min-height: 40px;
+}
+
+.reserva-row-actions {
+    flex-wrap: nowrap;
+}
+
+.reserva-solicitacoes-card .reserva-table-wrap {
+    overflow-x: visible;
+}
+
+.reserva-solicitacoes-table,
+.reserva-historico-table {
+    table-layout: fixed;
+}
+
+.reserva-solicitacoes-table th,
+.reserva-solicitacoes-table td,
+.reserva-historico-table th,
+.reserva-historico-table td {
+    padding: 9px 8px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.reserva-historico-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.reserva-historico-table th,
+.reserva-historico-table td {
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    vertical-align: middle;
+}
+
+.reserva-historico-table th {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.reserva-historico-table tbody tr:hover td {
+    background: var(--bg);
+}
+
+.reserva-solicitacoes-table th:nth-child(1),
+.reserva-solicitacoes-table td:nth-child(1) {
+    width: 18%;
+}
+
+.reserva-solicitacoes-table th:nth-child(2),
+.reserva-solicitacoes-table td:nth-child(2),
+.reserva-solicitacoes-table th:nth-child(3),
+.reserva-solicitacoes-table td:nth-child(3) {
+    width: 7%;
+}
+
+.reserva-solicitacoes-table th:nth-child(4),
+.reserva-solicitacoes-table td:nth-child(4) {
+    width: 14%;
+}
+
+.reserva-solicitacoes-table th:nth-child(5),
+.reserva-solicitacoes-table td:nth-child(5),
+.reserva-solicitacoes-table th:nth-child(6),
+.reserva-solicitacoes-table td:nth-child(6) {
+    width: 12%;
+}
+
+.reserva-solicitacoes-table th:nth-child(7),
+.reserva-solicitacoes-table td:nth-child(7) {
+    width: 13%;
+}
+
+.reserva-solicitacoes-table th:nth-child(8),
+.reserva-solicitacoes-table td:nth-child(8) {
+    width: 12%;
+}
+
+.reserva-row-actions .btn-success-sm,
+.reserva-row-actions .btn-danger-sm {
+    min-height: 32px;
+    padding: 6px 9px;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+    line-height: 1;
+}
+
+.reserva-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 24px;
+    padding: 4px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.reserva-status-aprovado {
+    background: var(--success-bg);
+    color: var(--success-text);
+}
+
+.reserva-status-pendente {
+    background: #fff8db;
+    color: #9a6a00;
+    border: 1px solid #f0d36b;
+}
+
+.reserva-status-recusado {
+    background: var(--danger-bg);
+    color: var(--danger-text);
+}
+
+.reserva-historico-actions {
+    margin-top: 20px;
+}
+
+[data-theme="dark"] .reserva-locais-table tbody tr:hover td,
+[data-theme="dark"] .reserva-solicitacoes-table tbody tr:hover td,
+[data-theme="dark"] .reserva-historico-table tbody tr:hover td {
+    background: #1a1c24;
+}
+
+[data-theme="dark"] .reserva-inline-input,
+[data-theme="dark"] .reserva-tab {
+    background: #13151a;
+    border-color: #2e3240;
+    color: #e8eaf0;
+}
+
+[data-theme="dark"] .reserva-tab.active,
+[data-theme="dark"] .reserva-tab:hover {
+    border-color: #5bbfe8;
+    background: rgba(91, 191, 232, .12);
+}
+
+[data-theme="dark"] .reserva-inline-input:focus {
+    border-color: #5bbfe8;
+    box-shadow: 0 0 0 3px rgba(91, 191, 232, .12);
+}
+
+@media (max-width: 700px) {
+    .reserva-section-head {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .reserva-recusa-vencidas-form {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .reserva-recusa-vencidas-form .btn-danger-sm {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .reserva-status-field,
+    .reserva-convidados {
+        max-width: none;
+    }
+
+    .reserva-filtros {
+        grid-template-columns: 1fr;
+    }
+
+    .reserva-historico-filtros {
+        grid-template-columns: 1fr;
+    }
+
+    .reserva-filter-actions {
+        justify-content: stretch;
+    }
+
+    .reserva-filter-actions .btn-primary,
+    .reserva-filter-actions .btn-ghost {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .reserva-row-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}

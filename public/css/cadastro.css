@@ -1,0 +1,354 @@
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    padding: 28px 16px 40px;
+    box-sizing: border-box;
+    font-family: var(--font) !important;
+    background: var(--bg) !important;
+}
+
+.cad-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+}
+
+.cad-brand {
+    margin: 0;
+}
+
+.cad-brand-img {
+    width: 180px;
+    height: auto;
+    display: block;
+}
+
+.cad-card {
+    width: 100%;
+    max-width: 660px;
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    padding: 28px 32px;
+    box-sizing: border-box;
+}
+
+.cad-header {
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+}
+
+.cad-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 2px;
+}
+
+.cad-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.cad-alert-error {
+    background: #FEF2F2 !important;
+    border-color: #FECACA !important;
+    color: #DC2626 !important;
+    font-size: 13px !important;
+    margin-bottom: 14px;
+}
+
+.cad-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.cad-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin: 16px 0 8px;
+}
+
+.cad-section-label:first-of-type {
+    margin-top: 0;
+}
+
+.cad-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.cad-unidade-note {
+    margin: -4px 0 14px;
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.cad-form .df-field {
+    margin-bottom: 0;
+    gap: 4px;
+}
+
+.cad-form .df-field label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.cad-form .df-field input {
+    font-family: var(--font) !important;
+    font-size: 15px;
+    padding: 9px 12px;
+}
+
+.cad-input-eye {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.cad-input-eye input {
+    width: 100%;
+    padding-right: 40px !important;
+}
+
+.cad-eye {
+    position: absolute;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    cursor: pointer;
+    color: #aaa;
+    padding: 0;
+    transition: color var(--transition);
+}
+
+.cad-eye:hover {
+    color: #555;
+}
+
+.cad-eye svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+}
+
+.cad-eye .icon-hide {
+    display: none;
+}
+
+.cad-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.cad-btn-voltar {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-muted) !important;
+    font-family: var(--font) !important;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none !important;
+    cursor: pointer;
+    transition: background var(--transition), color var(--transition);
+}
+
+.cad-btn-voltar:hover {
+    background: var(--bg);
+    color: var(--text) !important;
+}
+
+.cad-btn-criar {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    background: var(--primary-dark);
+    border: none;
+    border-radius: var(--radius);
+    color: #ffffff !important;
+    font-family: var(--font) !important;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity var(--transition), box-shadow var(--transition);
+}
+
+.cad-btn-criar:hover {
+    opacity: 0.88;
+    box-shadow: var(--shadow-md);
+}
+
+.cad-btn-criar i,
+.cad-btn-voltar i {
+    font-size: 15px;
+    line-height: 1;
+}
+
+.cad-field-senha .field-error-msg {
+    display: block;
+    width: 100%;
+    font-size: 12px;
+    color: var(--error);
+    font-weight: 500;
+    margin-top: 4px;
+    order: 3;
+}
+
+.cad-field-senha {
+    display: flex;
+    flex-direction: column;
+}
+
+.cad-termos-field {
+    display: block;
+    grid-column: 1 / -1;
+    margin-top: 8px;
+}
+
+.cad-form .df-field .cad-termos-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.45;
+    color: var(--text);
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.cad-form .cad-termos-check {
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    accent-color: var(--primary);
+    flex-shrink: 0;
+}
+
+.cad-termos-label span {
+    display: inline;
+}
+
+.cad-termos-link {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.cad-termos-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, .5);
+}
+
+.cad-termos-modal.is-open {
+    display: flex;
+}
+
+.cad-termos-dialog {
+    position: relative;
+    width: 90%;
+    max-width: 560px;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 32px;
+    border-radius: 16px;
+    background: #fff;
+}
+
+.cad-termos-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    border: none;
+    background: none;
+    color: #6B7280;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.cad-termos-dialog h3 {
+    margin-bottom: 16px;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.cad-termos-content {
+    color: #374151;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.cad-termos-content p {
+    margin-bottom: 12px;
+}
+
+.cad-termos-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 24px 16px 36px;
+    }
+
+    .cad-brand-img {
+        width: 150px;
+    }
+
+    .cad-card {
+        padding: 20px 16px;
+    }
+
+    .cad-grid-2 {
+        grid-template-columns: 1fr;
+    }
+
+    .cad-actions {
+        flex-direction: column-reverse;
+    }
+
+    .cad-btn-criar,
+    .cad-btn-voltar {
+        width: 100%;
+        justify-content: center;
+    }
+}

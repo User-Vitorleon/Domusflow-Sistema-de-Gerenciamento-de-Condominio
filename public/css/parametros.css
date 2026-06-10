@@ -1,0 +1,209 @@
+.parametros-page {
+    max-width: 1100px;
+}
+
+.parametros-page .page-header p {
+    margin: 4px 0 0;
+}
+
+.parametros-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.parametros-note {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 260px;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--bg);
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.parametros-lista {
+    padding: 0;
+    overflow: hidden;
+}
+
+.parametros-lista-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.parametros-lista-head .section-title {
+    margin: 0;
+}
+
+.parametros-table-wrap {
+    overflow-x: auto;
+}
+
+.parametros-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.parametros-table thead tr {
+    background: #F8FAFC;
+}
+
+.parametros-table th,
+.parametros-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    vertical-align: middle;
+}
+
+.parametros-table th:last-child,
+.parametros-table td:last-child {
+    text-align: center;
+}
+
+.parametros-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.parametros-table strong {
+    display: block;
+    color: var(--text);
+    font-size: 13px;
+}
+
+.parametros-table small {
+    display: block;
+    margin-top: 3px;
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+.parametros-kpi {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 28px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(15, 128, 182, .22);
+    background: rgba(15, 128, 182, .08);
+    color: var(--primary-dark);
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.parametros-input {
+    width: min(100%, 220px);
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: var(--white);
+    color: var(--text);
+    font: inherit;
+}
+
+.parametros-save {
+    min-height: 32px;
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
+.parametros-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.parametros-modal.is-open {
+    display: flex;
+}
+
+.parametros-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, .45);
+}
+
+.parametros-modal-dialog {
+    position: relative;
+    width: min(420px, 100%);
+    padding: 22px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--white);
+    box-shadow: var(--shadow-lg);
+}
+
+.parametros-modal-dialog h3 {
+    margin: 0 32px 8px 0;
+    color: var(--text);
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.parametros-modal-dialog p {
+    margin: 0 0 16px;
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.parametros-modal-close {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    border: 0;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.parametros-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+[data-theme="dark"] .parametros-table thead tr,
+[data-theme="dark"] .parametros-modal-dialog {
+    background: #1f222c;
+}
+
+@media (max-width: 720px) {
+    .parametros-header {
+        flex-direction: column;
+    }
+
+    .parametros-note {
+        max-width: 100%;
+        white-space: normal;
+    }
+
+    .parametros-lista-head {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .parametros-input {
+        width: 180px;
+    }
+}
