@@ -319,7 +319,8 @@ class MoradorService
         return true;
     }
 
-    public function resetarSenha(int $idMorador): array{
+
+    public function resetarSenha(int $idMorador, bool $resetadoPeloAdmin = false): array{
         $morador = $this->repo->findById($idMorador);
         if (!$morador) {
             return ['sucesso' => false, 'mensagem' => 'Morador não encontrado.'];
@@ -329,7 +330,12 @@ class MoradorService
         $this->repo->atualizarSenha($idMorador, hashSenha($novaSenha));
 
         $emailService = new EmailService();
-        $emailService->senhaResetada($morador['email'], $morador['nome'], $novaSenha);
+
+        if ($resetadoPeloAdmin) {
+            $emailService->senhaResetada($morador['email'], $morador['nome'], $novaSenha);
+        } else {
+            $emailService->senhaEsquecida($morador['email'], $morador['nome'], $novaSenha);
+        }
 
         return ['sucesso' => true];
     }

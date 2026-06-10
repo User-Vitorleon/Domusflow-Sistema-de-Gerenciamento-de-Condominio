@@ -217,7 +217,8 @@ public function inativar(): void
         }
 
         $resultado = ($idMorador > 0)
-            ? $this->service->resetarSenha($idMorador)
+
+            ? $this->service->resetarSenha($idMorador, true)
             : ['sucesso' => false];
 
         $this->redirecionarGestaoComFoco($idMorador, $resultado['sucesso'] ? 'reset=1' : 'erro=1');
