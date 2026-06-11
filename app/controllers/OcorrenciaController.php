@@ -17,12 +17,11 @@ class OcorrenciaController
 
 public function index(): void
     {
-        AuthGuard::requereUsuarioAtivo();
+        $usuario = $this->requireAcessoOcorrencias();
 
         $idUser = (int) $_SESSION['usuario_id'];
         $this->service->marcarNotificacoesLidas($idUser);
 
-        $usuario        = $this->getMoradorLogado();
         $statusFiltro   = $this->normalizarStatus($_GET['status'] ?? null);
         $pagina         = max(1, (int) ($_GET['pagina'] ?? 1));
         $porPagina      = self::ITENS_MORADOR_POR_PAGINA;
@@ -43,10 +42,9 @@ public function index(): void
 
     public function detalhes(): void
     {
-        AuthGuard::requereUsuarioAtivo();
+        $usuario = $this->requireAcessoOcorrencias();
 
         $id      = (int) ($_GET['id'] ?? 0);
-        $usuario = $this->getMoradorLogado();
         $detalhe = $this->service->buscarDetalhes($id);
 
         if (!$detalhe) {
@@ -65,7 +63,7 @@ public function index(): void
 
     public function abrir(): void
     {
-        AuthGuard::requereUsuarioAtivo();
+        $this->requireAcessoOcorrencias();
         AuthGuard::requerePost('/ocorrencia');
 
         $resultado = $this->service->abrir($_POST, (int) $_SESSION['usuario_id']);
@@ -74,7 +72,7 @@ public function index(): void
 
     public function cancelar(): void
     {
-        AuthGuard::requereUsuarioAtivo();
+        $this->requireAcessoOcorrencias();
         AuthGuard::requerePost('/ocorrencia');
 
         $id        = (int) ($_POST['id_ocorrencia'] ?? 0);
@@ -84,7 +82,7 @@ public function index(): void
 
     public function tramitarMorador(): void
     {
-        AuthGuard::requereUsuarioAtivo();
+        $this->requireAcessoOcorrencias();
         AuthGuard::requerePost('/ocorrencia');
 
         $id        = (int) ($_POST['id_ocorrencia'] ?? 0);
@@ -111,7 +109,6 @@ public function index(): void
 
 public function painel(): void
     {
-        AuthGuard::requereUsuarioAtivo();
         $this->requireSindico();
 
         $usuario   = $this->getMoradorLogado();
@@ -138,7 +135,6 @@ public function painel(): void
 
     public function tramitar(): void
     {
-        AuthGuard::requereUsuarioAtivo();
         $this->requireSindico();
         AuthGuard::requerePost('/ocorrencia/painel');
 
@@ -244,14 +240,25 @@ private function buscarDetalheDoMorador(int $idUser): ?array
 
     private function ehGestor(): bool
     {
-        return in_array((int) ($_SESSION['usuario_privilegio'] ?? 1), [2, 4], true);
+        $usuario = $this->getMoradorLogado();
+        return in_array((int) ($usuario['privilegio'] ?? 1), [2, 4], true);
     }
 
     private function requireSindico(): void
     {
-        if (!$this->ehGestor()) {
+        $usuario = AuthGuard::requereSindicoOuAdmin();
+        if (!in_array((int) ($usuario['privilegio'] ?? 0), [2, 4], true)) {
             $this->redirecionar('/ocorrencia');
         }
+    }
+
+    private function requireAcessoOcorrencias(): array
+    {
+        $usuario = AuthGuard::requereUsuarioAtivo();
+        if (!in_array((int) ($usuario['privilegio'] ?? 0), [1, 2, 4], true)) {
+            $this->redirecionar('/painel');
+        }
+        return $usuario;
     }
 
     private function getMoradorLogado(): array

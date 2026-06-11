@@ -82,6 +82,7 @@ class MoradorController
     public function liberar(): void
     {
         AuthGuard::requerePost('/moradores/pendentes');
+        $this->requireSindico();
 
         if (!$this->confirmarSenhaAdmin($_POST['admin_senha'] ?? '')) {
             $_SESSION['erro_pendentes'] = 'Senha incorreta. A ação não foi executada.';
@@ -122,6 +123,7 @@ public function formUpdate(): void
     public function updateSalvar(): void
     {
         AuthGuard::requerePost('/cadastro/update');
+        AuthGuard::requereUsuarioAtivo();
 
         $repo = new MoradorRepository();
         $usuarioAtual = $repo->findById((int) $_SESSION['usuario_id']);
@@ -381,17 +383,14 @@ private function extrairFiltrosPendentes(): array
 
     private function requireSindico(): void
     {
-        if (!isset($_SESSION['usuario_id'])
-            || !in_array((int) ($_SESSION['usuario_privilegio'] ?? 0), [2, 4], true)
-        ) {
-            $this->redirecionar('/painel');
-        }
+        AuthGuard::requereSindicoOuAdmin();
     }
 
     private function requireAdmin(): void
     {
-        if ((int) ($_SESSION['usuario_privilegio'] ?? 0) !== self::PRIVILEGIO_ADMIN) {
-            $this->redirecionar('/');
+        $usuario = AuthGuard::requereUsuarioAtivo();
+        if ((int) ($usuario['privilegio'] ?? 0) !== self::PRIVILEGIO_ADMIN) {
+            $this->redirecionar('/painel');
         }
     }
 

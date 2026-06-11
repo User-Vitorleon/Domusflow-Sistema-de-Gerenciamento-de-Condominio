@@ -85,10 +85,10 @@ public function taxasCad(): void
 
 public function lancamento(): void
     {
-        AuthGuard::requereUsuarioAtivo();
+        $usuario = AuthGuard::requereSindicoOuAdmin();
 
         $idUser     = (int) $_SESSION['usuario_id'];
-        $privilegio = (int) $_SESSION['usuario_privilegio'];
+        $privilegio = (int) ($usuario['privilegio'] ?? 0);
 
         $filtros   = $this->extrairFiltrosLancamento();
         $pagina    = max(1, (int) ($_GET['pagina'] ?? 1));
@@ -155,7 +155,7 @@ public function lancamento(): void
 
 public function historico(): void
     {
-        AuthGuard::requereUsuarioAtivo();
+        AuthGuard::requerePrivilegios([1]);
 
         $idUser    = (int) $_SESSION['usuario_id'];
         $historico = $this->repo->historico($idUser);
@@ -168,7 +168,7 @@ public function historico(): void
 
     public function gerarFatura(): void
     {
-        AuthGuard::requereUsuarioAtivo();
+        AuthGuard::requereSindicoOuAdmin();
         AuthGuard::requerePost('/financeiro/historico');
 
         $idUserAlvo = (int) ($_POST['id_user'] ?? 0);
@@ -210,7 +210,7 @@ public function historico(): void
 
     public function gerarBoleto(): void
     {
-        AuthGuard::requereUsuarioAtivo();
+        AuthGuard::requerePrivilegios([1]);
 
         $idLancamento = (int)($_GET['id'] ?? 0);
 
@@ -232,7 +232,7 @@ public function historico(): void
     }
 
     public function confirmarPagamento(): void{
-        AuthGuard::requereUsuarioAtivo();
+        AuthGuard::requerePrivilegios([1]);
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirecionar('/financeiro/historico');
@@ -336,18 +336,15 @@ public function historico(): void
 
     private function destinoAposFatura(): string
     {
-        return ((int) ($_SESSION['usuario_privilegio'] ?? 0) === self::PRIVILEGIO_SINDICO)
+        $usuario = AuthGuard::requereUsuarioAtivo();
+        return ((int) ($usuario['privilegio'] ?? 0) === self::PRIVILEGIO_SINDICO)
             ? '/financeiro/lancamento'
             : '/financeiro/historico';
     }
 
     private function requireSindico(): void
     {
-        if (!isset($_SESSION['usuario_id'])
-            || !in_array((int) ($_SESSION['usuario_privilegio'] ?? 0), [2, 4], true)
-        ) {
-            $this->redirecionar('/');
-        }
+        AuthGuard::requereSindicoOuAdmin();
     }
 
     private function confirmarSenhaUsuario(string $senha): bool

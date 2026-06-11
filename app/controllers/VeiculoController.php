@@ -17,12 +17,11 @@ class VeiculoController
     }
 
     public function index(): void{
-       AuthGuard::requereUsuarioAtivo();
+       $usuario = AuthGuard::requerePrivilegios([1, 2, 3, 4]);
 
-        $privilegio = (int) ($_SESSION['usuario_privilegio'] ?? 1);
+        $privilegio = (int) ($usuario['privilegio'] ?? 1);
 
         $repo      = new MoradorRepository();
-        $usuario   = $repo->findById((int) $_SESSION['usuario_id']);
         $moradores = [];
         $limiteVeiculosMorador = (new ParametrosService())->limiteVeiculosPorMorador();
         $totalVeiculosMorador  = 0;
@@ -52,10 +51,9 @@ class VeiculoController
 
     public function consultar(): void
     {
-        AuthGuard::requereUsuarioAtivo();
+        $usuario = AuthGuard::requerePrivilegios([3, 4]);
 
         $repo      = new MoradorRepository();
-        $usuario   = $repo->findById((int) $_SESSION['usuario_id']);
         $resultado = null;
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['placa'])) {
@@ -67,13 +65,13 @@ class VeiculoController
 
     public function salvar(): void
     {
-        AuthGuard::requereUsuarioAtivo();
+        $usuario = AuthGuard::requerePrivilegios([1, 2, 3, 4]);
         AuthGuard::requerePost('/veiculo');
 
         $resultado = $this->veiculoService->cadastrar(
             $_POST,
             (int) $_SESSION['usuario_id'],
-            (int) ($_SESSION['usuario_privilegio'] ?? 1)
+            (int) ($usuario['privilegio'] ?? 1)
         );
 
         $this->respondercomResultado($resultado);
@@ -81,13 +79,13 @@ class VeiculoController
 
     public function editar(): void
     {
-        AuthGuard::requereUsuarioAtivo();
+        $usuario = AuthGuard::requerePrivilegios([1, 2, 3, 4]);
         AuthGuard::requerePost('/veiculo');
 
         $resultado = $this->veiculoService->editar(
             (int) ($_POST['id_veiculo'] ?? 0),
             $_POST,
-            (int) ($_SESSION['usuario_privilegio'] ?? 1)
+            (int) ($usuario['privilegio'] ?? 1)
         );
 
         $this->respondercomResultado($resultado);
@@ -95,12 +93,12 @@ class VeiculoController
 
     public function excluir(): void
     {
-        AuthGuard::requereUsuarioAtivo();
+        $usuario = AuthGuard::requerePrivilegios([1, 2, 3, 4]);
         AuthGuard::requerePost('/veiculo');
 
         $resultado = $this->veiculoService->excluir(
             (int) ($_POST['id_veiculo'] ?? 0),
-            (int) ($_SESSION['usuario_privilegio'] ?? 1),
+            (int) ($usuario['privilegio'] ?? 1),
             (int) $_SESSION['usuario_id']
         );
 
@@ -109,12 +107,12 @@ class VeiculoController
 
     public function principal(): void
     {
-        AuthGuard::requereUsuarioAtivo();
+        $usuario = AuthGuard::requerePrivilegios([1, 2, 3, 4]);
         AuthGuard::requerePost('/veiculo');
 
         $resultado = $this->veiculoService->definirPrincipal(
             (int) ($_POST['id_veiculo'] ?? 0),
-            (int) ($_SESSION['usuario_privilegio'] ?? 1),
+            (int) ($usuario['privilegio'] ?? 1),
             (int) $_SESSION['usuario_id']
         );
 

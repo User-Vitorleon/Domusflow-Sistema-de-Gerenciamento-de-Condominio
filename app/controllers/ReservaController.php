@@ -23,10 +23,8 @@ class ReservaController
 
     public function index(): void
     {
-        AuthGuard::requereUsuarioAtivo();
+        $usuario = $this->requireAcessoReservas();
 
-        $moradorRepo = new MoradorRepository();
-        $usuario     = $moradorRepo->findById((int) $_SESSION['usuario_id']);
         $locais      = $this->reservaService->listarLocaisDisponiveis();
         $podeGerenciarLocais = $this->ehSindicoOuAdmin($usuario);
         $locaisCadastrados   = $podeGerenciarLocais ? (new LocalRepository())->findTodos() : [];
@@ -45,15 +43,16 @@ class ReservaController
 
     public function salvar(): void
     {
-        AuthGuard::requereUsuarioAtivo();
+        $usuario = $this->requireAcessoReservas();
         AuthGuard::requerePost('/reserva');
 
-        $resultado = $this->ehSindicoOuAdminSessao()
+        $podeGerenciarLocais = $this->ehSindicoOuAdmin($usuario);
+        $resultado = $podeGerenciarLocais
             ? $this->localService->cadastrar($_POST, (int) $_SESSION['usuario_id'])
             : $this->reservaService->salvar($_POST, (int) $_SESSION['usuario_id']);
 
         if ($resultado['sucesso']) {
-            $destino = $this->ehSindicoOuAdminSessao() ? '/reserva?visao=locais&sucesso=1' : '/reserva?sucesso=1';
+            $destino = $podeGerenciarLocais ? '/reserva?visao=locais&sucesso=1' : '/reserva?sucesso=1';
             $this->redirecionar($destino);
         }
 
@@ -63,11 +62,9 @@ class ReservaController
 
     public function historico(): void
     {
-        AuthGuard::requereUsuarioAtivo();
+        $usuario = $this->requireAcessoReservas();
 
-        $moradorRepo = new MoradorRepository();
-        $usuario = $moradorRepo->findById((int)$_SESSION['usuario_id']);
-        if (!$usuario || (int)($usuario['privilegio'] ?? 1) !== 1) {
+        if ((int)($usuario['privilegio'] ?? 1) !== 1) {
             $this->redirecionar('/painel');
         }
 
@@ -86,7 +83,6 @@ class ReservaController
 
     public function editarLocal(): void
     {
-        AuthGuard::requereUsuarioAtivo();
         AuthGuard::requerePost('/reserva');
         $this->requireSindicoOuAdmin();
 
@@ -102,7 +98,7 @@ class ReservaController
 
     public function decidir(): void{
 
-        AuthGuard::requereUsuarioAtivo();
+        AuthGuard::requerePost('/reserva?visao=solicitacoes');
         $this->requireSindicoOuAdmin(); 
 
         $idReserva = (int)($_POST['id_reserva'] ?? 0);
@@ -145,7 +141,6 @@ class ReservaController
 
     public function recusarVencidas(): void
     {
-        AuthGuard::requereUsuarioAtivo();
         AuthGuard::requerePost('/reserva?visao=solicitacoes');
         $this->requireSindicoOuAdmin();
 
@@ -257,20 +252,22 @@ class ReservaController
         return $usuario && in_array((int) ($usuario['privilegio'] ?? 0), [2, 4], true);
     }
 
-    private function ehSindicoOuAdminSessao(): bool
-    {
-        return in_array((int) ($_SESSION['usuario_privilegio'] ?? 1), [2, 4], true);
-    }
-
     private function redirecionar(string $caminho): void
     {
         header('Location: ' . BASE_URL . $caminho);
         exit();
     }
 
-    private function requireSindicoOuAdmin(): void{
-        if (!in_array((int) ($_SESSION['usuario_privilegio'] ?? 0), [2, 4], true)) {
-            $this->redirecionar('/reserva');
+    private function requireAcessoReservas(): array
+    {
+        $usuario = AuthGuard::requereUsuarioAtivo();
+        if (!in_array((int) ($usuario['privilegio'] ?? 0), [1, 2, 4], true)) {
+            $this->redirecionar('/painel');
         }
+        return $usuario;
+    }
+
+    private function requireSindicoOuAdmin(): void{
+        AuthGuard::requereSindicoOuAdmin();
     }
 }

@@ -14,10 +14,8 @@ class AvisosController
 
     public function index(): void
     {
-        AuthGuard::requereUsuarioAtivo();
+        $usuario = AuthGuard::requerePrivilegios([1, 2, 4]);
 
-        $moradorRepo = new MoradorRepository();
-        $usuario     = $moradorRepo->findById((int) $_SESSION['usuario_id']);
         $avisos      = $this->repo->listar();
 
         $_SESSION['avisos_visto_em'] = date('Y-m-d H:i:s');
@@ -55,11 +53,7 @@ class AvisosController
 
     private function requireSindico(): void
     {
-        if (!isset($_SESSION['usuario_id'])
-            || !in_array($_SESSION['usuario_privilegio'] ?? 0, [2, 4], true)
-        ) {
-            $this->redirecionar('/');
-        }
+        AuthGuard::requereSindicoOuAdmin();
     }
 
     private function redirecionar(string $caminho): void

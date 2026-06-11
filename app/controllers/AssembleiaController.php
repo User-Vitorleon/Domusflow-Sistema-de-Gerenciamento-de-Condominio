@@ -14,10 +14,8 @@ class AssembleiaController
 
     public function index(): void
     {
-        AuthGuard::requereUsuarioAtivo();
+        $usuario = AuthGuard::requerePrivilegios([1, 2, 4]);
 
-        $moradorRepo    = new MoradorRepository();
-        $usuario        = $moradorRepo->findById((int) $_SESSION['usuario_id']);
         $avisos         = $this->repo->listar(true);
         $assembleiaRepo = $this->repo;
 
@@ -67,7 +65,7 @@ class AssembleiaController
 
     public function confirmarPresenca(): void
     {
-        AuthGuard::requereUsuarioAtivo();
+        AuthGuard::requerePrivilegios([1]);
         AuthGuard::requerePost('/assembleia');
 
         $idAssembleia = (int) $_POST['id_assembleia'];
@@ -88,13 +86,7 @@ class AssembleiaController
     }
 
     public function listarPresencas(): void{
-        if (!in_array($_SESSION['usuario_privilegio'] ?? 0, [2, 4])) {
-            header('Location: ' . BASE_URL . '/assembleia');
-            exit();
-        }
-
-        $repo    = new MoradorRepository();
-        $usuario = $repo->findById((int)$_SESSION['usuario_id']);
+        $usuario = AuthGuard::requereSindicoOuAdmin();
 
         $assembleias = $this->repo->listar();
         $presencasAgrupadas = $this->repo->listarPresencasAgrupadas();
@@ -103,14 +95,9 @@ class AssembleiaController
     }
 
     public function detalhePresencas(): void{
-        if (!in_array($_SESSION['usuario_privilegio'] ?? 0, [2, 4])) {
-            header('Location: ' . BASE_URL . '/assembleia');
-            exit();
-        }
+        $usuario = AuthGuard::requereSindicoOuAdmin();
 
         $idAssembleia = (int)($_GET['id'] ?? 0);
-        $repo         = new MoradorRepository();
-        $usuario      = $repo->findById((int)$_SESSION['usuario_id']);
         $presencas    = $this->repo->listarPresencas($idAssembleia);
         $assembleia   = $this->repo->findById($idAssembleia);
 
@@ -119,11 +106,7 @@ class AssembleiaController
 
     private function requireSindico(): void
     {
-        if (!isset($_SESSION['usuario_id'])
-            || !in_array($_SESSION['usuario_privilegio'] ?? 0, [2, 4], true)
-        ) {
-            $this->redirecionar('/');
-        }
+        AuthGuard::requereSindicoOuAdmin();
     }
 
     private function redirecionar(string $caminho): void

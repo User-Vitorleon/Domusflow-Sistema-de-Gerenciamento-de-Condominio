@@ -31,9 +31,14 @@ class AuthGuard
 
     public static function requereSindicoOuAdmin(): array
     {
+        return self::requerePrivilegios([2, 4]);
+    }
+
+    public static function requerePrivilegios(array $privilegiosPermitidos, string $urlRedirect = '/painel'): array
+    {
         $usuario = self::requereUsuarioAtivo();
-        if (!in_array((int) $usuario['privilegio'], [2, 4], true)) {
-            self::redirecionar('/painel');
+        if (!in_array((int) ($usuario['privilegio'] ?? 0), $privilegiosPermitidos, true)) {
+            self::redirecionar($urlRedirect);
         }
         return $usuario;
     }
