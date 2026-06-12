@@ -133,17 +133,18 @@ class MoradorRepository
         $ordenar = $colunasPermitidas[$filtros['ordenar'] ?? 'data_solicitacao'] ?? 'created_at';
         $direcao = strtolower($filtros['direcao'] ?? 'asc') === 'desc' ? 'DESC' : 'ASC';
 
-        $sql .= " ORDER BY {$ordenar} {$direcao}, id_user ASC LIMIT :limit OFFSET :offset";
+        $sql .= " ORDER BY {$ordenar} {$direcao}, id_user ASC";
 
         $stmt = $this->pdo->prepare($sql);
         foreach ($params['bindings'] as $chave => $valor) {
             $stmt->bindValue($chave, $valor);
         }
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 
         $stmt->execute();
-        return $this->descriptografarLista($stmt->fetchAll());
+        $moradores = $this->descriptografarLista($stmt->fetchAll());
+        $moradores = $this->filtrarPorTexto($moradores, 'nome', $filtros['nome'] ?? '');
+
+        return array_slice($moradores, $offset, $limit);
     }
 
     public function countPendentesComFiltros(array $filtros): int
@@ -160,6 +161,17 @@ class MoradorRepository
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params['bindings']);
 
+        if (!empty($filtros['nome'])) {
+            $stmt = $this->pdo->prepare("
+                SELECT id_user, uuid, nome, apto, bloco, cpf, created_at, privilegio
+                FROM morador
+                WHERE status = 'P'
+                {$params['sql']}
+            ");
+            $stmt->execute($params['bindings']);
+            return count($this->filtrarPorTexto($this->descriptografarLista($stmt->fetchAll()), 'nome', $filtros['nome']));
+        }
+
         return (int)$stmt->fetchColumn();
     }
 
@@ -169,8 +181,7 @@ class MoradorRepository
         $bindings = [];
 
         if (!empty($filtros['nome'])) {
-            $sql .= ' AND nome LIKE :nome';
-            $bindings[':nome'] = '%' . $filtros['nome'] . '%';
+            
         }
         if (!empty($filtros['bloco'])) {
             $sql .= ' AND bloco LIKE :bloco';
@@ -425,6 +436,7 @@ class MoradorRepository
         }
         $stmt->execute();
         $moradores = $this->descriptografarLista($stmt->fetchAll());
+        $moradores = $this->filtrarPorTexto($moradores, 'nome', $filtros['nome'] ?? '');
         $moradores = $this->ordenarPorPerfilENome($moradores);
 
         return $limit === null ? $moradores : array_slice($moradores, $offset, $limit);
@@ -433,6 +445,13 @@ class MoradorRepository
     public function countTodosComFiltros(array $filtros): int
     {
         $params = $this->montarFiltrosTodos($filtros);
+
+        if (!empty($filtros['nome'])) {
+            $stmt = $this->pdo->prepare("SELECT * FROM morador WHERE 1=1" . $params['sql']);
+            $stmt->execute($params['bindings']);
+            return count($this->filtrarPorTexto($this->descriptografarLista($stmt->fetchAll()), 'nome', $filtros['nome']));
+        }
+
         $stmt   = $this->pdo->prepare("SELECT COUNT(*) FROM morador WHERE 1=1" . $params['sql']);
         $stmt->execute($params['bindings']);
         return (int)$stmt->fetchColumn();
@@ -444,8 +463,7 @@ class MoradorRepository
         $bindings = [];
 
         if (!empty($filtros['nome'])) {
-            $sql .= ' AND nome LIKE :nome';
-            $bindings[':nome'] = '%' . $filtros['nome'] . '%';
+            
         }
         if (!empty($filtros['apto'])) {
             $sql .= ' AND apto LIKE :apto';
@@ -512,6 +530,24 @@ class MoradorRepository
     private function descriptografarLista(array $moradores): array
     {
         return array_map(fn ($morador) => $this->descriptografarMorador($morador), $moradores);
+    }
+
+    private function filtrarPorTexto(array $linhas, string $campo, ?string $termo): array
+    {
+        $termo = self::normalizarBusca((string)$termo);
+        if ($termo === '') {
+            return $linhas;
+        }
+
+        return array_values(array_filter($linhas, static function ($linha) use ($campo, $termo) {
+            return str_contains(self::normalizarBusca((string)($linha[$campo] ?? '')), $termo);
+        }));
+    }
+
+    private static function normalizarBusca(string $valor): string
+    {
+        $valor = trim($valor);
+        return function_exists('mb_strtolower') ? mb_strtolower($valor, 'UTF-8') : strtolower($valor);
     }
 
 }

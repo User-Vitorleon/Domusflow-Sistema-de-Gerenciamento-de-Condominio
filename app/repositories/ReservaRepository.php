@@ -160,6 +160,7 @@ class ReservaRepository
     public function buscarPendentesComFiltros(array $filtros, int $offset = 0, int $limite = 10): array
     {
         $params = $this->montarFiltrosPendentes($filtros);
+        $temFiltroNome = trim((string)($filtros['nome'] ?? '')) !== '';
         $sql = "
             SELECT r.*, l.local, l.capacidade, m.nome AS nome_morador, m.apto, m.bloco
             FROM reservas r
@@ -168,17 +169,25 @@ class ReservaRepository
             WHERE r.status = 'P'
             {$params['sql']}
             ORDER BY r.data_reserva ASC, r.hora_ini ASC, m.nome ASC, r.created_at ASC
-            LIMIT :limite OFFSET :offset
         ";
+
+        if (!$temFiltroNome) {
+            $sql .= " LIMIT :limite OFFSET :offset";
+        }
 
         $stmt = $this->pdo->prepare($sql);
         foreach ($params['bindings'] as $chave => $valor) {
             $stmt->bindValue($chave, $valor);
         }
-        $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        if (!$temFiltroNome) {
+            $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        }
         $stmt->execute();
-        return $this->descriptografarMoradores($stmt->fetchAll(PDO::FETCH_ASSOC));
+        $reservas = $this->descriptografarMoradores($stmt->fetchAll(PDO::FETCH_ASSOC));
+        $reservas = $this->filtrarPorTexto($reservas, 'nome_morador', $filtros['nome'] ?? '');
+
+        return $temFiltroNome ? array_slice($reservas, $offset, $limite) : $reservas;
     }
 
     public function existeReservaPendente(int $idUser): bool
@@ -242,6 +251,20 @@ class ReservaRepository
     public function countPendentesComFiltros(array $filtros): int
     {
         $params = $this->montarFiltrosPendentes($filtros);
+
+        if (!empty($filtros['nome'])) {
+            $stmt = $this->pdo->prepare("
+                SELECT r.*, m.nome AS nome_morador
+                FROM reservas r
+                INNER JOIN locais_festivos l ON r.id_local = l.id_local
+                INNER JOIN morador m ON r.id_user = m.id_user
+                WHERE r.status = 'P'
+                {$params['sql']}
+            ");
+            $stmt->execute($params['bindings']);
+            return count($this->filtrarPorTexto($this->descriptografarMoradores($stmt->fetchAll(PDO::FETCH_ASSOC)), 'nome_morador', $filtros['nome']));
+        }
+
         $stmt = $this->pdo->prepare("
             SELECT COUNT(*)
             FROM reservas r
@@ -260,8 +283,7 @@ class ReservaRepository
         $bindings = [];
 
         if (!empty($filtros['nome'])) {
-            $sql .= ' AND m.nome LIKE :nome';
-            $bindings[':nome'] = '%' . $filtros['nome'] . '%';
+           
         }
         if (!empty($filtros['bloco'])) {
             $sql .= ' AND m.bloco LIKE :bloco';
@@ -410,5 +432,23 @@ class ReservaRepository
             }
             return $row;
         }, $rows);
+    }
+
+    private function filtrarPorTexto(array $linhas, string $campo, ?string $termo): array
+    {
+        $termo = self::normalizarBusca((string)$termo);
+        if ($termo === '') {
+            return $linhas;
+        }
+
+        return array_values(array_filter($linhas, static function ($linha) use ($campo, $termo) {
+            return str_contains(self::normalizarBusca((string)($linha[$campo] ?? '')), $termo);
+        }));
+    }
+
+    private static function normalizarBusca(string $valor): string
+    {
+        $valor = trim($valor);
+        return function_exists('mb_strtolower') ? mb_strtolower($valor, 'UTF-8') : strtolower($valor);
     }
 }

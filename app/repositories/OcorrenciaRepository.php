@@ -246,6 +246,7 @@ public function criarNotificacao(int $idUser, int $idOcorrencia): void
 
 public function listarComFiltros(array $filtros, int $limit = 15, int $offset = 0): array
     {
+        $temFiltroMorador = trim((string)($filtros['morador'] ?? '')) !== '';
         $sql = "
             SELECT o.id_ocorrencia, o.id_user, o.categoria, o.titulo,
                    o.descricao, o.status, o.created_at,
@@ -259,28 +260,37 @@ public function listarComFiltros(array $filtros, int $limit = 15, int $offset = 
 
         $sql .= "
             ORDER BY o.created_at DESC, o.id_ocorrencia DESC
-            LIMIT ? OFFSET ?";
+        ";
 
-        $params[] = $limit;
-        $params[] = $offset;
+        if (!$temFiltroMorador) {
+            $sql .= " LIMIT ? OFFSET ?";
+            $params[] = $limit;
+            $params[] = $offset;
+        }
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
-        return $this->descriptografarNomesMoradores($stmt->fetchAll(PDO::FETCH_ASSOC));
+        $ocorrencias = $this->descriptografarNomesMoradores($stmt->fetchAll(PDO::FETCH_ASSOC));
+        $ocorrencias = $this->filtrarPorTexto($ocorrencias, 'nome_morador', $filtros['morador'] ?? '');
+
+        return $temFiltroMorador ? array_slice($ocorrencias, $offset, $limit) : $ocorrencias;
     }
 
     public function contarComFiltros(array $filtros): int
     {
-        $sql = "
-            SELECT COUNT(*)
-            FROM ocorrencias o
+        $sql = " FROM ocorrencias o
             INNER JOIN morador m ON m.id_user = o.id_user
-            WHERE 1=1
-        ";
+            WHERE 1=1";
         $params = [];
         $this->aplicarFiltrosOcorrencia($filtros, $sql, $params);
 
-        $stmt = $this->pdo->prepare($sql);
+        if (!empty($filtros['morador'])) {
+            $stmt = $this->pdo->prepare("SELECT o.id_ocorrencia, m.nome AS nome_morador {$sql}");
+            $stmt->execute($params);
+            return count($this->filtrarPorTexto($this->descriptografarNomesMoradores($stmt->fetchAll(PDO::FETCH_ASSOC)), 'nome_morador', $filtros['morador']));
+        }
+
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) {$sql}");
         $stmt->execute($params);
         return (int)$stmt->fetchColumn();
     }
@@ -296,8 +306,7 @@ public function listarComFiltros(array $filtros, int $limit = 15, int $offset = 
             $params[] = $filtros['status'];
         }
         if (!empty($filtros['morador'])) {
-            $sql .= ' AND m.nome LIKE ?';
-            $params[] = '%' . $filtros['morador'] . '%';
+          
         }
         if (!empty($filtros['categoria'])) {
             $sql .= ' AND o.categoria = ?';
@@ -381,5 +390,23 @@ public function listarComFiltros(array $filtros, int $limit = 15, int $offset = 
             $row['nome_morador'] = CryptoHelper::decrypt($row['nome_morador']);
         }
         return $row;
+    }
+
+    private function filtrarPorTexto(array $linhas, string $campo, ?string $termo): array
+    {
+        $termo = self::normalizarBusca((string)$termo);
+        if ($termo === '') {
+            return $linhas;
+        }
+
+        return array_values(array_filter($linhas, static function ($linha) use ($campo, $termo) {
+            return str_contains(self::normalizarBusca((string)($linha[$campo] ?? '')), $termo);
+        }));
+    }
+
+    private static function normalizarBusca(string $valor): string
+    {
+        $valor = trim($valor);
+        return function_exists('mb_strtolower') ? mb_strtolower($valor, 'UTF-8') : strtolower($valor);
     }
 }

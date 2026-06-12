@@ -21,6 +21,11 @@ class MoradorService
             return ['sucesso' => false, 'mensagem' => 'Você precisa aceitar os termos de uso.'];
         }
 
+        $privilegioCadastro = (int) ($dados['privilegio'] ?? 1);
+        if (!in_array($privilegioCadastro, self::PRIVILEGIOS_VALIDOS, true)) {
+            $privilegioCadastro = 1;
+        }
+
         $obrigatorios = [
             'nome'     => 'Por favor, preencha o campo nome.',
             'cpf'      => 'Por favor, preencha o CPF.',
@@ -30,6 +35,9 @@ class MoradorService
             'telefone' => 'Por favor, preencha o telefone.',
             'senha'    => 'Por favor, preencha a senha.',
         ];
+        if (!self::exigeUnidadeReal($privilegioCadastro)) {
+            unset($obrigatorios['apto'], $obrigatorios['bloco']);
+        }
         foreach ($obrigatorios as $campo => $mensagem) {
             if (empty($dados[$campo])) {
                 return ['sucesso' => false, 'mensagem' => $mensagem];
@@ -42,7 +50,7 @@ class MoradorService
             $privilegio = 1;
         }
 
-        [$apto, $bloco] = self::unidadePorPrivilegio($privilegio, $dados['apto'], $dados['bloco']);
+        [$apto, $bloco] = self::unidadePorPrivilegio($privilegio, $dados['apto'] ?? '', $dados['bloco'] ?? '');
 
         if (!self::cpfValido($cpf)) {
             return ['sucesso' => false, 'mensagem' => 'CPF inválido.'];

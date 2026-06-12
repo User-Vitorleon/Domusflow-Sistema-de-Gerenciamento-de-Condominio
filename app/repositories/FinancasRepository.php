@@ -108,6 +108,7 @@ class FinancasRepository
     ): array {
         $params = [];
         $where  = $this->montarWhereLancamentos($nome, $tipo, $descricao, $status, $dtLanc, $dtVenc, $atraso, $params);
+        $temFiltroNome = trim($nome) !== '';
 
         if ($privilegio === 2 || $privilegio === 4) {
             $sql = "
@@ -116,8 +117,10 @@ class FinancasRepository
                 INNER JOIN morador m ON l.id_user = m.id_user
                 WHERE 1=1 {$where}
                 ORDER BY l.id_lancamento DESC
-                LIMIT :limite OFFSET :offset
             ";
+            if (!$temFiltroNome) {
+                $sql .= " LIMIT :limite OFFSET :offset";
+            }
         } else {
             $where        .= ' AND l.id_user = :id';
             $params[':id'] = $id;
@@ -134,10 +137,17 @@ class FinancasRepository
         foreach ($params as $k => $v) {
             $stmt->bindValue($k, $v);
         }
-        $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        if (!$temFiltroNome || !($privilegio === 2 || $privilegio === 4)) {
+            $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        }
         $stmt->execute();
-        return $this->descriptografarNomesMoradores($stmt->fetchAll());
+        $lancamentos = $this->descriptografarNomesMoradores($stmt->fetchAll());
+        $lancamentos = $this->filtrarPorTexto($lancamentos, 'nome_morador', $nome);
+
+        return $temFiltroNome && ($privilegio === 2 || $privilegio === 4)
+            ? array_slice($lancamentos, $offset, $limite)
+            : $lancamentos;
     }
 
     public function excluirLancamento(int $id): bool
@@ -161,6 +171,20 @@ class FinancasRepository
         $where  = $this->montarWhereLancamentos($nome, $tipo, $descricao, $status, $dtLanc, $dtVenc, $atraso, $params);
 
         if ($privilegio === 2 || $privilegio === 4) {
+            if (trim($nome) !== '') {
+                $stmt = $this->pdo->prepare("
+                    SELECT l.*, m.nome AS nome_morador
+                    FROM lancamentos l
+                    INNER JOIN morador m ON l.id_user = m.id_user
+                    WHERE 1=1 {$where}
+                ");
+                foreach ($params as $k => $v) {
+                    $stmt->bindValue($k, $v);
+                }
+                $stmt->execute();
+                return count($this->filtrarPorTexto($this->descriptografarNomesMoradores($stmt->fetchAll()), 'nome_morador', $nome));
+            }
+
             $sql = "
                 SELECT COUNT(*)
                 FROM lancamentos l
@@ -198,8 +222,6 @@ class FinancasRepository
         $where = '';
 
         if ($nome !== '') {
-            $where            .= ' AND LOWER(m.nome) LIKE LOWER(:nome)';
-            $params[':nome']  = "%{$nome}%";
         }
 
         if ($tipo !== '') {
@@ -465,5 +487,23 @@ class FinancasRepository
             }
             return $row;
         }, $rows);
+    }
+
+    private function filtrarPorTexto(array $linhas, string $campo, ?string $termo): array
+    {
+        $termo = self::normalizarBusca((string)$termo);
+        if ($termo === '') {
+            return $linhas;
+        }
+
+        return array_values(array_filter($linhas, static function ($linha) use ($campo, $termo) {
+            return str_contains(self::normalizarBusca((string)($linha[$campo] ?? '')), $termo);
+        }));
+    }
+
+    private static function normalizarBusca(string $valor): string
+    {
+        $valor = trim($valor);
+        return function_exists('mb_strtolower') ? mb_strtolower($valor, 'UTF-8') : strtolower($valor);
     }
 }
