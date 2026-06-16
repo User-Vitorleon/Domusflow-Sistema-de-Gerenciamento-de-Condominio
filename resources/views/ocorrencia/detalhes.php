@@ -17,8 +17,7 @@ if (!function_exists('statusBadgeP')) {
     }
 }
 
-$priv = (int)($_SESSION['usuario_privilegio'] ?? 1);
-$isGestor = in_array($priv, [2, 4], true);
+$isGestor = $ehGestor ?? false;
 $encerrada = in_array($detalhe['status'] ?? '', ['R', 'C'], true);
 ?>
 

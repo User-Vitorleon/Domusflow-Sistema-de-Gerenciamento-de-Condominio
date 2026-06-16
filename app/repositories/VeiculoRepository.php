@@ -67,8 +67,9 @@ class VeiculoRepository
     public function findAllComFiltros(array $filtros, int $limite, int $offset): array
     {
         [$where, $params] = $this->montarFiltrosTodos($filtros);
+        $temFiltroNome = trim((string)($filtros['nome'] ?? '')) !== '';
 
-        $stmt = $this->pdo->prepare("
+        $sql = "
             SELECT v.*,
                    dono.nome AS nome_morador,
                    dono.apto AS apto,
@@ -79,22 +80,47 @@ class VeiculoRepository
             JOIN morador cad  ON cad.id_user  = v.id_user_cad
             {$where}
             ORDER BY v.created_at DESC, dono.nome ASC
-            LIMIT :limite OFFSET :offset
-        ");
+        ";
+
+        if (!$temFiltroNome) {
+            $sql .= " LIMIT :limite OFFSET :offset";
+        }
+
+        $stmt = $this->pdo->prepare($sql);
 
         foreach ($params as $chave => $valor) {
             $stmt->bindValue($chave, $valor);
         }
-        $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        if (!$temFiltroNome) {
+            $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        }
         $stmt->execute();
 
-        return $this->descriptografarNomes($stmt->fetchAll());
+        $veiculos = $this->descriptografarNomes($stmt->fetchAll());
+        $veiculos = $this->filtrarPorTexto($veiculos, 'nome_morador', $filtros['nome'] ?? '');
+
+        return $temFiltroNome ? array_slice($veiculos, $offset, $limite) : $veiculos;
     }
 
     public function countAllComFiltros(array $filtros): int
     {
         [$where, $params] = $this->montarFiltrosTodos($filtros);
+        $temFiltroNome = trim((string)($filtros['nome'] ?? '')) !== '';
+
+        if ($temFiltroNome) {
+            $stmt = $this->pdo->prepare("
+                SELECT v.*,
+                       dono.nome AS nome_morador,
+                       cad.nome  AS cadastrado_por
+                FROM veiculos v
+                JOIN morador dono ON dono.id_user = v.id_user
+                JOIN morador cad  ON cad.id_user  = v.id_user_cad
+                {$where}
+            ");
+            $stmt->execute($params);
+            return count($this->filtrarPorTexto($this->descriptografarNomes($stmt->fetchAll()), 'nome_morador', $filtros['nome']));
+        }
 
         $stmt = $this->pdo->prepare("
             SELECT COUNT(v.id_veiculo)
@@ -259,8 +285,7 @@ class VeiculoRepository
         $params = [];
 
         if (!empty($filtros['nome'])) {
-            $where[] = 'LOWER(dono.nome) LIKE LOWER(:nome)';
-            $params[':nome'] = '%' . trim($filtros['nome']) . '%';
+            
         }
 
         if (!empty($filtros['placa'])) {
@@ -304,5 +329,23 @@ class VeiculoRepository
         }
 
         return $linha;
+    }
+
+    private function filtrarPorTexto(array $linhas, string $campo, ?string $termo): array
+    {
+        $termo = self::normalizarBusca((string)$termo);
+        if ($termo === '') {
+            return $linhas;
+        }
+
+        return array_values(array_filter($linhas, static function ($linha) use ($campo, $termo) {
+            return str_contains(self::normalizarBusca((string)($linha[$campo] ?? '')), $termo);
+        }));
+    }
+
+    private static function normalizarBusca(string $valor): string
+    {
+        $valor = trim($valor);
+        return function_exists('mb_strtolower') ? mb_strtolower($valor, 'UTF-8') : strtolower($valor);
     }
 }

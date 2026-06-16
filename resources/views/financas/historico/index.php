@@ -7,6 +7,16 @@ require_once __DIR__ . '/../../layout/header.php';
 $pendentes = array_filter($historico, fn($h) => $h['status'] === 'A');
 $pagas     = array_filter($historico, fn($h) => $h['status'] === 'P');
 $totalPendente = array_sum(array_column($pendentes, 'valor'));
+
+$itensPagasPorPagina = 10;
+$paginaPagas = max(1, (int)($_GET['pagina_pagas'] ?? 1));
+$totalPagas = count($pagas);
+$totalPaginasPagas = max(1, (int)ceil($totalPagas / $itensPagasPorPagina));
+if ($paginaPagas > $totalPaginasPagas) {
+    $paginaPagas = $totalPaginasPagas;
+}
+$offsetPagas = ($paginaPagas - 1) * $itensPagasPorPagina;
+$pagasPagina = array_slice(array_values($pagas), $offsetPagas, $itensPagasPorPagina);
 ?>
 
 <main class="main-content">
@@ -163,7 +173,7 @@ $totalPendente = array_sum(array_column($pendentes, 'valor'));
                             </tr>
                         </thead>
                         <tbody id="tabelaGeradas">
-                            <?php foreach ($pagas as $h):
+                            <?php foreach ($pagasPagina as $h):
                                 $corModelo = strtoupper($h['modelo']) === 'TAXA' ? '#2563EB' : '#DC2626';
                             ?>
                                 <tr style="border-bottom: 1px solid #F1F5F9;"
@@ -201,6 +211,35 @@ $totalPendente = array_sum(array_column($pendentes, 'valor'));
                         </tbody>
                     </table>
                 </div>
+
+                <?php if ($totalPaginasPagas > 1): ?>
+                    <nav class="mt-3 d-flex justify-content-center pb-2" aria-label="Paginação de faturas pagas">
+                        <ul class="pagination">
+                            <li class="page-item <?= $paginaPagas <= 1 ? 'disabled' : '' ?>">
+                                <a class="page-link"
+                                    href="?<?= http_build_query(array_merge($_GET, ['pagina_pagas' => $paginaPagas - 1])) ?>">
+                                    Anterior
+                                </a>
+                            </li>
+
+                            <?php for ($i = 1; $i <= $totalPaginasPagas; $i++): ?>
+                                <li class="page-item <?= $i === $paginaPagas ? 'active' : '' ?>">
+                                    <a class="page-link"
+                                        href="?<?= http_build_query(array_merge($_GET, ['pagina_pagas' => $i])) ?>">
+                                        <?= $i ?>
+                                    </a>
+                                </li>
+                            <?php endfor; ?>
+
+                            <li class="page-item <?= $paginaPagas >= $totalPaginasPagas ? 'disabled' : '' ?>">
+                                <a class="page-link"
+                                    href="?<?= http_build_query(array_merge($_GET, ['pagina_pagas' => $paginaPagas + 1])) ?>">
+                                    Próximo
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                <?php endif; ?>
             <?php endif; ?>
         </div>
 
